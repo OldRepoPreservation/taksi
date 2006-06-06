@@ -17,6 +17,7 @@ typedef LONGLONG TIMEFAST_t;
 extern LIBSPEC TIMEFAST_t GetPerformanceCounter();
 extern LIBSPEC TCHAR* GetFileTitlePtr( TCHAR* pszPath );
 extern LIBSPEC char* Str_SkipSpace( const char* pszNon );
+extern LIBSPEC bool Str_IsSpace( char ch );
 
 extern LIBSPEC HINSTANCE CHttpLink_GotoURL( const TCHAR* pszURL, int iShowCmd );
 
