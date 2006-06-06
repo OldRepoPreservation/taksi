@@ -5,11 +5,12 @@ OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
-BUGS:
-hook Switch DX app multiple times causes crash. asymetric hook/unhook.
+KNOWN BUGS:
+Odd flash when switching DX applcations. must change focus 2 times ?
+GDI record includes stuff outside rectangle ?
 GUI indicator drawn over overlapped windows. bleeds through.
-Data recorded stat number not including overhead!
-Should prefer graphics hook over GDI hook. Option to hook GDI or not.
+Data recorded stat number not including overhead! too small.
+Should prefer graphics hook over GDI hook. 
 
 TODO:
 Manual.txt completely out of date!

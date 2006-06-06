@@ -47,13 +47,20 @@ struct CUSTOMVERTEX
 
 static HRESULT CreateVB( IDirect3DDevice8* pDevice, IRefPtr<IDirect3DVertexBuffer8>& pVB, const CUSTOMVERTEX* pVertSrc, int iSizeSrc )
 {
+	// Create a vertex buffer to display my overlay info 
+	if ( pVB )
+	{
+		// Already set so i must need to destroy the old one first?!
+		pVB.ReleaseRefObj();
+		g_DX8.m_iRefCountMe--;
+	}
 	HRESULT hRes = pDevice->CreateVertexBuffer( 
 		iSizeSrc, D3DUSAGE_WRITEONLY, 
 		D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, 
 		IREF_GETPPTR(pVB,IDirect3DVertexBuffer8));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "CreateVertexBuffer() failed." LOG_CR));
+		DEBUG_ERR(( "CreateVertexBuffer() FAILED. 0%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	g_DX8.m_iRefCountMe++;
@@ -62,7 +69,7 @@ static HRESULT CreateVB( IDirect3DDevice8* pDevice, IRefPtr<IDirect3DVertexBuffe
 	hRes = pVB->Lock(0, iSizeSrc, &pVertices, 0);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "s_pVB->Lock() failed." LOG_CR ));
+		DEBUG_ERR(( "s_pVB->Lock() FAILED. 0%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	memcpy(pVertices, pVertSrc, iSizeSrc);
@@ -833,7 +840,6 @@ bool CTaksiDX8::HookFunctions()
 void CTaksiDX8::UnhookFunctions()
 {
 	// Restore original Reset() and Present()
-	// ??? NON Symetric with HookFunctions() !!!!!!!!!!!!!!!!!!!!!
 	if ( !IsValidDll())
 		return;
 
@@ -841,6 +847,10 @@ void CTaksiDX8::UnhookFunctions()
 		*m_Hook_AddRef = (UINT_PTR)s_D3D8_AddRef;
 	if (m_Hook_Release != NULL && s_D3D8_Release != NULL)
 		*m_Hook_Release = (UINT_PTR)s_D3D8_Release;
+
+	// restore IDirect3D8Device methods
+	m_Hook_Present.RemoveHook(s_D3D8_Present);
+	m_Hook_Reset.RemoveHook(s_D3D8_Reset);
 
 	__super::UnhookFunctions();
 }
@@ -854,11 +864,6 @@ void CTaksiDX8::FreeDll()
 		return;
 
 	InvalidateDeviceObjects(true);
-
-	// restore IDirect3D8Device methods
-	m_Hook_Present.RemoveHook(s_D3D8_Present);
-	m_Hook_Reset.RemoveHook(s_D3D8_Reset);
-
 	UnhookFunctions();
 
 	DEBUG_MSG(( "CTaksiDX8::FreeDll:done." LOG_CR));
