@@ -30,8 +30,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,7,4,5
- PRODUCTVERSION 0,7,4,5
+ FILEVERSION TAKSI_VERSION_RES_N
+ PRODUCTVERSION TAKSI_VERSION_RES_N
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -48,9 +48,9 @@ BEGIN
         BEGIN
             VALUE "Comments", "Video-capture/Screenshot-making program for graphics applications."
             VALUE "FileDescription", "Taksi Server"
-            VALUE "FileVersion", "0,7,4,5"
-            VALUE "ProductVersion", "0,7,4,5"
-            VALUE "LegalCopyright", "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson"
+            VALUE "FileVersion", TAKSI_VERSION_RES_S
+            VALUE "ProductVersion", TAKSI_VERSION_RES_S
+            VALUE "LegalCopyright", TAKSI_COPYRIGHT
         END
     END
     BLOCK "VarFileInfo"
@@ -245,6 +245,24 @@ BEGIN
     LTEXT           "MB",IDC_STATIC,167,84,35,8
 END
 
+IDD_About DIALOGEX 0, 0, 214, 97
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About Taksi Desktop Video Recorder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,157,7,50,14
+    LTEXT           "Taksi",IDC_STATIC,7,7,140,8
+    LTEXT           "",IDC_STATIC,7,15,140,8
+    LTEXT           "",IDC_STATIC,7,24,140,8
+    LTEXT           "",IDC_STATIC,7,33,140,8
+    LTEXT           "",IDC_STATIC,7,41,140,8
+    LTEXT           "",IDC_STATIC,7,50,140,8
+    LTEXT           "",IDC_STATIC,7,58,140,8
+    LTEXT           "",IDC_STATIC,7,67,140,8
+    ICON            ID_APP,ID_APP,186,70,20,20
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -303,6 +321,14 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 262
         TOPMARGIN, 7
+    END
+
+    IDD_About, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 90
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -10,6 +10,7 @@
 #define IDD_GuiConfigTab4               114
 #define IDD_GuiConfigTab5               115
 #define IDD_GuiConfigTab6               116
+#define IDD_About                       143
 #define IDB_ConfigOpen                  200
 #define IDB_HookModeToggle              201
 #define IDB_IndicatorToggle             202
@@ -64,7 +65,6 @@
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
-
 #define IDS_GuiConfigHelp1              2000
 #define IDS_GuiConfigHelp2              2001
 #define IDS_GuiConfigHelp3              2002
@@ -83,7 +83,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           105
