@@ -28,11 +28,29 @@ TCHAR* GetFileTitlePtr( TCHAR* pszPath )
 	return p;
 }
 
+bool Str_IsSpace( char ch )
+{
+	// isspace() chokes on bad values!
+	if ( ch < 0 || ch >= 0x80 )	// isspace() chokes on this!
+		return false;
+	if ( isspace(ch))
+		return true;
+	return false;
+}
+
 char* Str_SkipSpace( const char* pszNon )
 {
 	// NOTE: \n is a space.
-	while ( *pszNon && isspace(*pszNon))
+	ASSERT(pszNon);
+	for(;;)
+	{
+		char ch = *pszNon;
+		if ( ch <= 0 )
+			break;
+		if ( ! Str_IsSpace(ch))
+			break;
 		pszNon++;
+	}
 	return (char*) pszNon;
 }
 
@@ -121,7 +139,7 @@ int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc )
 {
 	// Read bytes in from string format.
 	// RETURN: the number of bytes read.
-#define STR_GETNONWHITESPACE( pStr ) while ( isspace((pStr)[0] )) { (pStr)++; } // isspace()
+#define STR_GETNONWHITESPACE( pStr ) while ( Str_IsSpace((pStr)[0] )) { (pStr)++; } // isspace()
 
 	int i=0;
 	for ( ; i<iLengthMax; i++ )

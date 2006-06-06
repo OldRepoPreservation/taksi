@@ -565,7 +565,7 @@ bool CTaksiConfig::WriteIniFile()
 		{
 			// covers \n or \r\n
 			char* pszTmp = pszEndLine;
-			for ( ; pszTmp >= pszLine && isspace(*pszTmp); pszTmp-- )
+			for ( ; pszTmp >= pszLine && Str_IsSpace(*pszTmp); pszTmp-- )
 				pszTmp[0] = '\0'; 
 			pszEndLine++;
 		}

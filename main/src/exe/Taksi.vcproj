@@ -277,10 +277,10 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\Taksi.ini">
+			RelativePath=".\taksi.ini">
 		</File>
 		<File
-			RelativePath="..\Taksi2.ini">
+			RelativePath=".\taksi2.ini">
 		</File>
 	</Files>
 	<Globals>
