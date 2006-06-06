@@ -198,6 +198,9 @@
 			Name="Shared"
 			Filter="">
 			<File
+				RelativePath="..\Config.h">
+			</File>
+			<File
 				RelativePath="..\ConfigProps.tbl">
 			</File>
 			<File
