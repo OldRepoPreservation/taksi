@@ -1,0 +1,22 @@
+//
+// ConfigProps.tbl
+// for CTaksiConfig
+
+ConfigProp(AudioCodecInfo,				"Audio format / codec")
+ConfigProp(AudioDevice,					"Use audio device for AVI or not")
+
+ConfigProp(Debug,						"Debug Flags")
+ConfigProp(CaptureDir,					"Capture directory (NOTE: must end with a backslash)")
+ConfigProp(KeyboardUseDirectInput,		"use DirectInput for hotkeys else use hooks")
+ConfigProp(MovieFrameRateTarget,		"desired frame rate of captured video (f/sec)")
+ConfigProp(ShowIndicator,				"Show the indicator on the window")
+ConfigProp(VideoCodecInfo,				"Video Codec Info stored as an array of bytes.")
+ConfigProp(VideoHalfSize,				"Capture Half vs Full size video")
+
+ConfigProp(VKey_ConfigOpen,				"Hot key to open the config dialog")
+ConfigProp(VKey_HookModeToggle,			"Hot key mappings HookModeToggle")
+ConfigProp(VKey_IndicatorToggle,		"Hot key mappings IndicatorToggle")
+ConfigProp(VKey_RecordStart,			"Hot key mappings RecordStart")
+ConfigProp(VKey_RecordStop,				"Hot key mappings RecordStop")
+ConfigProp(VKey_Screenshot,				"Hot key mappings Screenshot")
+ConfigProp(VKey_SmallScreenshot,		"Hot key mappings SmallScreenshot")
