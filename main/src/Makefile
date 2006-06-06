@@ -1,3 +1,5 @@
+; TODO - this is out of date! update it
+
 INC=\DXSDK9\Include
 STL=\STL
 CC=cl
@@ -6,38 +8,40 @@ LINK=link
 LFLAGS=/NOLOGO /LIBPATH:\DXSDK9\Lib
 LIBS=user32.lib dinput8.lib dxguid.lib gdi32.lib vfw32.lib
 
-all: taksi.dll taksi.exe
+all: taksidll.dll taksi.exe
 release:
-	$(MAKE) EXTRA_CFLAGS=/DMYDLL_RELEASE_BUILD
+	$(MAKE) EXTRA_CFLAGS=/DNDEBUG
 perf:
-	$(MAKE) EXTRA_CFLAGS=/DMYDLL_CLOCK_STATS
+	$(MAKE) EXTRA_CFLAGS=/DTaksiDll_CLOCK_STATS
 
-taksi.exe: hook.obj win32gui.obj config.obj det_dx8.obj det_dx9.obj hook.res taksi.dll
+taksi.exe: taksi.obj guiconfig.obj gui.obj det_dx8.obj det_dx9.obj taksi.res taksi.dll
 	$(LINK) $(LFLAGS) /out:taksi.exe hook.obj win32gui.obj config.obj det_dx8.obj det_dx9.obj taksi.lib hook.res $(LIBS)
-hook.obj: hook.cpp hook.h win32gui.h shared.h config.h 
-win32gui.obj: win32gui.cpp win32gui.h
-config.obj: config.cpp config.h
-det_dx8: det_dx8.cpp
-det_dx9: det_dx9.cpp
-log.obj: log.cpp log.h
-configutil.obj: configutil.cpp config.h
-graphx_dx8.obj: graphx_dx8.cpp graphx_dx8.h shared.h log.h config.h heap.h 
-graphx_dx9.obj: graphx_dx9.cpp graphx_dx9.h shared.h log.h config.h heap.h 
-graphx_ogl.obj: graphx_ogl.cpp graphx_ogl.h shared.h log.h config.h
+	
+det_dx8.obj: det_dx8.cpp
+det_dx9.obj: det_dx9.cpp
+gui.obj: gui.cpp guiconfig.h taksi.h stdafx.h
+guiconfig.obj: guiconfig.cpp guiconfig.h taksi.h stdafx.h
+taksi.obj: taksi.cpp guiConfig.h taksi.h stdafx.h
+
+config.obj: imageutil.cpp imageutil.h
 dinp.obj: dinp.cpp dinp.h
-imageutil.obj: imageutil.cpp imageutil.h
-heap.obj: heap.cpp heap.h log.h
+graphx.obj: graphx.cpp graphx.h taksidll.h stdafx.h 
+graphx_dx8.obj: graphx_dx8.cpp graphx.h taksidll.h stdafx.h  
+graphx_dx9.obj: graphx_dx9.cpp graphx.h taksidll.h stdafx.h  
+graphx_gdi.obj: graphx_gdi.cpp graphx.h taksidll.h stdafx.h 
+graphx_ogl.obj: graphx_ogl.cpp graphx.h taksidll.h stdafx.h 
+TaksiDll.obj: TaksiDll.cpp heap.h log.h
 
-hook.res: 
-	rc -r -fo hook.res hook.rc
+TaksiDll.res: 
+	rc -r -fo TaksiDll.res TaksiDll.rc
 
-mydll.res: 
-	rc -r -fo mydll.res mydll.rc
+Taksi.res: 
+	rc -r -fo Taksi.res Taksi.rc
 
-taksi.lib: mydll.obj configutil.obj config.obj log.obj graphx_dx8.obj graphx_dx9.obj graphx_ogl.obj dinp.obj imageutil.obj
-taksi.dll: taksi.lib mydll.res
-	$(LINK) $(LFLAGS) /out:taksi.dll /DLL mydll.obj configutil.obj config.obj log.obj graphx_dx8.obj graphx_dx9.obj graphx_ogl.obj dinp.obj imageutil.obj mydll.res $(LIBS)
-mydll.obj: mydll.cpp mydll.h shared.h config.h log.h
+taksidll.lib: taksidll.obj graphx.obj graphx_dx8.obj graphx_dx9.obj graphx_ogl.obj dinp.obj
+taksidll.dll: taksidll.lib taksidll.res
+	$(LINK) $(LFLAGS) /out:taksi.dll /DLL taksidll.obj config.objgraphx_dx8.obj graphx_dx9.obj graphx_ogl.obj dinp.obj imageutil.obj mydll.res $(LIBS)
+taksidll.obj: taksidll.cpp taksidll.h stdafx.h
 
 .cpp.obj:
 	$(CC) $(CFLAGS) -c /I $(INC) /I $(STL) $<
