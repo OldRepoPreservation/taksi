@@ -14,7 +14,11 @@ public:
 		: m_dwOldProtection(0)
 	{
 		m_Jump[0] = 0;
-		m_OldCode[0] = 0;
+	}
+
+	bool IsHookInstalled() const
+	{
+		return( m_Jump[0] != 0 );
 	}
 	bool InstallHook( LPVOID pFunc, LPVOID pFuncNew );
 	void RemoveHook( LPVOID pFunc );
@@ -27,11 +31,13 @@ public:
 	void SwapReset( LPVOID pFunc )
 	{
 		// put back JMP instruction again
+		if ( ! IsHookInstalled())	// hook has since been destroyed!
+			return;
 		memcpy(pFunc, m_Jump, sizeof(m_Jump));
 	}
 public:
 	DWORD m_dwOldProtection;			// used by VirtualProtect()
 	BYTE m_OldCode[CHookJump_LEN];	// what was there previous.
-	BYTE m_Jump[CHookJump_LEN];	// what do i want to replace it with.
+	BYTE m_Jump[CHookJump_LEN];		// what do i want to replace it with.
 };
 

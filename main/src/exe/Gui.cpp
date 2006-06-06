@@ -113,7 +113,7 @@ int CGui::GetHotKeyName( TCHAR* pszName, int iLen, TAKSI_HOTKEY_TYPE eHotKey ) /
 		return 0;
 
 	int i=0;
-	BYTE bExt = wHotKey >> 8 ;
+	BYTE bExt = HIBYTE(wHotKey);
 	for ( int j=0; bExt && j<COUNTOF(sm_vKeysExt); j++, bExt >>= 1 )
 	{
 		if ( bExt & 1 )
@@ -122,7 +122,7 @@ int CGui::GetHotKeyName( TCHAR* pszName, int iLen, TAKSI_HOTKEY_TYPE eHotKey ) /
 			pszName[i++] = '+';
 		}
 	}
-	return GetVirtKeyName( pszName+i, iLen-i, (BYTE) wHotKey );
+	return GetVirtKeyName( pszName+i, iLen-i, LOBYTE(wHotKey));
 }
 
 void CGui::UpdateButtonToolTips()

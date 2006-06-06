@@ -127,7 +127,7 @@ public:
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 	HRESULT RestoreDeviceObjects();
-	HRESULT InvalidateDeviceObjects(bool bDetaching);
+	HRESULT InvalidateDeviceObjects();
 
 public:
 	IDirect3DDevice9* m_pDevice;	// use this carefully, it is not IRefPtr locked

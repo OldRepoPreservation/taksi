@@ -46,14 +46,22 @@ struct CUSTOMVERTEX
 
 static HRESULT CreateVB( IDirect3DDevice9* pDevice, IRefPtr<IDirect3DVertexBuffer9>& pVB, const CUSTOMVERTEX* pVertSrc, int iSizeSrc )
 {
+	// Create a vertex buffer to display my overlay info 
 	ASSERT(pDevice);
+	if ( pVB )
+	{
+		// Already set so i must need to destroy the old one first?!
+		pVB.ReleaseRefObj();
+		g_DX9.m_iRefCountMe--;
+	}
+
 	HRESULT hRes = pDevice->CreateVertexBuffer( 
 		iSizeSrc, D3DUSAGE_WRITEONLY, 
 		D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, 
 		IREF_GETPPTR(pVB,IDirect3DVertexBuffer9), NULL );
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "CreateVertexBuffer() failed. %d" LOG_CR, hRes ));
+		DEBUG_ERR(( "CreateVertexBuffer() FAILED. %d" LOG_CR, hRes ));
 		return hRes;
 	}
 	g_DX9.m_iRefCountMe++;
@@ -62,7 +70,7 @@ static HRESULT CreateVB( IDirect3DDevice9* pDevice, IRefPtr<IDirect3DVertexBuffe
 	hRes = pVB->Lock(0, iSizeSrc, &pVertices, 0);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "s_pVB->Lock() failed. %d" LOG_CR, hRes ));
+		DEBUG_ERR(( "s_pVB->Lock() FAILED. %d" LOG_CR, hRes ));
 		return hRes;
 	}
 	memcpy(pVertices, pVertSrc, iSizeSrc);
@@ -153,11 +161,12 @@ HRESULT CTaksiDX9::RestoreDeviceObjects()
     return S_OK;
 }
 
-HRESULT CTaksiDX9::InvalidateDeviceObjects(bool bDetaching)
+HRESULT CTaksiDX9::InvalidateDeviceObjects()
 {
-	// Desc: Destroys all device-dependent objects
-	DEBUG_MSG(( "CTaksiDX9:InvalidateDeviceObjects: called." LOG_CR));
-	//if (detaching) return S_OK;
+	// Desc: Release all device-dependent objects
+
+	int iRefCountPrev = m_iRefCountMe;
+	DEBUG_TRACE(( "CTaksiDX9:InvalidateDeviceObjects: called." LOG_CR));
 
     // Delete the state blocks
 	if (s_pSavedState_Them.IsValidRefObj())
@@ -185,7 +194,10 @@ HRESULT CTaksiDX9::InvalidateDeviceObjects(bool bDetaching)
 		m_iRefCountMe--;
 	}
 
-	DEBUG_MSG(( "CTaksiDX9:InvalidateDeviceObjects: done." LOG_CR));
+	if ( iRefCountPrev != m_iRefCountMe )
+	{
+		DEBUG_MSG(( "CTaksiDX9:InvalidateDeviceObjects: done." LOG_CR));
+	}
     return S_OK;
 }
 
@@ -262,7 +274,7 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 	//DEBUG_TRACE(( "iSrcPitch = %d" LOG_CR, iSrcPitch));
 	//DEBUG_TRACE(( "frame.m_iPitch = %d" LOG_CR, frame.m_iPitch));
 
-	int i, j, k;
+	int i, k;
 	switch (s_bbFormat)
 	{
 	case D3DFMT_R8G8B8:
@@ -279,7 +291,7 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		// 16-bit: some conversion needed.
 		for (i=0, k=height-1; i<height, k>=0; i++, k--)
 		{
-			for (j=0; j<width; j++)
+			for (int j=0; j<width; j++)
 			{
 				BYTE b0 = pSrcRow[k*iSrcPitch + j*2];
 				BYTE b1 = pSrcRow[k*iSrcPitch + j*2 + 1];
@@ -312,7 +324,7 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		// 16-bit: some conversion needed.
 		for (i=0, k=height-1; i<height, k>=0; i++, k--)
 		{
-			for (j=0; j<width; j++)
+			for (int j=0; j<width; j++)
 			{
 				BYTE b0 = pSrcRow[k*iSrcPitch + j*2];
 				BYTE b1 = pSrcRow[k*iSrcPitch + j*2 + 1];
@@ -346,7 +358,7 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		// 32-bit entries: discard alpha
 		for (i=0, k=height-1; i<height, k>=0; i++, k--)
 		{
-			for (j=0; j<width; j++)
+			for (int j=0; j<width; j++)
 			{
 				frame.m_pPixels[i*frame.m_iPitch + j*3] = pSrcRow[k*iSrcPitch + j*4];
 				frame.m_pPixels[i*frame.m_iPitch + j*3 + 1] = pSrcRow[k*iSrcPitch + j*4 + 1];
@@ -377,7 +389,7 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 	//DEBUG_TRACE(( "frame.m_iPitch = %d" LOG_CR, frame.m_iPitch));
 
 	int sbpp = 0;
-	int i, j, k, m;
+	int i, k;
 
 	switch (s_bbFormat)
 	{
@@ -386,7 +398,8 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		// 16-bit: some conversion needed.
 		for (i=0, k=height-2; i<dHeight, k>=0; i++, k-=2)
 		{
-			for (j=0, m=0; j<dWidth, m<width-1; j++, m+=2)
+			int m=0;
+			for (int j=0; j<dWidth, m<width-1; j++, m+=2)
 			{
 				//  memory layout 16 bit:
 				//  ---------------------------------
@@ -451,7 +464,8 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		// 16-bit: some conversion needed.
 		for (i=0, k=height-2; i<dHeight, k>=0; i++, k-=2)
 		{
-			for (j=0, m=0; j<dWidth, m<width-1; j++, m+=2)
+			int m=0;
+			for (int j=0; j<dWidth, m<width-1; j++, m+=2)
 			{
 				//  memory layout 16 bit:
 				//  ---------------------------------
@@ -518,7 +532,8 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 		sbpp = (s_bbFormat == D3DFMT_R8G8B8)? 3 : 4;
 		for (i=0, k=height-2; i<dHeight, k>=0; i++, k-=2)
 		{
-			for (j=0, m=0; j<dWidth, m<width-1; j++, m+=2)
+			int m=0;
+			for (int j=0; j<dWidth, m<width-1; j++, m+=2)
 			{
 				/*
 				// fetch 1 pixel: nearest neigbour
@@ -707,7 +722,6 @@ EXTERN_C ULONG _declspec(dllexport) STDMETHODCALLTYPE DX9_Release(IDirect3DDevic
 	// if in recording mode, close the AVI file,
 	g_DX9.RecordAVI_Reset();
 	g_DX9.UnhookFunctions();	// unhook device methods
-	g_DX9.InvalidateDeviceObjects(false);
 
 	// reset the pointers
 	g_DX9.m_Hook_AddRef = NULL;
@@ -749,6 +763,10 @@ static void DX9_HooksVerify( IDirect3DDevice9* pDevice )
 	// NOTE: we don't want blindly re-assign, because there can be other programs
 	// hooking on the same methods. Therefore, we only re-assign if we see that
 	// original addresses are restored by the system.
+
+	if ( ! g_DX9.m_bHookedFunctions )	// no intent to hook.
+		return;
+
 	UINT_PTR* pVTable = (UINT_PTR*)(*((UINT_PTR*)pDevice));
 	ASSERT(pVTable);
 	if (pVTable[TAKSI_INTF_AddRef] == (UINT_PTR)s_D3D9_AddRef)
@@ -767,22 +785,22 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Reset(
 	IDirect3DDevice9* pDevice, LPVOID params )
 {
 	// New Reset function
-	DEBUG_MSG(( "#################################" LOG_CR));
-	DEBUG_MSG(( "DX9_Reset: called." LOG_CR));
-	LOG_MSG(( "DX9_Reset: cleaning-up." LOG_CR));
+	// put back saved code fragment
+	g_DX9.m_Hook_Reset.SwapOld(s_D3D9_Reset);
+
+	LOG_MSG(( "DX9_Reset: called." LOG_CR));
 
 	g_DX9.m_pDevice = pDevice;
 
-	// put back saved code fragment
-	g_DX9.m_Hook_Reset.SwapOld(s_D3D9_Reset);
 	g_DX9.RecordAVI_Reset();
-	g_DX9.InvalidateDeviceObjects(false);
+	g_DX9.InvalidateDeviceObjects();
 
 	//call real Present() 
 	HRESULT hRes = s_D3D9_Reset(pDevice, params);
 
 	DX9_HooksVerify(pDevice);
-	DEBUG_MSG(( "DX9_Reset: Reset() is done. About to return." LOG_CR));
+
+	DEBUG_MSG(( "DX9_Reset: done." LOG_CR));
 
 	// put JMP instruction again
 	g_DX9.m_Hook_Reset.SwapReset(s_D3D9_Reset);
@@ -793,11 +811,12 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Present(
 	IDirect3DDevice9* pDevice, const RECT* src, const RECT* dest, HWND hWnd, LPVOID unused)
 {
 	// New Present function 
+	g_DX9.m_Hook_Present.SwapOld(s_D3D9_Present);
+
 	DEBUG_TRACE(( "--------------------------------" LOG_CR ));
 	DEBUG_TRACE(( "DX9_Present: called." LOG_CR ));
 
 	g_DX9.m_pDevice = pDevice;
-	g_DX9.m_Hook_Present.SwapOld(s_D3D9_Present);
 
 	// rememeber IDirect3DDevice9::Release pointer so that we can clean-up properly.
 	if (g_DX9.m_Hook_AddRef == NULL || g_DX9.m_Hook_Release == NULL)
@@ -813,7 +832,7 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Present(
 	g_DX9.PresentFrameEnd();
 
 	DX9_HooksVerify(pDevice);
-	DEBUG_TRACE(( "DX9_Present: Present() is done. About to return." LOG_CR ));
+	DEBUG_TRACE(( "DX9_Present: done." LOG_CR ));
 
 	g_DX9.m_Hook_Present.SwapReset(s_D3D9_Present);
 	return hRes;
@@ -868,13 +887,25 @@ bool CTaksiDX9::HookFunctions()
 void CTaksiDX9::UnhookFunctions()
 {
 	// Restore original Reset() and Present()
-	// ??? NON Symetric with HookFunctions() !@!!!!!!!!!!!!!!!!!!!!
+	
 	if ( ! IsValidDll())
 		return;
+
 	if (m_Hook_AddRef != NULL && s_D3D9_AddRef != NULL)
+	{
 		*m_Hook_AddRef = (UINT_PTR)s_D3D9_AddRef;
+	}
 	if (m_Hook_Release != NULL && s_D3D9_Release != NULL)
+	{
 		*m_Hook_Release = (UINT_PTR)s_D3D9_Release;
+	}
+
+	// restore IDirect3D9Device methods
+	m_Hook_Present.RemoveHook(s_D3D9_Present);
+	m_Hook_Reset.RemoveHook(s_D3D9_Reset);
+
+	InvalidateDeviceObjects();
+
 	__super::UnhookFunctions();
 }
 
@@ -885,12 +916,6 @@ void CTaksiDX9::FreeDll()
 	// invalidate all our D3D objects 
 	if ( ! IsValidDll())
 		return;
-
-	InvalidateDeviceObjects(true);
-
-	// restore IDirect3D9Device methods
-	m_Hook_Present.RemoveHook(s_D3D9_Present);
-	m_Hook_Reset.RemoveHook(s_D3D9_Reset);
 
 	UnhookFunctions();
 
