@@ -1,4 +1,7 @@
+Parts Copyright (c) 2006 Dennis Robinson
+
 Copyright (c) 2004, Anton Jouline
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
