@@ -210,7 +210,7 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_Alloc() // static
 	CTaksiConfigCustom* pConfig = (CTaksiConfigCustom*) ::HeapAlloc( 
 		::GetProcessHeap(), 
 		HEAP_ZERO_MEMORY, sizeof(CTaksiConfigCustom));
-	return new( (void*) pConfig ) CTaksiConfigCustom();	// init the struct properly
+	return new((void*) pConfig ) CTaksiConfigCustom();	// init the struct properly
 }
 
 void CTaksiConfig::CustomConfig_Delete( CTaksiConfigCustom* pConfig ) // static

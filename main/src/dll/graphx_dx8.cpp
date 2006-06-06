@@ -833,7 +833,7 @@ bool CTaksiDX8::HookFunctions()
 void CTaksiDX8::UnhookFunctions()
 {
 	// Restore original Reset() and Present()
-	// ??? NON Symetric with HookFunctions() !@!!!!!!!!!!!!!!!!!!!!
+	// ??? NON Symetric with HookFunctions() !!!!!!!!!!!!!!!!!!!!!
 	if ( !IsValidDll())
 		return;
 

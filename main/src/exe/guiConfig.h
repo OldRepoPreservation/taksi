@@ -29,6 +29,8 @@ private:
 	static ATOM RegisterClass();
 	static LRESULT CALLBACK WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
+	bool UpdateWindowTitle();
+
 	bool OnCommand( int id, int iNotify, HWND hControl );
 	bool IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const;
 	LRESULT UpdateButton( TAKSI_HOTKEY_TYPE eKey );

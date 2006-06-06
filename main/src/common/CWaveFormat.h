@@ -126,7 +126,7 @@ public:
 		ASSERT(get_WF());
 		ASSERT(IsPCM());
 		int iBits = ( get_WF()->wBitsPerSample ) - 1;
-		return( (1<<iBits) - 1 );
+		return((1<<iBits) - 1 );
 	}
 
 	//

@@ -133,7 +133,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		return hRes;
 	}
 
-	ASSERT( g_AVIFile.IsOpen() );
+	ASSERT( g_AVIFile.IsOpen());
 	LOG_MSG(( "PresentFrameBegin Recording started." LOG_CR));
 
 	hRes = g_AVIThread.StartAVIThread();

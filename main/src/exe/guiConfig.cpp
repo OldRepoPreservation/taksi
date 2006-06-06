@@ -745,11 +745,11 @@ INT_PTR CALLBACK CGuiConfig::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 	case WM_COMMAND:
 		return g_GUIConfig.OnCommand( LOWORD(wParam), HIWORD(wParam), (HWND)lParam );
 	case WM_NOTIFY:
-		return g_GUIConfig.OnNotify( (int) wParam, (NMHDR*) lParam );
+		return g_GUIConfig.OnNotify((int) wParam, (NMHDR*) lParam );
 	case WM_TIMER:
-		return g_GUIConfig.OnTimer( (UINT) wParam );
+		return g_GUIConfig.OnTimer((UINT) wParam );
 	case WM_HELP:
-		return g_GUIConfig.OnHelp( (LPHELPINFO) lParam );
+		return g_GUIConfig.OnHelp((LPHELPINFO) lParam );
 	case WM_CLOSE:
 		::DestroyWindow(hWnd);
 		break;

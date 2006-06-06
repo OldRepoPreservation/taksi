@@ -13,6 +13,35 @@ CGui::CGui()
 {
 }
 
+bool CGui::UpdateWindowTitle()
+{
+	// Set the app title to reflect current hooked app.
+	TCHAR szName[ _MAX_PATH ];
+	if ( ! LoadString( g_hInst, ID_APP, szName, sizeof(szName)-1 ))
+	{
+		ASSERT(0);
+		return false;
+	}
+	const TCHAR* pszHookApp = NULL;
+	if ( sg_ProcStats.m_dwProcessId )
+	{
+		pszHookApp = ::GetFileTitlePtr( sg_ProcStats.m_szProcessFile );
+	}
+
+	TCHAR szTitle[ _MAX_PATH ];
+	if ( pszHookApp == NULL || pszHookApp[0] == '\0' )
+	{
+		_sntprintf( szTitle, COUNTOF(szTitle), _T("%s v") _T(TAKSI_VERSION_S), szName ); 
+	}
+	else
+	{
+		_sntprintf( szTitle, COUNTOF(szTitle), _T("%s - %s"), szName, pszHookApp ); 
+	}
+
+	SetWindowText( m_hWnd, szTitle );
+	return true;
+}
+
 bool CGui::IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const
 {
 	switch (eKey)
@@ -22,6 +51,8 @@ bool CGui::IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const
 	case TAKSI_HOTKEY_HookModeToggle:
 		return( ! sg_Dll.IsHookCBT());
 	case TAKSI_HOTKEY_IndicatorToggle:
+		if ( sg_Config.m_bShowIndicator )
+			return false;
 		return true;
 	case TAKSI_HOTKEY_RecordStart:
 	case TAKSI_HOTKEY_Screenshot:
@@ -55,6 +86,8 @@ void CGui::UpdateButtonStates()
 	UpdateButton( TAKSI_HOTKEY_RecordStop );
 	UpdateButton( TAKSI_HOTKEY_Screenshot );
 	UpdateButton( TAKSI_HOTKEY_SmallScreenshot );
+
+	UpdateWindowTitle();
 }
 
 int CGui::GetVirtKeyName( TCHAR* pszName, int iLen, BYTE bVirtKey ) // static
@@ -156,6 +189,7 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		}
 		return true;
 	case IDB_HookModeToggle:
+	case TAKSI_HOTKEY_HookModeToggle:
 		if ( sg_Dll.IsHookCBT())
 		{
 			sg_Dll.HookCBT_Uninstall();
@@ -167,6 +201,7 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		UpdateButtonStates();
 		return true;
 	case IDB_IndicatorToggle:
+	case TAKSI_HOTKEY_IndicatorToggle:
 		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
 		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
 		UpdateButtonStates();
@@ -255,7 +290,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 
 	for ( int i=0; i<COUNTOF(m_Bitmap); i++ )
 	{
-		m_Bitmap[i].Attach( ::LoadBitmap( g_hInst, MAKEINTRESOURCE(i+IDB_ConfigOpen)) );
+		m_Bitmap[i].Attach( ::LoadBitmap( g_hInst, MAKEINTRESOURCE(i+IDB_ConfigOpen)));
 		// ASSERT(m_Bitmap[i].get_HBitmap());
 	}
 
@@ -272,18 +307,9 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 	RECT rect = { 0, 0, bmi.bmWidth*BTN_QTY, bmi.bmHeight };
 	::AdjustWindowRectEx( &rect, c_dwStyle, false, c_dwExStyle );
 
-	TCHAR szName[ _MAX_PATH ];
-	if ( ! LoadString( g_hInst, ID_APP, szName, sizeof(szName)-1 ))
-	{
-		ASSERT(0);
-		return false;
-	}
-	TCHAR szTitle[ _MAX_PATH ];
-	_sntprintf( szTitle, COUNTOF(szTitle), _T("%s ") _T(TAKSI_VERSION_S), szName ); 
-
 	m_hWnd = CreateWindowEx( c_dwExStyle,
 		TAKSI_MASTER_CLASSNAME,      // class name
-		szTitle, // title for our window (appears in the titlebar)
+		"", // title for our window (appears in the titlebar)
 		c_dwStyle,
 		CW_USEDEFAULT,  CW_USEDEFAULT,  // initial x, y coordinate
 		1+(rect.right-rect.left), 1+(rect.bottom-rect.top),   // width and height of the window
@@ -331,7 +357,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 
 		// set the proper bitmap for the button.
 		ASSERT(m_Bitmap[i].get_HBitmap());
-		::SendMessage( hWndCtrl, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM) m_Bitmap[i].get_HBitmap() );
+		::SendMessage( hWndCtrl, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM) m_Bitmap[i].get_HBitmap());
 	}
 
 	UpdateButtonToolTips();

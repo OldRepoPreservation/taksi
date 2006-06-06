@@ -8,7 +8,7 @@
 #include "HotKeys.h"
 
 //**************************************************************************************
-// Shared by all processes variables. 
+// Shared by all procuniesses variables. 
 // NOTE: Must be init with 0
 // WARN: Constructors WILL BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
 //**************************************************************************************
@@ -67,6 +67,8 @@ int CTaksiLogFile::EventStr( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, co
 
 	if ( m_File.IsValidHandle())
 	{
+		DWORD dwWritten = 0;
+		::WriteFile( m_File, szTmp, iLen, &dwWritten, NULL );
 	}
 
 	return __super::EventStr(dwGroupMask,eLogLevel,szTmp);
@@ -151,7 +153,7 @@ bool CTaksiDll::HookCBT_Install(void)
 	m_hHookCBT = ::SetWindowsHookEx( WH_CBT, HookCBTProc, g_hInst, 0);
 
 	LOG_MSG(( "HookCBT_Install: hHookCBT=0%x,ProcID=%d" LOG_CR,
-		m_hHookCBT, ::GetCurrentProcessId() ));
+		m_hHookCBT, ::GetCurrentProcessId()));
 
 	UpdateMaster();
 	return( IsHookCBT());
@@ -168,10 +170,15 @@ bool CTaksiDll::HookCBT_Uninstall(void)
 		return false;
 	}
 
-	LOG_MSG(( "CTaksiDll::HookCBT_Uninstall: hHookCBT=0%x,ProcID=%d" LOG_CR,
-		m_hHookCBT, ::GetCurrentProcessId() ));
-
-	::UnhookWindowsHookEx( m_hHookCBT );
+	if ( ::UnhookWindowsHookEx( m_hHookCBT ))
+	{
+		LOG_MSG(( "CTaksiDll::HookCBT_Uninstall: hHookCBT=0%x,ProcID=%d" LOG_CR,
+			m_hHookCBT, ::GetCurrentProcessId()));
+	}
+	else
+	{
+		DEBUG_ERR(( "CTaksiDll::HookCBT_Uninstall FAIL" LOG_CR ));
+	}
 	m_hHookCBT = NULL;
 	UpdateMaster();
 	return true;
@@ -233,14 +240,18 @@ void CTaksiDll::UpdateConfigCustom()
 
 void CTaksiDll::OnDetachProcess()
 {
-	HookCBT_Uninstall();
-
-	// If i was the current hook. then we probably weant to re-hook some other app.
-	// if .exe is still running, tell it to re-install the CBT hook
-	if ( !m_bMasterExiting && m_hMasterWnd )
+	if ( g_Proc.IsProcPrime())
 	{
-		::PostMessage(m_hMasterWnd, WM_APP_REHOOKCBT, 0, 0 );
-		LOG_MSG(( "Post message for Master to re-hook CBT." LOG_CR));
+		sg_ProcStats.InitProcStats();	// no prime anymore!
+		HookCBT_Uninstall();
+
+		// If i was the current hook. then we probably weant to re-hook some other app.
+		// if .exe is still running, tell it to re-install the CBT hook
+		if ( !m_bMasterExiting && m_hMasterWnd )
+		{
+			::PostMessage(m_hMasterWnd, WM_APP_REHOOKCBT, 0, 0 );
+			LOG_MSG(( "Post message for Master to re-hook CBT." LOG_CR));
+		}
 	}
 }
 
@@ -359,7 +370,9 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	{
 		_T("devenv"),	// debugger!
 		_T("dwwin"),	// debugger!
+#ifdef _DEBUG
 		_T("gaim"),
+#endif
 		_T("js7jit"),	// debugger!
 		_T("monitor"),	// debugger!
 		_T("taskmgr"),	// debugger!
@@ -569,7 +582,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	// open log file, specific for this process
 	TCHAR szLogName[ _MAX_PATH ];
 	lstrcpy(szLogName, sg_Dll.m_szDllDir );
-	lstrcat(szLogName, _T("Taksi_") ); 
+	lstrcat(szLogName, _T("Taksi_")); 
 	lstrcat(szLogName, m_szProcessTitleNoExt); 
 	lstrcat(szLogName, _T(".log"));
 
