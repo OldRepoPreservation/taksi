@@ -188,7 +188,7 @@ void CTaksiDll::LogMessage( const TCHAR* pszPrefix )
 {
 	// Log a common shared message for the dll, not the process.
 	// LOG_NAME_DLL
-	if ( sg_Config.m_dwDebug <= 0)
+	if ( ! sg_Config.m_bDebugLog)
 		return;
 
 	TCHAR szMsg[ _MAX_PATH + 64 ];
@@ -219,12 +219,6 @@ bool CTaksiDll::InitMasterWnd(HWND hWnd)
 	ASSERT(hWnd);
 	m_hMasterWnd = hWnd;
 	m_iMasterUpdateCount = 0;
-
-	// check for "silent" mode
-	if ( sg_Config.m_dwDebug == 0 )
-	{
-		::DeleteFile(LOG_NAME_DLL);
-	}
 
 	// Install the hook
 	return HookCBT_Install();
@@ -596,7 +590,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	}
 #endif
 
-	DEBUG_TRACE(( "m_Config.m_dwDebug=%d" LOG_CR, sg_Config.m_dwDebug));
+	DEBUG_TRACE(( "m_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
 	DEBUG_TRACE(( "m_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
 	DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
 	DEBUG_TRACE(( "sg_Dll.m_bMasterExiting=%d" LOG_CR, sg_Dll.m_bMasterExiting));

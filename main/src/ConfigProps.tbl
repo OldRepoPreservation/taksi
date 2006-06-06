@@ -5,7 +5,7 @@
 ConfigProp(AudioCodecInfo,				"Audio format / codec")
 ConfigProp(AudioDevice,					"Use audio device for AVI or not")
 
-ConfigProp(Debug,						"Debug Flags")
+ConfigProp(DebugLog,					"Debug Log kept?")
 ConfigProp(CaptureDir,					"Capture directory (NOTE: must end with a backslash)")
 ConfigProp(KeyboardUseDirectInput,		"use DirectInput for hotkeys else use hooks")
 ConfigProp(MovieFrameRateTarget,		"desired frame rate of captured video (f/sec)")

@@ -52,8 +52,8 @@ bool CGui::IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const
 		return( ! sg_Dll.IsHookCBT());
 	case TAKSI_HOTKEY_IndicatorToggle:
 		if ( sg_Config.m_bShowIndicator )
-			return false;
-		return true;
+			return true;
+		return false;
 	case TAKSI_HOTKEY_RecordStart:
 	case TAKSI_HOTKEY_Screenshot:
 	case TAKSI_HOTKEY_SmallScreenshot:
@@ -81,12 +81,10 @@ void CGui::UpdateButtonStates()
 {
 	// Gray record/stop depending on state.
 	// IDB_RecordStop = TAKSI_HOTKEY_RecordStop
-	UpdateButton( TAKSI_HOTKEY_HookModeToggle );
-	UpdateButton( TAKSI_HOTKEY_RecordStart );
-	UpdateButton( TAKSI_HOTKEY_RecordStop );
-	UpdateButton( TAKSI_HOTKEY_Screenshot );
-	UpdateButton( TAKSI_HOTKEY_SmallScreenshot );
-
+	for ( int i=0; i<TAKSI_HOTKEY_QTY; i++ )
+	{
+		UpdateButton( (TAKSI_HOTKEY_TYPE) i );
+	}
 	UpdateWindowTitle();
 }
 

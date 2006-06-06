@@ -146,7 +146,7 @@ public:
 
 	// CAN NOT be set from CGuiConfig (yet)
 	bool   m_bShowIndicator;
-	DWORD  m_dwDebug;
+	bool   m_bDebugLog;			// keep log files or not?
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
 
 	// CONSTANTS! (for now)
