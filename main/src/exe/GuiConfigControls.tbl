@@ -4,6 +4,7 @@
 
 GuiConfigControl(CaptureDirectory,			1,	"displays capture directory path")
 GuiConfigControl(CaptureDirectoryBrowse,	1,	"browse files dialog")
+GuiConfigControl(DebugLog,					1,	"Create Debug Logs")
 
 GuiConfigControl(FrameRate,					2,	"displays adaptive frame rate")
 GuiConfigControl(VideoCodecButton,			2,	"button to choose video codec from a dialog")
@@ -22,6 +23,7 @@ GuiConfigControl(KeyRecordStart,      3, "displays key binding for video start")
 GuiConfigControl(KeyRecordStop,	       3, "displays key binding for video stop")
 GuiConfigControl(KeyScreenshot,        3, "displays key binding for normal screenshot")
 GuiConfigControl(KeySmallScreenshot,   3, "displays key binding for small screenshot")
+GuiConfigControl(UseDirectInput,		3, "Use direct input or not")
 
 GuiConfigControl(CustomSettingsList,   4, "drop-down list of custom settings")
 GuiConfigControl(CustomAddButton,      4, "'Add' button for custom settings")
@@ -30,9 +32,15 @@ GuiConfigControl(CustomPattern,        4, "displays current custom pattern strin
 GuiConfigControl(CustomFrameRate,      4, "displays current custom frame rate")
 GuiConfigControl(CustomFrameWeight,    4, "displays current custom frame weight")
 
-GuiConfigControl(StatProcessName,		5, "")
-GuiConfigControl(StatLastError,			5, "")
-GuiConfigControl(StatState,				5, "")
-GuiConfigControl(StatFormat,			5, "size of the window.")
-GuiConfigControl(StatFrameRate,			5, "")
-GuiConfigControl(StatDataRecorded,		5, "")
+GuiConfigControl(OverlayVerbose,        5, "Indicator has verbose text")
+GuiConfigControl(GDIUse,				5, "Use GDI mode hooking?")
+GuiConfigControl(GDIFull,               5, "")
+GuiConfigControl(GDIFrame,              5, "")
+
+GuiConfigControl(StatProcessName,		6, "")
+GuiConfigControl(StatLastError,			6, "")
+GuiConfigControl(StatState,				6, "")
+GuiConfigControl(StatFormat,			6, "size of the window.")
+GuiConfigControl(StatFrameRate,			6, "")
+GuiConfigControl(StatDataRecorded,		6, "")
+

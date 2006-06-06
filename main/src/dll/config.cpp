@@ -18,7 +18,7 @@ inline void __cdecl operator delete(void*, void*)
 
 const char* CTaksiConfig::sm_Props[TAKSI_CFGPROP_QTY+1] = 
 {
-#define ConfigProp(a,b) #a,
+#define ConfigProp(a,b,c) #a,
 #include "../ConfigProps.tbl"
 #undef ConfigProp
 	NULL,
@@ -98,6 +98,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 void CTaksiConfigData::InitConfig()
 {
 	m_szCaptureDir[0] = '\0';
+	m_bDebugLog = false;
 
 	// Video Format
 	m_fFrameRateTarget=20;
@@ -116,12 +117,10 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 
 	m_bShowIndicator = true;
-	m_bDebugLog = 0;
 	m_bUseDirectInput = true;
 
-	// CONSTANTS!
-	m_bUseGDI = true;
-	m_bRecordNonClient = true;
+	m_bGDIUse = true;
+	m_bGDIFrame = true;
 
 	DEBUG_MSG(("CTaksiConfig::InitConfig" LOG_CR ));
 }

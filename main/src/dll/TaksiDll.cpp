@@ -40,6 +40,8 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] =
 bool CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 {
 	CloseLogFile();
+	if ( ! sg_Config.m_bDebugLog)
+		return false;
 	m_File.AttachHandle( ::CreateFile( pszFileName,            // file to create 
 		GENERIC_WRITE,                // open for writing 
 		0,                            // do not share 
@@ -65,7 +67,7 @@ int CTaksiLogFile::EventStr( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, co
 	int iLen = _snprintf( szTmp, sizeof(szTmp)-1,
 		"Taksi:%s:%s", g_Proc.m_szProcessTitleNoExt, pszMsg );
 
-	if ( m_File.IsValidHandle())
+	if ( sg_Config.m_bDebugLog && m_File.IsValidHandle())
 	{
 		DWORD dwWritten = 0;
 		::WriteFile( m_File, szTmp, iLen, &dwWritten, NULL );

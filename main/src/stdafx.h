@@ -109,7 +109,7 @@ public:
 enum TAKSI_CFGPROP_TYPE
 {
 	// enum the tags that can go in the config file.
-#define ConfigProp(a,b) TAKSI_CFGPROP_##a,
+#define ConfigProp(a,b,c) TAKSI_CFGPROP_##a,
 #include "ConfigProps.tbl"
 #undef ConfigProp
 	TAKSI_CFGPROP_QTY,
@@ -134,6 +134,7 @@ struct LIBSPEC CTaksiConfigData
 public:
 	// CAN be set from CGuiConfig
 	TCHAR  m_szCaptureDir[_MAX_PATH];	// files go here!
+	bool   m_bDebugLog;					// keep log files or not?
 
 	float  m_fFrameRateTarget;			// What do we want our movies frame rate to be? (f/sec)
 	CVideoCodec m_VideoCodec;			// Video Compression scheme selected
@@ -143,15 +144,13 @@ public:
 	CWaveFormat m_AudioCodec;
 
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
-
-	// CAN NOT be set from CGuiConfig (yet)
-	bool   m_bShowIndicator;
-	bool   m_bDebugLog;			// keep log files or not?
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
 
-	// CONSTANTS! (for now)
-	bool   m_bUseGDI;		// hook GDI mode at all?
-	bool   m_bRecordNonClient;
+	bool   m_bGDIUse;				// hook GDI mode at all?
+	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
+
+	// CAN NOT be set from CGuiConfig
+	bool   m_bShowIndicator;
 };
 extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set via CGuiConfig
 

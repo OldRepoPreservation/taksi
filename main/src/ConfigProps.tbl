@@ -2,21 +2,25 @@
 // ConfigProps.tbl
 // for CTaksiConfig
 
-ConfigProp(AudioCodecInfo,				"Audio format / codec")
-ConfigProp(AudioDevice,					"Use audio device for AVI or not")
+ConfigProp(AudioCodecInfo,			m_AudioCodec,	"Audio format / codec")
+ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")
 
-ConfigProp(DebugLog,					"Debug Log kept?")
-ConfigProp(CaptureDir,					"Capture directory (NOTE: must end with a backslash)")
-ConfigProp(KeyboardUseDirectInput,		"use DirectInput for hotkeys else use hooks")
-ConfigProp(MovieFrameRateTarget,		"desired frame rate of captured video (f/sec)")
-ConfigProp(ShowIndicator,				"Show the indicator on the window")
-ConfigProp(VideoCodecInfo,				"Video Codec Info stored as an array of bytes.")
-ConfigProp(VideoHalfSize,				"Capture Half vs Full size video")
+ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end with a backslash)")
+ConfigProp(DebugLog,				m_bDebugLog,	"Debug Log kept?")
 
-ConfigProp(VKey_ConfigOpen,				"Hot key to open the config dialog")
-ConfigProp(VKey_HookModeToggle,			"Hot key mappings HookModeToggle")
-ConfigProp(VKey_IndicatorToggle,		"Hot key mappings IndicatorToggle")
-ConfigProp(VKey_RecordStart,			"Hot key mappings RecordStart")
-ConfigProp(VKey_RecordStop,				"Hot key mappings RecordStop")
-ConfigProp(VKey_Screenshot,				"Hot key mappings Screenshot")
-ConfigProp(VKey_SmallScreenshot,		"Hot key mappings SmallScreenshot")
+ConfigProp(GDIFrame,				m_bGDIFrame,	"Record the GDI frame or just the client area")
+ConfigProp(GDIUse,					m_bGDIUse,		"hook GDI mode at all?")
+
+ConfigProp(KeyboardUseDirectInput,	m_bUseDirectInput,	"use DirectInput for hotkeys else use hooks")
+ConfigProp(MovieFrameRateTarget,	m_fFrameRateTarget,	"desired frame rate of captured video (f/sec)")
+ConfigProp(ShowIndicator,			m_bShowIndicator,	"Show the indicator on the window")
+ConfigProp(VideoCodecInfo,			m_VideoCodec,		"Video Codec Info stored as an array of bytes.")
+ConfigProp(VideoHalfSize,			m_bVideoHalfSize,	"Capture Half vs Full size video")
+
+ConfigProp(VKey_ConfigOpen,			m_wHotKey,	"Hot key to open the config dialog")
+ConfigProp(VKey_HookModeToggle,		m_wHotKey,	"Hot key mappings HookModeToggle")
+ConfigProp(VKey_IndicatorToggle,	m_wHotKey,	"Hot key mappings IndicatorToggle")
+ConfigProp(VKey_RecordStart,		m_wHotKey,	"Hot key mappings RecordStart")
+ConfigProp(VKey_RecordStop,			m_wHotKey,	"Hot key mappings RecordStop")
+ConfigProp(VKey_Screenshot,			m_wHotKey,	"Hot key mappings Screenshot")
+ConfigProp(VKey_SmallScreenshot,	m_wHotKey,	"Hot key mappings SmallScreenshot")

@@ -31,6 +31,7 @@
 #define IDC_C_CaptureDirectory          1020
 #define IDC_C_CaptureDirectoryBrowse    1021
 #define IDC_C_CaptureDirectoryExplore   1022
+#define IDC_C_DebugLog                  1023
 #define IDC_C_FrameRate                 1030
 #define IDC_C_VideoCodecButton          1031
 #define IDC_C_VideoCodec                1032
@@ -45,6 +46,7 @@
 #define IDC_C_KeyRecordStop             1044
 #define IDC_C_KeyScreenshot             1045
 #define IDC_C_KeySmallScreenshot        1046
+#define IDC_C_UseDirectInput            1047
 #define IDC_C_CustomSettingsList        1050
 #define IDC_C_CustomPattern             1051
 #define IDC_C_CustomFrameRate           1052
@@ -57,8 +59,12 @@
 #define IDC_C_StatFrameRate             1063
 #define IDC_C_StatDataRecorded          1064
 #define IDC_C_StatFormat                1065
-#define IDC_C_CaptureDesktop            1070
-#define IDC_C_ShowOverlay               1071
+#define IDC_C_OverlayShow               1071
+#define IDC_C_OverlayVerbose            1072
+#define IDC_C_GDIUse                    1073
+#define IDC_C_GDIFull                   1074
+#define IDC_C_GDIFrame                  1075
+
 #define IDS_GuiConfigHelp1              2000
 #define IDS_GuiConfigHelp2              2001
 #define IDS_GuiConfigHelp3              2002
@@ -79,7 +85,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1081
+#define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif
