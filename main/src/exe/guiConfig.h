@@ -67,6 +67,7 @@ protected:
 	bool UpdateAudioCodec( const CWaveFormat& codec );
 	void UpdateSettings( const CTaksiConfig& config );
 
+	bool OnCommandCheck( HWND hWndCtrl );
 	void OnCommandRestore();
 	void OnCommandSave();
 	bool OnCommandCaptureBrowse();
@@ -95,7 +96,7 @@ public:
 
 	int m_iTabCur;	// persist this.
 	HWND m_hControlTab;
-	HWND m_hWndTab[5]; // N tabs
+	HWND m_hWndTab[6]; // N tabs
 
 #define GuiConfigControl(a,b,c) HWND m_hControl##a;
 #include "GuiConfigControls.tbl"

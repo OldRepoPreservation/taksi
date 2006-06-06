@@ -30,8 +30,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION TAKSI_VERSION_RES_N
- PRODUCTVERSION TAKSI_VERSION_RES_N
+ FILEVERSION 0,7,4,5
+ PRODUCTVERSION 0,7,4,5
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -48,9 +48,9 @@ BEGIN
         BEGIN
             VALUE "Comments", "Video-capture/Screenshot-making program for graphics applications."
             VALUE "FileDescription", "Taksi Server"
-            VALUE "FileVersion", TAKSI_VERSION_RES_S
-            VALUE "ProductVersion", TAKSI_VERSION_RES_S
-            VALUE "LegalCopyright", TAKSI_COPYRIGHT
+            VALUE "FileVersion", "0,7,4,5"
+            VALUE "ProductVersion", "0,7,4,5"
+            VALUE "LegalCopyright", "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson"
         END
     END
     BLOCK "VarFileInfo"
@@ -116,8 +116,11 @@ BEGIN
     ICON            ID_APP,ID_APP,247,7,20,20
     LTEXT           "Capture Directory:",IDC_STATIC,5,20,71,8
     EDITTEXT        IDC_C_CaptureDirectory,5,35,254,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Explore Folder...",IDC_C_CaptureDirectoryExplore,5,55,95,12
+    PUSHBUTTON      "Explore Folder...",IDC_C_CaptureDirectoryExplore,5,55,
+                    95,12
     PUSHBUTTON      "Browse...",IDC_C_CaptureDirectoryBrowse,220,54,41,12
+    CONTROL         "Create Debug Log Files",IDC_C_DebugLog,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,82,156,10
 END
 
 IDD_GuiConfigTab2 DIALOGEX 4, 14, 274, 113
@@ -150,7 +153,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Hot Keys are pressed to activate Taksi from inside other applications",
                     IDC_STATIC,7,10,230,8
-    ICON            ID_APP,ID_APP,247,7,20,20
+    ICON            ID_APP,ID_APP,247,7,21,20
     LTEXT           "Config Dialog Open",IDC_STATIC,7,32,62,8
     CONTROL         "",IDC_C_KeyConfigOpen,"msctls_hotkey32",WS_BORDER | 
                     WS_TABSTOP,75,29,46,14
@@ -172,6 +175,8 @@ BEGIN
     LTEXT           "Small Screenshot",IDC_STATIC,147,80,55,8
     CONTROL         "",IDC_C_KeySmallScreenshot,"msctls_hotkey32",WS_BORDER | 
                     WS_TABSTOP,214,77,46,14
+    CONTROL         "Use Direct Input API for keys",IDC_C_UseDirectInput,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,126,10
 END
 
 IDD_GuiConfigTab4 DIALOGEX 4, 14, 274, 113
@@ -198,6 +203,24 @@ IDD_GuiConfigTab5 DIALOGEX 4, 14, 274, 113
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    LTEXT           "The display options for the current application.",-1,7,
+                    5,255,8
+    ICON            ID_APP,ID_APP,247,7,20,20
+    CONTROL         "Verbose Overlay Information (FPS,Record Size)",
+                    IDC_C_OverlayVerbose,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_TABSTOP,7,38,196,10
+    CONTROL         "Hook GDI",IDC_C_GDIUse,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,63,196,10
+    CONTROL         "Allow capture of full desktop",IDC_C_GDIFull,"Button",
+                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,76,196,10
+    CONTROL         "Record GDI Frame",IDC_C_GDIFrame,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,89,196,10
+END
+
+IDD_GuiConfigTab6 DIALOGEX 4, 14, 274, 113
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
     LTEXT           "Live statistics for the current foreground application.",
                     IDC_STATIC,7,5,255,8
     ICON            ID_APP,ID_APP,247,7,20,20
@@ -220,18 +243,6 @@ BEGIN
     EDITTEXT        IDC_C_StatDataRecorded,90,81,66,14,ES_AUTOHSCROLL | 
                     ES_READONLY
     LTEXT           "MB",IDC_STATIC,167,84,35,8
-END
-
-IDD_GuiConfigTab6 DIALOGEX 4, 14, 274, 113
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "The display for the current application.",-1,7,5,255,8
-    ICON            ID_APP,ID_APP,247,7,20,20
-    CONTROL         "Show status indicator overlay",IDC_C_ShowOverlay,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,23,255,10
-    CONTROL         "Allow capture of full desktop",IDC_C_CaptureDesktop,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,38,196,10
 END
 
 
@@ -270,7 +281,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 260
         TOPMARGIN, 7
-        BOTTOMMARGIN, 99
+        BOTTOMMARGIN, 106
     END
 
     IDD_GuiConfigTab4, DIALOG
@@ -341,8 +352,8 @@ BEGIN
     IDD_GuiConfigTab2       "Format"
     IDD_GuiConfigTab3       "Hot Keys"
     IDD_GuiConfigTab4       "Custom"
-    IDD_GuiConfigTab5       "Stats"
-    IDD_GuiConfigTab6       "Display"
+    IDD_GuiConfigTab5       "Display"
+    IDD_GuiConfigTab6       "Stats"
 END
 
 STRINGTABLE 
@@ -351,8 +362,8 @@ BEGIN
     IDS_GuiConfigHelp2      "Change the Format and codecs used to create the video"
     IDS_GuiConfigHelp3      "Hot Keys to activate functions inside the application"
     IDS_GuiConfigHelp4      "Custom configurations for specific applications"
-    IDS_GuiConfigHelp5      "Display stats for actions on the current hooked application"
-    IDS_GuiConfigHelp6      "Configure display properties"
+    IDS_GuiConfigHelp5      "Configure display properties"
+    IDS_GuiConfigHelp6      "Display stats for actions on the current hooked application"
 END
 
 STRINGTABLE 

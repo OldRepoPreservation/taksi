@@ -6,22 +6,19 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 BUGS:
-App Hook switch not always correct. TEST switch between 2 apps
-hook Switch DX app multiple times causes crash.
+hook Switch DX app multiple times causes crash. asymetric hook/unhook.
 GUI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead!
-Should prefer graphics hook over GDI hook.
+Should prefer graphics hook over GDI hook. Option to hook GDI or not.
 
 TODO:
 Manual.txt completely out of date!
 Background thread queue N raw frames for compression.
-Option to hook GDI or not.
 Audio
 Pause live record ?
 Better frame rate calculation ?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 Context sensative help file.
-Move debug flag to Gui such that logs are turned on on demand?
 
 Suggest codecs appropriate to desired CPU usage. MSMpeg4 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??

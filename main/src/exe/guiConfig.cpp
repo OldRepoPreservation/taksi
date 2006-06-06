@@ -233,6 +233,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 
 	// Dest Dir
 	SetWindowText( m_hControlCaptureDirectory, config.m_szCaptureDir );
+	SendMessage( m_hControlDebugLog, BM_SETCHECK, config.m_bDebugLog ? BST_CHECKED : BST_UNCHECKED, 0 );
 
 	// Format
 	TCHAR szTmp[_MAX_PATH];
@@ -253,8 +254,14 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 			HKM_SETHOTKEY, config.GetHotKey((TAKSI_HOTKEY_TYPE)i), 0 );
 	}
 
+	SendMessage( m_hControlUseDirectInput, BM_SETCHECK, config.m_bUseDirectInput ? BST_CHECKED : BST_UNCHECKED, 0 );
+
 	// custom configs
 	Custom_Init(config.m_pCustomList);
+
+	// Display options
+	SendMessage( m_hControlGDIUse, BM_SETCHECK, config.m_bGDIUse ? BST_CHECKED : BST_UNCHECKED, 0 );
+	SendMessage( m_hControlGDIFrame, BM_SETCHECK, config.m_bGDIFrame ? BST_CHECKED : BST_UNCHECKED, 0 );
 
 	m_bDataUpdating = false;
 }
@@ -475,13 +482,13 @@ bool CGuiConfig::OnCommandCaptureBrowse()
 
 bool CGuiConfig::OnTimer( UINT idTimer )
 {
-	// IDD_GuiConfigTab5
+	// IDD_GuiConfigTab6
 	if ( idTimer != IDT_UpdateStats )
 	{
 		return false;
 	}
 	// Check for stats update. only if this tab is set.
-	if ( m_iTabCur != 4 )
+	if ( m_iTabCur != 5 )
 		return false;
 
 	if ( sg_ProcStats.m_dwPropChangedMask )
@@ -509,6 +516,13 @@ bool CGuiConfig::OnNotify( int id, NMHDR* pHead )
 	return false;
 }
 
+bool CGuiConfig::OnCommandCheck( HWND hWndCtrl )
+{
+	bool bVal = ( SendMessage( hWndCtrl, BM_GETCHECK, 0, 0 ) == BST_CHECKED );
+	OnChanges();
+	return bVal;
+}
+
 bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 {
 	// WM_COMMAND
@@ -519,6 +533,16 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case IDC_C_RestoreButton:
 		OnCommandRestore();
+		return true;
+
+	case IDC_C_DebugLog:
+		g_Config.m_bDebugLog = OnCommandCheck( m_hControlDebugLog );
+		return true;
+	case IDC_C_GDIUse:
+		g_Config.m_bGDIUse = OnCommandCheck( m_hControlGDIUse );
+		return true;
+	case IDC_C_GDIFrame:
+		g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
 		return true;
 
 	case IDC_C_CaptureDirectory:
@@ -558,8 +582,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		OnCommandVideoCodecButton();
 		return true;
 	case IDC_C_VideoHalfSize:
-		g_Config.m_bVideoHalfSize = ( SendMessage( m_hControlVideoHalfSize, BM_GETCHECK, 0, 0 ) == BST_CHECKED );
-		OnChanges();
+		g_Config.m_bVideoHalfSize = OnCommandCheck( m_hControlVideoHalfSize );
 		return true;
 
 	case IDC_C_AudioDevices:
@@ -594,6 +617,10 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_KeySmallScreenshot:
 		// Change to the hotkey.
 		OnCommandKeyChange( hControl );
+		return true;
+
+	case IDC_C_UseDirectInput:
+		g_Config.m_bUseDirectInput = OnCommandCheck( m_hControlUseDirectInput );
 		return true;
 
 	case IDC_C_CustomSettingsList:

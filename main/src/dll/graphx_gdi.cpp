@@ -55,7 +55,7 @@ HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
 			return NULL;
 	}
 
-	if ( sg_Config.m_bRecordNonClient )
+	if ( sg_Config.m_bGDIFrame )
 	{
 		// Record the whole window include non client area.
 		if ( ! ::GetWindowRect(m_hWnd, &m_WndRect))
@@ -224,7 +224,7 @@ bool CTaksiGDI::HookFunctions()
 	{
 		return false;
 	}
-	if ( ! sg_Config.m_bUseGDI )	// not allowed.
+	if ( ! sg_Config.m_bGDIUse )	// not allowed.
 	{
 		return false;
 	}
