@@ -1,4 +1,4 @@
-Parts Copyright (c) 2006 Dennis Robinson
+Parts Copyright (c) 1992 - 2006 Dennis Robinson
 
 Copyright (c) 2004, Anton Jouline
 
