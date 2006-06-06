@@ -186,8 +186,8 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 			::SetFocus(g_GUIConfig.m_hWnd);
 		}
 		return true;
-	case IDB_HookModeToggle:
 	case TAKSI_HOTKEY_HookModeToggle:
+	case IDB_HookModeToggle:
 		if ( sg_Dll.IsHookCBT())
 		{
 			sg_Dll.HookCBT_Uninstall();
@@ -198,12 +198,14 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		}
 		UpdateButtonStates();
 		return true;
-	case IDB_IndicatorToggle:
 	case TAKSI_HOTKEY_IndicatorToggle:
+	case IDB_IndicatorToggle:
 		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
 		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
 		UpdateButtonStates();
 		return true;
+	case TAKSI_HOTKEY_RecordStart:
+	case TAKSI_HOTKEY_RecordStop:
 	case IDB_RecordStart:
 	case IDB_RecordStop:
 	case IDB_Screenshot:
@@ -248,6 +250,7 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			return 0;
 		break;
 	case WM_APP_UPDATE:
+		// Use m_iMasterUpdateCount to throttle these ?
 		g_GUI.UpdateButtonToolTips();
 		g_GUI.UpdateButtonStates();
 		return 1;
