@@ -6,10 +6,11 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 BUGS:
-App Hook switch not always correct. TEST switch between 2 GDI apps, 2 DX apps.
+App Hook switch not always correct. TEST switch between 2 apps
+hook Switch DX app multiple times causes crash.
 GUI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead!
-Fix logging of messages to 'Taksi_App.log' file.
+Should prefer graphics hook over GDI hook.
 
 TODO:
 Manual.txt completely out of date!

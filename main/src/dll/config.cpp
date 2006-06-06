@@ -116,7 +116,7 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 
 	m_bShowIndicator = true;
-	m_dwDebug = 0;
+	m_bDebugLog = 0;
 	m_bUseDirectInput = true;
 
 	// CONSTANTS!
@@ -137,7 +137,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
 
 	m_bUseDirectInput = config.m_bUseDirectInput;
-	m_dwDebug = config.m_dwDebug;
+	m_bDebugLog = config.m_bDebugLog;
 
 	// CANT COPY m_pCustomList for interproces access ??
 	DEBUG_MSG(("CTaksiConfig::CopyConfig '%s'" LOG_CR, m_szCaptureDir ));
@@ -309,8 +309,8 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	// TAKSI_CFGPROP_TYPE
 	switch (eProp)
 	{
-	case TAKSI_CFGPROP_Debug:
-		return _snprintf(pszValue, iSizeMax, "%d", m_dwDebug);
+	case TAKSI_CFGPROP_DebugLog:
+		return _snprintf(pszValue, iSizeMax, "%d", m_bDebugLog);
 	case TAKSI_CFGPROP_CaptureDir:
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szCaptureDir);
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
@@ -347,8 +347,8 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	// TAKSI_CFGPROP_TYPE
 	switch (eProp)
 	{
-	case TAKSI_CFGPROP_Debug:
-		m_dwDebug = atoi(pszValue);
+	case TAKSI_CFGPROP_DebugLog:
+		m_bDebugLog = atoi(pszValue);
 		break;
 	case TAKSI_CFGPROP_CaptureDir:
 		if (! Str_GetQuoted( m_szCaptureDir, pszValue, sizeof(m_szCaptureDir)))

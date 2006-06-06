@@ -160,8 +160,8 @@ DWORD CAVIThread::ThreadRun()
 		m_hEventDataDone.SetEvent();	// done
 	}
 
-	DEBUG_MSG(( "CAVIThread::ThreadRun() END" LOG_CR ));
 	m_nThreadId = 0;		// it actually is closed!
+	DEBUG_MSG(( "CAVIThread::ThreadRun() END" LOG_CR ));
 	return 0;
 }
 
@@ -209,7 +209,7 @@ HRESULT CAVIThread::StopAVIThread()
 		hRes = ::WaitForSingleObject( m_hThread, 15*1000 );
 		if ( hRes == WAIT_OBJECT_0 )
 		{
-			ASSERT(m_nThreadId==0);
+			//ASSERT(m_nThreadId==0);
 			hRes = S_OK;
 		}
 		else 
