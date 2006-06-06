@@ -194,7 +194,7 @@ bool CVideoCodec::put_Str( const char* pszValue )
 	// serialize from a string format.
 	DestroyCodec();
 	ZeroMemory( &m_v, sizeof(m_v));
-	int iSize = Mem_ReadFromString( (BYTE*) &m_v, sizeof(m_v), pszValue );
+	int iSize = Mem_ReadFromString((BYTE*) &m_v, sizeof(m_v), pszValue );
 	if ( iSize != sizeof(m_v))
 	{
 	}
@@ -714,7 +714,7 @@ do_retry:
 	if ( ! m_VideoCodec.CompStart(&biIn))
 	{
 		// re-try the aligned size.
-		if ( ( FrameForm.m_Size.cx & 3 ) || ( FrameForm.m_Size.cy & 3 ))
+		if (( FrameForm.m_Size.cx & 3 ) || ( FrameForm.m_Size.cy & 3 ))
 		{
 			DEBUG_WARN(( "CAVIFile:CompStart retry at (%d x %d)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy ));
 			FrameForm.m_Size.cx &= ~3;
@@ -884,7 +884,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 
 		// write video frame
 		::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
-		if ( dwBytesWritten != sizeof(dwTags) )
+		if ( dwBytesWritten != sizeof(dwTags))
 		{
 			DWORD dwLastError = ::GetLastError();
 			DEBUG_ERR(("CAVIFile:WriteVideoFrame:WriteFile FAIL=%d" LOG_CR, dwLastError ));

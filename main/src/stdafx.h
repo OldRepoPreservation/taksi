@@ -247,7 +247,7 @@ public:
 		// Move just a single property.
 		ASSERT( eProp >= 0 && eProp < TAKSI_PROCSTAT_QTY );
 		const WORD wOffset = sm_Props[eProp][0];
-		memcpy( ((BYTE*)this) + wOffset, ((const BYTE*)&stats) + wOffset, sm_Props[eProp][1] );
+		memcpy(((BYTE*)this) + wOffset, ((const BYTE*)&stats) + wOffset, sm_Props[eProp][1] );
 		UpdateProcStat(eProp);
 	}
 

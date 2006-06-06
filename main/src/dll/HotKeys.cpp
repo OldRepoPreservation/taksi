@@ -127,7 +127,7 @@ void CTaksiDI::ProcessDirectInput()
 
 	for ( int i=0; i<TAKSI_HOTKEY_QTY; i++ )
 	{
-		WORD wHotKey = sg_Config.GetHotKey( (TAKSI_HOTKEY_TYPE) i);
+		WORD wHotKey = sg_Config.GetHotKey((TAKSI_HOTKEY_TYPE) i);
 		BYTE iScanCode = ::MapVirtualKey( LOBYTE(wHotKey), 0);
 		if ( buffer[iScanCode] & 0x80 ) 
 		{

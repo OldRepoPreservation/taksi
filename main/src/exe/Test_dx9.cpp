@@ -59,13 +59,17 @@ bool Test_DirectX9( HWND hWnd )
 		LOG_MSG(("Test_DirectX9 CreateDevice failed. %d" LOG_CR, hRes ));
         return false;
     }
-	LOG_MSG(("Test_DirectX9: %08x" LOG_CR, (UINT_PTR)pD3DDevice.get_RefObj()));
 
 	// step 4: store method addresses in out vars
 	UINT_PTR* pVTable = (UINT_PTR*)(*((UINT_PTR*)pD3DDevice.get_RefObj()));
 	ASSERT(pVTable);
-	sg_Dll.m_nDX9_Present = ( pVTable[TAKSI_INTF_DX9_Present] - _DX9.get_DllInt() );
-	sg_Dll.m_nDX9_Reset = ( pVTable[TAKSI_INTF_DX9_Reset] - _DX9.get_DllInt() );
+	sg_Dll.m_nDX9_Present = ( pVTable[TAKSI_INTF_DX9_Present] - _DX9.get_DllInt());
+	sg_Dll.m_nDX9_Reset = ( pVTable[TAKSI_INTF_DX9_Reset] - _DX9.get_DllInt());
+
+	LOG_MSG(("Test_DirectX9: %08x, Present=0%x, Reset=0%x " LOG_CR,
+		(UINT_PTR)pD3DDevice.get_RefObj(),
+		sg_Dll.m_nDX9_Present, sg_Dll.m_nDX9_Reset ));
+
 	return true;
 }
 

@@ -296,4 +296,5 @@ June 6,2006
 ==============
 Ver 0.745 test release.
 sources all merged into Subversion on sourceforge.
+Title shows name of prime hooked app.
 
