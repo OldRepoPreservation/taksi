@@ -94,6 +94,7 @@ public:
 	}
 	WORD get_BlockSize() const
 	{
+		// This is the smallest possible useful unit size.
 		ASSERT(get_WF());
 		return( get_WF()->nBlockAlign );
 	}

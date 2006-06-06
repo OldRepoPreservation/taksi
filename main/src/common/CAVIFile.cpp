@@ -13,35 +13,44 @@
 
 struct AVI_FILE_HEADER
 {
-	FOURCC fccRiff;                 //  should be "RIFF"
+	FOURCC fccRiff;                 // "RIFF"
 	DWORD  dwSizeRiff;          
 
-	FOURCC fccForm;                 //  should be "AVI "
-	FOURCC fccList_0;				//  should be "LIST"
+	FOURCC fccForm;                 // "AVI "
+	FOURCC fccList_0;				// "LIST"
 	DWORD  dwSizeList_0;
 
-	FOURCC fccHdrl;                 //  should be "hdrl"
-	FOURCC fccAvih;                 //  should be "avih"
+	FOURCC fccHdrl;                 // "hdrl"
+	FOURCC fccAvih;                 // "avih"
 	DWORD  dwSizeAvih;			// sizeof(m_AviHeader)
 
 	MainAVIHeader m_AviHeader;
 
-	FOURCC fccList_1;                  //  should be "LIST"
-	DWORD  dwSizeList_1;
+	// Video Format.
+	FOURCC fccList_V;                  // "LIST"
+	DWORD  dwSizeList_V;
 
-	FOURCC fccStrl;                 //  should be "strl"
-	FOURCC fccStrh;                 //  should be "strh"
+	FOURCC fccStrl;                 // "strl"
+	FOURCC fccStrh;                 // "strh"
 	DWORD  dwSizeStrh;
 	AVIStreamHeader m_StreamHeader;	// sizeof() = 64 ?
 
-	FOURCC fccStrf;                 //  should be "strf"
+	FOURCC fccStrf;                 // "strf"
 	DWORD  dwSizeStrf;
 	BITMAPINFOHEADER m_biHeader;
 
-	FOURCC fccStrn;                 //  should be "strn"
+	FOURCC fccStrn;                 // "strn"
 	DWORD  dwSizeStrn;
 	char m_Strn[13];				// "Video Stream"
 	char m_StrnPadEven;
+
+	// Audio Format.
+#if 0
+	FOURCC fccList_A;				// "LIST"
+	DWORD  dwSizeList_A;
+
+
+#endif
 
 #define AVI_MOVILIST_OFFSET 0x800
 
@@ -69,9 +78,9 @@ void CVideoFrame::AllocPadXY( int cx, int cy, int iBPP, int iPad )
 
 	if (m_pPixels)
 	{
-		CVideoFrameForm form;
-		form.InitPadded(cx,cy,iBPP,iPad);
-		if ( ! memcmp( &form, this, sizeof(form)))
+		CVideoFrameForm FrameForm;
+		FrameForm.InitPadded(cx,cy,iBPP,iPad);
+		if ( ! memcmp( &FrameForm, this, sizeof(FrameForm)))
 			return;
 		FreeFrame();
 	}
@@ -545,13 +554,20 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 	ZeroMemory( &afh, sizeof(afh));
 
 	afh.fccRiff = FOURCC_RIFF; // "RIFF"
+	afh.dwSizeRiff = sizeof(afh);	// re-calc later.
+
 	afh.fccForm = formtypeAVI; // "AVI "
 	afh.fccList_0  = FOURCC_LIST; // "LIST"
+	afh.dwSizeList_0 = 0;	// re-calc later.
+
 	afh.fccHdrl = listtypeAVIHEADER; // "hdrl"
 	afh.fccAvih = ckidAVIMAINHDR; // "avih"
 	afh.dwSizeAvih = sizeof(afh.m_AviHeader);
 
-	afh.fccList_1  = FOURCC_LIST; // "LIST"
+	// Video Format
+	afh.fccList_V  = FOURCC_LIST; // "LIST"
+	afh.dwSizeList_V = 0;	// recalc later.
+
 	afh.fccStrl = listtypeSTREAMHEADER; // "strl"
 	afh.fccStrh = ckidSTREAMHEADER; // "strh"
 	afh.dwSizeStrh = sizeof(afh.m_StreamHeader);
@@ -564,16 +580,16 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 	ASSERT( afh.dwSizeStrn == 13 );
 	strcpy( afh.m_Strn, "Video Stream" );
 
-	afh.dwSizeList_1 = sizeof(FOURCC) 
+	afh.dwSizeList_V = sizeof(FOURCC) 
 		+ sizeof(FOURCC) + sizeof(DWORD) + sizeof(afh.m_StreamHeader)
 		+ sizeof(FOURCC) + sizeof(DWORD) + sizeof(afh.m_biHeader)
 		+ sizeof(FOURCC) + sizeof(DWORD) + sizeof(afh.m_Strn);
-	if ( afh.dwSizeList_1 & 1 )	// always even size.
-		afh.dwSizeList_1 ++;
+	if ( afh.dwSizeList_V & 1 )	// always even size.
+		afh.dwSizeList_V ++;
 
 	afh.dwSizeList_0 = sizeof(FOURCC) 
 		+ sizeof(FOURCC) + sizeof(DWORD) + sizeof(afh.m_AviHeader) 
-		+ sizeof(FOURCC) + sizeof(DWORD) + afh.dwSizeList_1;
+		+ sizeof(FOURCC) + sizeof(DWORD) + afh.dwSizeList_V;
 	if ( afh.dwSizeList_0 & 1 )	// always even size.
 		afh.dwSizeList_0 ++;
 
@@ -609,17 +625,19 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 	return iPadFile;
 }
 
-HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& form, double fFrameRate, CVideoCodec& VideoCodec )
+HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
 {
 	// Opens a new file, and writes the AVI header 
 	// prepare filename
 	// we could use mmioOpen() ??
+	// NOTE:
+	//  FrameForm = could be modified to match a format i can use.
 
 	ASSERT(pszFileName);
 	LOG_MSG(("OpenAVIFile: szFileName: %s" LOG_CR, pszFileName ));
 
 	// Store my params i'm going to use.
-	m_FrameForm = form;
+	m_FrameForm = FrameForm;
 	m_fFrameRate = fFrameRate;
 	// prepare compressor. 
 	m_VideoCodec.CopyCodec( VideoCodec );
@@ -634,6 +652,15 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& form, 
 	{
 		DEBUG_ERR(( "CAVIFile:OpenCodec FAILED" LOG_CR ));
 		return E_FAIL;
+	}
+
+	if ( pAudioCodec )
+	{
+		m_AudioCodec.SetFormat( *pAudioCodec );
+	}
+	else
+	{
+		m_AudioCodec.SetFormat( NULL );
 	}
 
 	// prepare BITMAPINFO for compressor
@@ -687,18 +714,18 @@ do_retry:
 	if ( ! m_VideoCodec.CompStart(&biIn))
 	{
 		// re-try the aligned size.
-		if ( ( form.m_Size.cx & 3 ) || ( form.m_Size.cy & 3 ))
+		if ( ( FrameForm.m_Size.cx & 3 ) || ( FrameForm.m_Size.cy & 3 ))
 		{
-			DEBUG_WARN(( "CAVIFile:CompStart retry at (%d x %d)" LOG_CR, form.m_Size.cx, form.m_Size.cy ));
-			form.m_Size.cx &= ~3;
-			form.m_Size.cy &= ~3;
-			biIn.bmiHeader.biWidth = form.m_Size.cx;
-			biIn.bmiHeader.biHeight = form.m_Size.cy;
-			m_FrameForm = form;
+			DEBUG_WARN(( "CAVIFile:CompStart retry at (%d x %d)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy ));
+			FrameForm.m_Size.cx &= ~3;
+			FrameForm.m_Size.cy &= ~3;
+			biIn.bmiHeader.biWidth = FrameForm.m_Size.cx;
+			biIn.bmiHeader.biHeight = FrameForm.m_Size.cy;
+			m_FrameForm = FrameForm;
 			goto do_retry;
 		}
 
-		DEBUG_ERR(( "CAVIFile:CompStart FAILED (%d x %d)" LOG_CR, form.m_Size.cx, form.m_Size.cy ));
+		DEBUG_ERR(( "CAVIFile:CompStart FAILED (%d x %d)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy ));
 		return E_FAIL;
 	}
 
@@ -718,7 +745,6 @@ do_retry:
 	}
 
 	AVI_FILE_HEADER afh;
-	ZeroMemory(&afh, sizeof(AVI_FILE_HEADER));
 	InitFileHeader(afh); // needs m_VideoCodec.m_v.lpbiOut
 
 	DWORD dwBytesWritten = 0;
@@ -730,8 +756,9 @@ do_retry:
 		return HRESULT_FROM_WIN32(dwLastError);
 	}
 
-	const int iJunkChunkSize = AVI_MOVILIST_OFFSET - sizeof(afh);
+	int iJunkChunkSize = AVI_MOVILIST_OFFSET - sizeof(afh);
 	ASSERT(iJunkChunkSize>0);
+
 	{
 	// add "JUNK" chunk to get the 2K-alignment
 	HANDLE hHeap = ::GetProcessHeap();

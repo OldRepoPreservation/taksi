@@ -358,7 +358,7 @@ END
 STRINGTABLE 
 BEGIN
     IDB_ConfigOpen          "Open the configuration dialog window"
-    IDB_HookModeToggle      "Change application hook by starting the Hook Focus Mode\tBlue=Next selected application will be hooked\tGreen=Current application is ready to record"
+    IDB_HookModeToggle      "Change application hook by starting the Hook Focus Mode. Blue=Next selected application will be hooked. Green=Current application is ready to record"
     IDB_IndicatorToggle     "Toggle the indicator on and off"
     IDB_RecordStart         "Start the video recorder"
     IDB_RecordStop          "Stop the video recorder"
