@@ -1,3 +1,4 @@
+; TODO - this is out of date! update it
 TAKSI manual v0.5.1-dev                                      December 08, 2004
 ==============================================================================
 

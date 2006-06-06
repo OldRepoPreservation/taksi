@@ -246,3 +246,7 @@ However, this may be useful option for windowed-applications, which
 are running in relatively small windows.
 
 
+==============
+May 20,2006
+Dennis Robinson Refactor of code.
+

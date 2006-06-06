@@ -1,0 +1,91 @@
+Taksi TODO list
+5/22/2006
+
+Open Questions?
+why use HeapAlloc instead of new for allocs ?
+dummy keyboard to keep dll loaded ?
+
+BUGS:
+App Hook switch not always correct.
+GUI indicator drawn over overlapped windows.
+TEST - DX app hook switching. 
+
+TODO:
+option to Use GDI or not.
+Hook only when needed. (vid cap, display, screen cap)
+Pause live record ?
+frame rate slowdown problem while recording? figure out the frame rate calc.
+Clean up '???' marked stuff in code. (possible leaks?)
+Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
+tray icon 
+context menu to take actions.
+context help file.
+Suggest codecs appropriate to desired CPU usage. MSMpeg4 seems good.
+Can we use the DirectX JPEG/PNG compressor for screen shots ??
+AVI may not be the best format. has too much overhead. is MPG or WMV better ?
+http://guru.multimedia.cx/category/container-formats/
+smaller AVI index ?
+reflect state in tooltip ?
+
+GDI:
+Tab to record next app ?
+
+AUDIO TASK: ?
+Capture Audio stream
+ Capture of audio is quite complex unless there is already a loopback in place on the hardware.
+ Without a loopback input the output must be hooked at a very low (kernel) level.
+ Hook audio output (Wave,DirectSound) device at kernel level
+Option to get audio from WaveIn (assumes loopback) ? (much easier)
+compress and write audio frames to the AVI file.
+
+DONE:
+button bar. global record button on Taksi.EXE App
+Update the button bar correctly for current state.
+Fill in the live stats data for Taksi.EXE dialog.
+Single record app at any given time.
+Tool tips - for the main window buttons.
+Add all hot keys to the button bar.
+Add a seperate hotkey for video stop.
+Add icons to the config pages.
+Add graphics to the installer MSI.
+Record GDI like iCord
+trim capture rectangle to 4 byte alignment to fix XVid refuseing to record.
+Browser dialog for selecting dir to place files.
+Persist Selected audio format. 
+Select Audio Format. (ACM dialog)
+allow hotkeys to have SHIFT, CTRL, ALT, etc
+Gray out the save button in config dialog if there are no changes.
+Add Stats Tab to config dialog.
+Unify INI prop names with the rest of the code.
+floating point frame rate to allow <1 sec frame rates.
+do frame compression/write on background thread
+persist selected video codec in INI file
+Tabbed config dialog
+Move common code to a common sub dir
+use MS hotkey control for setting hotkeys
+General C++ wrapper for the VFW 
+Replace CFG file with INI file format
+RC file for dialog
+Replace logging system with logging class.
+Basic MSI installer.
+Wrap hooking functions in a class 
+Wrap frame alloc functions in a class
+IRefPtr smart pointers for DX interfaces.
+Renaming of Taksi.EXE and TaksiDll.DLL files.
+Use of consistant header files.
+Object oriented Classes. Wrap major functionality in classes.
+Merge redundant code in graphics mode handlers to single shared function calls.
+always use sizeof() instead of constants
+use of static for scoping of variables.
+use of precompiled headers.
+Clear seperation of EXE,DLL and shared files.
+
+
+NOTE: When debugging. 
+You need 2 debuggers. One for the Taksi app and one for the target app.
+This way you can watch debug messages live from both process spaces.
+Attach the debugger to the target task first then run Taksi under the debugger.
+good sample target tasks are some of the sample apps that come with DirectX SDK
+You can set breakpoints in the target process space and the Taksi.exe process space seperately.
+
+Using a global debug monitor like Compuwares Monitor.exe app is very helpfull as well.

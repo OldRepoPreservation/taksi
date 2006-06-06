@@ -1,7 +1,9 @@
 BUILD INSTRUCTIONS
 ==========================================================================
 
-The Makefile (in the src folder) is intended to be used by Microsoft NMAKE 
+There is a Taksi.SLN file for building in Micrsoft Visual Studio 7.1
+
+Alternately the Makefile (in the src folder) is intended to be used by Microsoft NMAKE 
 tool, which comes with Visual C++ 6. You will need the following 3rd-party
 software to build this program:
 
@@ -12,10 +14,6 @@ of the SDK on your disk. Default is \DXSDK9)
 2. OpenGL main header file (gl.h)
 (Usually is installed in Visual Studio standard location for headers.
 If not, modify the Makefile accordingly.)
-
-3. STL (Standard Template Library), which is available freely from SGI. 
-(Modify the Makefile accordingly so that it points to correct location
-on your disk. Default is \STL)
 
 Three types of build are supported by the current Makefile: 
 "debug", "release", and "perf".
