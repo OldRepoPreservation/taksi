@@ -150,7 +150,7 @@ public:
 		return m_File.IsValidHandle();
 	}
 
-	HRESULT OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& form, double fFrameRate, CVideoCodec& CodecInfo );
+	HRESULT OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
 	HRESULT WriteAudioFrame( const BYTE* pWaveData );
 	HRESULT WriteVideoFrame( CVideoFrame& frame, int iTimes );
 	void CloseAVIFile();

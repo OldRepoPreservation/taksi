@@ -3,7 +3,7 @@ BUILD INSTRUCTIONS
 
 There is a Taksi.SLN file for building in Micrsoft Visual Studio 7.1
 
-Alternately the Makefile (in the src folder) is intended to be used by Microsoft NMAKE 
+Alternately the (OUT OF DATE, MUST UPDATE) Makefile (in the src folder) is intended to be used by Microsoft NMAKE 
 tool, which comes with Visual C++ 6. You will need the following 3rd-party
 software to build this program:
 
@@ -32,3 +32,13 @@ statistics, using CLOCK_START and CLOCK_STOP_AND_LOG macros from log.h
 
 (NOTE: You can also build the EXE and DLL files separately, using 
 appropriate targets, specified in the Makefile.)
+
+NOTE: When debugging:
+
+You can use 2 debuggers. One for the Taksi app and one for the target app.
+This way you can watch debug messages live from both process spaces.
+Attach the debugger to the target task first then run Taksi under the debugger.
+good sample target tasks are some of the sample apps that come with DirectX SDK
+You can set breakpoints in the target process space and the Taksi.exe process space seperately.
+
+Try using a global debug message monitor like Compuwares Monitor.exe.

@@ -1,7 +1,8 @@
+MOST RECENT CHANGES AT THE BOTTOM
+
 NOTE: This file contains chaotic notes taken primarily during the early 
 stages of development. The information here has mostly historic value.
 =======================================================================
-
 
 d3d8.dll base: 00230000
 
@@ -245,8 +246,54 @@ and also the actual frame rate of the video is not very good.
 However, this may be useful option for windowed-applications, which
 are running in relatively small windows.
 
-
-==============
 May 20,2006
-Dennis Robinson Refactor of code.
+==============
+Dennis Robinson - Extreme Refactoring of code.
+
+main button bar added. global record button on Taksi.EXE App
+Update the button bar correctly for current state.
+Fill in the live stats data for Taksi.EXE dialog.
+Single record app at any given time.
+Tool tips - for the main window buttons.
+Add all hot keys to the button bar.
+Add a seperate hotkey for video stop.
+Add icons to the config pages.
+Add graphics to the installer MSI.
+Record GDI like iCord
+trim capture rectangle to 4 byte alignment to fix XVid refuseing to record.
+Browser dialog for selecting dir to place files.
+Persist Selected audio format. 
+Select Audio Format. (ACM dialog)
+allow hotkeys to have SHIFT, CTRL, ALT, etc
+Gray out the save button in config dialog if there are no changes.
+Add Stats Tab to config dialog.
+Unify INI prop names with the rest of the code.
+floating point frame rate to allow <1 sec frame rates.
+do frame compression/write on background thread
+persist selected video codec in INI file
+Tabbed config dialog
+Move common code to a common sub dir
+use MS hotkey control for setting hotkeys
+General C++ wrapper for the VFW 
+Replace CFG file with INI file format
+RC file for dialog
+Replace logging system with logging class.
+Basic MSI installer.
+Wrap hooking functions in a class 
+Wrap frame alloc functions in a class
+IRefPtr smart pointers for DX interfaces.
+Renaming of Taksi.EXE and TaksiDll.DLL files.
+Use of consistant header files.
+Object oriented Classes. Wrap major functionality in classes.
+Merge redundant code in graphics mode handlers to single shared function calls.
+always use sizeof() instead of constants
+use of static for scoping of variables.
+use of precompiled headers.
+Clear seperation of EXE,DLL and shared files.
+New TAKSI icon
+
+June 6,2006 
+==============
+Ver 0.745 test release.
+sources all merged into Subversion on sourceforge.
 
