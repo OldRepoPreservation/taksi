@@ -302,3 +302,5 @@ Ver 0.746 test release.
 Title shows name of prime hooked app.
 Fix logging of messages to 'Taksi_App.log' file.
 DebugLog=0/1 in the INI file. keep debug log files or not?
+Indicator button reflects current state.
+
