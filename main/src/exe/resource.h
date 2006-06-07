@@ -26,6 +26,7 @@
 #define IDB_G_Screenshot                212
 #define IDB_G_SmallScreenshot           213
 #define IDC_ABOUT_1                     1001
+#define IDC_ABOUT_4						1004
 #define IDC_C_TAB                       1009
 #define IDC_C_StatusText                1010
 #define IDC_C_RestoreButton             1011

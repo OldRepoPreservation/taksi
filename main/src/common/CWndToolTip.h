@@ -21,8 +21,9 @@ public:
 	bool Create( HWND hWndParent, DWORD dwStyle=WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP );
 	void Start();
 
-	bool AddTool( HWND hWndCtrl, LPCTSTR lpszText, LPCRECT lpRectTool=NULL, UINT_PTR nIDTool=0 );
-	void DelTool( HWND hWndCtrl, UINT_PTR nIDTool=0 );
+	bool AddTool( HWND hWnd, LPCTSTR lpszText, LPCRECT lpRectTool=NULL, UINT_PTR nIDTool=0 );
+	bool AddToolForControl( HWND hWnd, UINT_PTR nIDTool=0 );
+	void DelTool( HWND hWnd, UINT_PTR nIDTool=0 );
 
 	void Activate( bool bActivate=true )
 	{ 

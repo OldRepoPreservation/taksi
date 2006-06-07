@@ -70,7 +70,13 @@ public:
 
 	int get_FrameBusyCount() const
 	{
-		return m_iFrameCount;	// how many busy frames are there? (not yet processed)
+		return m_iFrameCount.m_lValue;	// how many busy frames are there? (not yet processed)
+	}
+	void InitFrameQ()
+	{
+		m_iFrameBusy=0;	// index to Frame ready to compress.
+		m_iFrameFree=0;	// index to empty frame. ready to fill
+		m_iFrameCount.m_lValue = 0;
 	}
 
 private:
@@ -87,11 +93,14 @@ private:
 
 	// Make a pool of frames waiting to be compressed/written
 	// ASSUME: dont need a critical section on these since i assume int x=y assignment is atomic.
-#define AVI_FRAME_QTY 16	// make this variable ??? (full screen raw frames are HUGE!)
+#define AVI_FRAME_QTY 8	// make this variable ??? (full screen raw frames are HUGE!)
 	CAVIFrame m_aFrames[AVI_FRAME_QTY];		// buffer to keep current video frame 
 	int m_iFrameBusy;	// index to Frame ready to compress.
 	int m_iFrameFree;	// index to Frame ready to fill.
-	int m_iFrameCount;	// how many busy frames are there?
+	// (must be locked because it is changed by 2 threads)
+	CThreadLockedLong m_iFrameCount;	// how many busy frames are there? 
+
+	DWORD m_dwTotalFramesProcessed;
 };
 extern CAVIThread g_AVIThread;
 

@@ -6,13 +6,15 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
+Non Frame GDI not working.
 Odd flash when switching DX applcations. must change focus 2 times ?
-GDI record includes stuff outside rectangle ?
-GUI indicator drawn over overlapped windows. bleeds through.
+GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 
 TODO:
+Need message saying there is no codec selected!
+Need message explaining focus changing.
 Adjust size of the background thread Q
 Manual.txt completely out of date!
 Audio
