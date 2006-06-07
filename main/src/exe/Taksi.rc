@@ -102,7 +102,7 @@ CAPTION "Taksi Config"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_C_TAB,"SysTabControl32",0x0,1,0,281,133
-    LTEXT           "About Taksi: Ver: 1.0",IDC_C_StatusText,8,139,170,8
+    LTEXT           "Taksi",IDC_C_StatusText,8,139,170,8
     PUSHBUTTON      "Revert",IDC_C_RestoreButton,181,134,50,14
     DEFPUSHBUTTON   "Save",IDC_C_SaveButton,232,134,50,14
 END
@@ -254,7 +254,7 @@ BEGIN
     LTEXT           "Taksi",IDC_ABOUT_1,7,7,140,8
     LTEXT           "Desktop Video Recorder",IDC_STATIC,7,15,140,8
 	LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,140,8
-	LTEXT           "",IDC_STATIC,7,33,140,8
+	LTEXT           "",IDC_ABOUT_4,7,33,140,8
     LTEXT           "Copyright©2004 Anton Jouline (Juce)",IDC_STATIC,7,41,140,8
     LTEXT           "http://taksi.sourceforge.net/",IDC_STATIC,7,50,140,8
     LTEXT           "Copyright©1992-2006 Dennis Robinson",IDC_STATIC,7,58,140,8
@@ -404,8 +404,13 @@ END
 
 STRINGTABLE 
 BEGIN
+	IDC_C_SaveButton		"Save any changes to the INI file"
+	IDC_C_RestoreButton		"Restore previous settings last stored in the INI file"
+
     IDC_C_CaptureDirectoryBrowse 
-                            "select a directory from the windows file explorer"
+                            "Browse... Select a directory from the windows file explorer."
+    IDC_C_CaptureDirectoryExplore 
+                            "Explore... View the current contents of the selected directory with the Windows File Explorer."
 END
 
 STRINGTABLE 

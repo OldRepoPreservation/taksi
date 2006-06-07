@@ -314,3 +314,6 @@ June 7,2006
 ==============
 Ver 0.747 test release.
 Background thread queue N raw frames for compression.
+Save previous window position
+ToolTips for some config controls.
+Test on OpenGL samples.

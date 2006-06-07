@@ -116,10 +116,9 @@ DWORD CTaksiFrameRate::CheckFrameRate()
 CAVIThread::CAVIThread()
 	: m_nThreadId(0)
 	, m_bStop(false)
-	, m_iFrameBusy(0)	// index to Frame ready to compress.
-	, m_iFrameFree(0)	// index to empty frame. ready to fill
-	, m_iFrameCount(0)
+	, m_dwTotalFramesProcessed(0)
 {
+	InitFrameQ();
 }
 CAVIThread::~CAVIThread()
 {
@@ -130,13 +129,13 @@ CAVIThread::~CAVIThread()
 DWORD CAVIThread::ThreadRun()
 {
 	// m_hThread
-	DEBUG_MSG(( "CAVIThread::ThreadRun()" LOG_CR));
-
+	DEBUG_MSG(( "CAVIThread::ThreadRun() n=%d" LOG_CR, m_dwTotalFramesProcessed ));
 	goto do_wait;
 
-	for (;;)
+	while ( ! m_bStop && m_hThread.IsValidHandle())
 	{
-		ASSERT( m_iFrameBusy != m_iFrameFree );
+		int iFrameCountPrev = m_iFrameCount.m_lValue;
+		ASSERT( m_iFrameCount.m_lValue > 0 );
 		CAVIFrame* pFrame = &m_aFrames[ m_iFrameBusy ];
 		ASSERT(pFrame);
 		ASSERT(pFrame->IsValidFrame());
@@ -157,11 +156,13 @@ DWORD CAVIThread::ThreadRun()
 		// g_AVIFile.WriteAudioFrame(xxx);
 
 		// we are done.
+		m_dwTotalFramesProcessed++;
 		pFrame->m_dwFrameDups = 0;	// done.
 		m_iFrameBusy = ( m_iFrameBusy + 1 ) % AVI_FRAME_QTY;
-		m_iFrameCount--;
+		ASSERT( m_iFrameCount.m_lValue > 0 );
+		bool bMore = m_iFrameCount.Dec();
 		m_EventDataDone.SetEvent();	// done at least one frame!
-		if ( m_iFrameBusy != m_iFrameFree )	// more to do ?
+		if ( bMore )	// more to do ?
 			continue;
 
 do_wait:
@@ -173,12 +174,9 @@ do_wait:
 			DEBUG_ERR(( "CAVIThread::WaitForSingleObject FAIL" LOG_CR ));
 			break;
 		}
-
-		if ( m_bStop || ! m_hThread.IsValidHandle())
-			break;
 	}
 
-	m_iFrameCount = 0;
+	m_iFrameCount.Exchange(0);
 	m_nThreadId = 0;		// it actually is closed!
 	DEBUG_MSG(( "CAVIThread::ThreadRun() END" LOG_CR ));
 	return 0;
@@ -197,7 +195,7 @@ void CAVIThread::WaitForAllFrames()
 	if ( m_nThreadId == 0 )
 		return;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
-	while ( m_iFrameCount ) 
+	while ( m_iFrameCount.m_lValue ) 
 	{
 		DWORD dwRet = ::WaitForSingleObject( m_EventDataDone, INFINITE );
 		if ( dwRet != WAIT_OBJECT_0 )
@@ -221,7 +219,7 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
 
 	// just wait for a free frame. all busy.
-	if ( m_iFrameFree == m_iFrameBusy && m_iFrameCount >= AVI_FRAME_QTY )
+	if ( m_iFrameCount.m_lValue >= AVI_FRAME_QTY )
 	{
 		DWORD dwRet = ::WaitForSingleObject( m_EventDataDone, INFINITE );
 		if ( dwRet != WAIT_OBJECT_0 )
@@ -231,11 +229,16 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 		}
 	}
 
+	ASSERT( m_iFrameCount.m_lValue < AVI_FRAME_QTY );
 	CAVIFrame* pFrame = &m_aFrames[ m_iFrameFree ];
 	ASSERT( pFrame );
-	ASSERT( pFrame->m_dwFrameDups == 0 );
+	ASSERT( pFrame->m_dwFrameDups == 0 ); 
+	ASSERT( g_AVIFile.m_FrameForm.get_SizeBytes());
 	if ( ! pFrame->AllocForm( g_AVIFile.m_FrameForm ))
+	{
+		ASSERT(0);
 		return NULL;
+	}
 	return pFrame;	// ready
 }
 
@@ -248,12 +251,16 @@ void CAVIThread::SignalFrameStart( CAVIFrame* pFrame, DWORD dwFrameDups )	// rea
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
 	ASSERT(dwFrameDups);
 	ASSERT(pFrame);
-	ASSERT( pFrame->m_dwFrameDups == 0 );
+	ASSERT( pFrame->m_dwFrameDups == 0 ); 
+	ASSERT( pFrame->IsValidFrame());
 	pFrame->m_dwFrameDups = dwFrameDups;
 	m_iFrameFree = ( m_iFrameFree + 1 ) % AVI_FRAME_QTY;	// its ready.
-	m_iFrameCount++;
 	m_EventDataDone.ResetEvent();	// manual reset.
-	m_EventDataStart.SetEvent();	// wake the thread if it needs it.
+	ASSERT( m_iFrameCount.m_lValue < AVI_FRAME_QTY );
+	if ( m_iFrameCount.Inc() == 1 )
+	{
+		m_EventDataStart.SetEvent();	// wake the thread if it needs it.
+	}
 }
 
 HRESULT CAVIThread::StopAVIThread()
@@ -295,6 +302,7 @@ HRESULT CAVIThread::StartAVIThread()
 
 	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
 	m_bStop	= false;
+	InitFrameQ();
 
 	if ( ! m_EventDataStart.CreateEvent(NULL,false,false))
 	{

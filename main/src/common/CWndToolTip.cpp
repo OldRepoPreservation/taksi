@@ -25,8 +25,8 @@ void CWndToolTip::FillInToolInfo( TOOLINFO& ti, HWND hWnd, UINT_PTR nIDTool ) co
 {
 	// hWnd = the parent or the control depending on nIDTool
 
+	ASSERT(hWnd);
 	ASSERT(::IsWindow(m_hWnd));
-	ASSERT( hWnd != NULL );
 
 	memset(&ti, 0, sizeof(ti));
 	ti.cbSize = sizeof(ti);
@@ -48,10 +48,8 @@ void CWndToolTip::FillInToolInfo( TOOLINFO& ti, HWND hWnd, UINT_PTR nIDTool ) co
 bool CWndToolTip::AddTool( HWND hWnd, LPCTSTR lpszText, LPCRECT lpRectTool, UINT_PTR nIDTool )
 {
 	// hWnd = the parent or the control depending on nIDTool
+	ASSERT(hWnd);
 	ASSERT(lpszText != NULL);
-	// the toolrect and toolid must both be zero or both valid
-	ASSERT((lpRectTool != NULL && nIDTool != 0) ||
-		   (lpRectTool == NULL) && (nIDTool == 0));
 
 	TOOLINFO ti;
 	FillInToolInfo(ti, hWnd, nIDTool);
@@ -63,9 +61,32 @@ bool CWndToolTip::AddTool( HWND hWnd, LPCTSTR lpszText, LPCRECT lpRectTool, UINT
 	return ::SendMessage(m_hWnd, TTM_ADDTOOL, 0, (LPARAM)&ti) ? true : false;
 }
 
+bool CWndToolTip::AddToolForControl( HWND hWnd, UINT_PTR nIDTool )
+{
+	ASSERT(hWnd);
+	int id = nIDTool;
+	if ( id <= 0 )
+	{
+		id = ::GetDlgCtrlID( hWnd );
+		if ( id <= 0 )
+			return false;
+	}
+	TCHAR szTmp[ _MAX_PATH ];
+	int iLen = LoadString( NULL, id, szTmp, COUNTOF(szTmp)-1 ); 
+	if ( iLen <= 0 )
+	{
+		HWND hWndControl = ( nIDTool == 0 ) ? hWnd : (::GetDlgItem(hWnd,nIDTool));
+		iLen = GetWindowText( hWndControl, szTmp, COUNTOF(szTmp)-1 );
+		if ( iLen <= 0 )
+			return false;
+	}
+	return AddTool( hWnd, szTmp, NULL, nIDTool );
+}
+
 void CWndToolTip::DelTool( HWND hWnd, UINT_PTR nIDTool )
 {
 	// hWnd = the parent or the control depending on nIDTool
+	ASSERT(hWnd);
 	TOOLINFO ti;
 	FillInToolInfo(ti, hWnd, nIDTool);
 	::SendMessage(m_hWnd, TTM_DELTOOL, 0, (LPARAM)&ti);

@@ -106,6 +106,7 @@ void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
 void CTaksiDll::UpdateMaster()
 {
 	// tell the Master EXE to redisplay state info.
+	// Multi thread safe.
 	if ( m_hMasterWnd == NULL )
 		return;
 	if ( m_bMasterExiting )

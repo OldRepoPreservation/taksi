@@ -181,9 +181,10 @@ BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
     { 
 	case WM_INITDIALOG:
 		{
-			TCHAR szTitle[ _MAX_PATH ];
-			g_GUI.MakeWindowTitle( szTitle, NULL );
-			SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTitle );
+			TCHAR szTmp[ _MAX_PATH ];
+			int iLen = g_GUI.MakeWindowTitle( szTmp, NULL );
+			iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, ", (built:" __DATE__ ")" );
+			SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTmp );
 		}
 		break;
 	case WM_COMMAND: 
@@ -275,6 +276,16 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	case WM_CREATE:
 		DEBUG_MSG(( "CGui::WM_CREATE" LOG_CR ));
 		break;
+	case WM_MOVE:
+		{
+		ASSERT(hWnd);
+		RECT rect;
+		::GetWindowRect(hWnd,&rect);
+		g_Config.m_ptMasterWindow.x = rect.left;
+		g_Config.m_ptMasterWindow.y = rect.top;
+		sg_Config.m_ptMasterWindow = g_Config.m_ptMasterWindow;
+		}
+		break;
 	case WM_DESTROY: // destroy the app with the window.
 		// Exit the application when the window closes
 		DEBUG_MSG(( "CGui::WM_DESTROY" LOG_CR ));
@@ -364,7 +375,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 		TAKSI_MASTER_CLASSNAME,      // class name
 		"", // title for our window (appears in the titlebar)
 		c_dwStyle,
-		CW_USEDEFAULT,  CW_USEDEFAULT,  // initial x, y coordinate
+		g_Config.m_ptMasterWindow.x, g_Config.m_ptMasterWindow.y,  // initial x, y coordinate
 		1+(rect.right-rect.left), 1+(rect.bottom-rect.top),   // width and height of the window
 		HWND_DESKTOP,           // no parent window.
 		NULL,           // no menu

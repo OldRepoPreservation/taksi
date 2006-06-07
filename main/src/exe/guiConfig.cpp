@@ -725,13 +725,20 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	TabCtrl_SetCurSel( m_hControlTab, m_iTabCur );
 	UpdateGuiTabCur();
 
-#define GuiConfigControl(a,b,c)	m_hControl##a = ::GetDlgItem(m_hWndTab[b-1],IDC_C_##a); if (m_hControl##a == NULL ) { ASSERT(0); return false; }
+#define GuiConfigControl(a,b,c)	\
+	m_hControl##a = ::GetDlgItem(m_hWndTab[b-1],IDC_C_##a); \
+	if (m_hControl##a == NULL ) \
+	{ ASSERT(0); return false; } \
+	m_ToolTips.AddToolForControl(m_hControl##a); 
 #include "GuiConfigControls.tbl"
 #undef GuiConfigControl
 
 	// show credits
 	SendMessage(m_hControlCustomSettingsList, CB_LIMITTEXT, _MAX_PATH-1, 0);
 	SetSaveState( false );
+
+	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_SaveButton));
+	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_RestoreButton));
 
 	TabCtrl_SetToolTips( m_hControlTab, m_ToolTips.m_hWnd );
 	m_ToolTips.Start();
@@ -741,7 +748,7 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	UpdateProcStats( sg_ProcStats, 0xFFFFFFFF );
 	::SetTimer( m_hWnd, IDT_UpdateStats, 1000, NULL );
 
-	SetStatusText( _TEXT("About Taksi: Version " TAKSI_VERSION_S " (05/2006)."));
+	SetStatusText( _TEXT("Taksi: Version " TAKSI_VERSION_S " " __DATE__ "."));
 	return true;
 }
 

@@ -61,6 +61,9 @@ int CTaksiConfigCustom::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%g", m_fFrameWeight);
 	case TAKSI_CUSTOM_Pattern:
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szPattern);
+	default:
+		ASSERT(0);
+		break;
 	}
 	return -1;
 }
@@ -80,6 +83,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 			return false;
 		break;
 	default:
+		ASSERT(0);
 		return false;
 	}
 #ifdef _DEBUG
@@ -116,11 +120,13 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_Screenshot]=0x77;
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 
-	m_bShowIndicator = true;
-	m_bUseDirectInput = true;
-
 	m_bGDIUse = true;
 	m_bGDIFrame = true;
+
+	m_bShowIndicator = true;
+	m_bUseDirectInput = true;
+	m_ptMasterWindow.x = 0;
+	m_ptMasterWindow.y = 0;
 
 	DEBUG_MSG(("CTaksiConfig::InitConfig" LOG_CR ));
 }
@@ -337,6 +343,15 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%d", m_iAudioDevice );
 	case TAKSI_CFGPROP_ShowIndicator:
 		return _snprintf(pszValue, iSizeMax, m_bShowIndicator? "1" : "0" );
+	case TAKSI_CFGPROP_PosMasterWindow:
+		return _snprintf(pszValue, iSizeMax, "%d,%d", m_ptMasterWindow.x, m_ptMasterWindow.y );
+	case TAKSI_CFGPROP_GDIFrame:
+		return _snprintf(pszValue, iSizeMax, m_bGDIFrame? "1" : "0" );
+	case TAKSI_CFGPROP_GDIUse:
+		return _snprintf(pszValue, iSizeMax, m_bGDIUse? "1" : "0" );
+	default:
+		ASSERT(0);
+		break;
 	}
 	return -1;
 }
@@ -355,6 +370,10 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		break;
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
 		m_fFrameRateTarget = (float) atof(pszValue);
+		break;
+
+	case TAKSI_CFGPROP_PosMasterWindow:
+		sscanf( pszValue, "%d,%d", &m_ptMasterWindow.x, &m_ptMasterWindow.y );
 		break;
 		
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
@@ -398,7 +417,14 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_ShowIndicator:
 		m_bShowIndicator = atoi(pszValue) ? true : false;
 		break;
+	case TAKSI_CFGPROP_GDIFrame:
+		m_bGDIFrame = atoi(pszValue) ? true : false;
+		break;
+	case TAKSI_CFGPROP_GDIUse:
+		m_bGDIUse = atoi(pszValue) ? true : false;
+		break;
 	default:
+		ASSERT(0);
 		return false;
 	}
 #ifdef _DEBUG
@@ -466,6 +492,7 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 			else
 			{
 				pObj = NULL;
+				DEBUG_ERR(("INI Bad Section %s" LOG_CR, pszName ));
 			}
 			continue;
 		}
@@ -480,7 +507,10 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 
 		char* pszValue = Str_SkipSpace( pszEq + 1 );	// skip leading spaces.
 
-		pObj->PropSetName( pszName, pszValue );
+		if ( ! pObj->PropSetName( pszName, pszValue ))
+		{
+			DEBUG_ERR(("INI Bad Prop %s" LOG_CR, pszName ));
+		}
 	}
 
 	fclose(pFile);

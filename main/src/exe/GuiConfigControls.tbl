@@ -4,6 +4,7 @@
 
 GuiConfigControl(CaptureDirectory,			1,	"displays capture directory path")
 GuiConfigControl(CaptureDirectoryBrowse,	1,	"browse files dialog")
+GuiConfigControl(CaptureDirectoryExplore,	1,  "")
 GuiConfigControl(DebugLog,					1,	"Create Debug Logs")
 
 GuiConfigControl(FrameRate,					2,	"displays adaptive frame rate")
