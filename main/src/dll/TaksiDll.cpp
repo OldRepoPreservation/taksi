@@ -105,6 +105,7 @@ void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
 
 void CTaksiDll::UpdateMaster()
 {
+	// tell the Master EXE to redisplay state info.
 	if ( m_hMasterWnd == NULL )
 		return;
 	if ( m_bMasterExiting )
@@ -258,7 +259,6 @@ void CTaksiDll::DestroyDll()
 	DEBUG_TRACE(( "CTaksiDll::DestroyDll" LOG_CR ));
 	// Signal to unhook from IDirect3DDeviceN methods
 	m_bMasterExiting = true;
-	// sg_Config.DestroyConfig();
 
 	// Uninstall the hook
 	HookCBT_Uninstall();
@@ -319,6 +319,7 @@ void CTaksiProcess::UpdateStat( TAKSI_PROCSTAT_TYPE eProp )
 	m_Stats.UpdateProcStat(eProp);
 	if ( IsProcPrime())
 	{
+		// Dupe the data for global display.
 		sg_ProcStats.CopyProcStat( m_Stats, eProp );
 	}
 	if ( eProp == TAKSI_PROCSTAT_LastError )
@@ -336,10 +337,11 @@ int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
 	::GetLocalTime(&time);
 
 	int iLen = _sntprintf( pszFileName, _MAX_PATH-1,
-		_T("%s%s-%d%02d%02d-%02d%02d%02d%03d.%s"), 
+		_T("%s%s-%d%02d%02d-%02d%02d%02d%01d.%s"), 
 		sg_Config.m_szCaptureDir, m_szProcessTitleNoExt, 
 		time.wYear, time.wMonth, time.wDay,
-		time.wHour, time.wMinute, time.wSecond, time.wMilliseconds,
+		time.wHour, time.wMinute, time.wSecond,
+		time.wMilliseconds/100,	// uniqueness to tenths of a sec. 
 		pszExt );
 
 	return iLen;
@@ -347,7 +349,7 @@ int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
 
 bool CTaksiProcess::CheckProcessMaster() const
 {
-	// the master process ?
+	// the master EXE process ?
 	// TAKSI.EXE has special status!
 	return( ! lstrcmpi( m_szProcessTitleNoExt, _T("taksi")));
 }
@@ -365,9 +367,9 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	static const TCHAR* sm_SpecialNames[] = 
 	{
 		_T("devenv"),	// debugger!
-		_T("dwwin"),	// debugger!
+		_T("dwwin"),	// debugger! crash
 #ifdef _DEBUG
-		_T("gaim"),
+		_T("gaim"),		// sorry, this was bugging me.
 #endif
 		_T("js7jit"),	// debugger!
 		_T("monitor"),	// debugger!
@@ -389,13 +391,11 @@ bool CTaksiProcess::CheckProcessSpecial() const
 
 	if ( ! ::IsWindow( sg_Dll.m_hMasterWnd ))
 	{
-		// The master app is gone! this is bad!
+		// The master app is gone! this is bad! This shouldnt really happen
 		DEBUG_ERR(( "Taksi.EXE App is NOT Loaded! (%d)" LOG_CR, sg_Dll.m_hMasterWnd ));
-#if 1
 		sg_Dll.m_hMasterWnd = NULL;
 		sg_Dll.m_bMasterExiting = true;
 		return true;
-#endif
 	}
 
 	return false;
@@ -451,7 +451,7 @@ void CTaksiProcess::CheckProcessCustom()
 				LOG_MSG(( "FindCustomConfig: Unable to allocate new custom config" LOG_CR));
 				return;
 			}
-			*m_pCustomConfig = *pCfgMatch;
+			*m_pCustomConfig = *pCfgMatch; // copy contents.
 			m_pCustomConfig->m_pNext = NULL;
 			return;
 		}
@@ -484,7 +484,7 @@ HRESULT CTaksiProcess::AttachGraphXMode()
 void CTaksiProcess::StopGraphXMode()
 {
 	// this can be called in the PresentFrameEnd
-	g_AVIThread.StopAVIThread();	// kill my thread, i'm done
+	g_AVIThread.StopAVIThread();	// kill my work thread, i'm done
 	g_AVIFile.CloseAVIFile();	// close AVI file, if we were in recording mode 
 	g_HotKeys.DetachHotKeys();
 }

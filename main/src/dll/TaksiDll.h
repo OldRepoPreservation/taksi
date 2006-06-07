@@ -8,6 +8,8 @@
 #pragma once
 #endif
 
+#include "../common/CThreadLockedLong.h"
+
 extern CAVIFile g_AVIFile;
 
 struct CTaksiFrameRate
@@ -34,13 +36,23 @@ public:
 	}
 
 private:
-	DWORD m_dwFreqUnits;				// the units/sec of the TIMEFAST_t timer.
+	DWORD m_dwFreqUnits;		// the units/sec of the TIMEFAST_t timer.
 	TIMEFAST_t m_tLastCount;	// when was CheckFrameRate() called?
 	float m_fLeftoverWeight;
 	DWORD m_dwLastOverhead;
 	DWORD m_dwPenalty;
 };
 extern CTaksiFrameRate g_FrameRate;
+
+struct CAVIFrame : public CVideoFrame
+{
+	// an en-queueed frame to be processed.
+	CAVIFrame()
+		: m_dwFrameDups(0)
+	{
+	}
+	DWORD m_dwFrameDups;	// Dupe the current frame to catch up the frame rate. 0=unused
+};
 
 struct CAVIThread
 {
@@ -52,8 +64,14 @@ public:
 	HRESULT StartAVIThread();
 	HRESULT StopAVIThread();
 
-	CVideoFrame* WaitForNextFrame( bool bFlush );
-	void SignalFrameStart( CVideoFrame* pFrame, DWORD dwFrameDups );	// ready to compress/write
+	void WaitForAllFrames();
+	CAVIFrame* WaitForNextFrame();
+	void SignalFrameStart( CAVIFrame* pFrame, DWORD dwFrameDups );	// ready to compress/write a raw frame
+
+	int get_FrameBusyCount() const
+	{
+		return m_iFrameCount;	// how many busy frames are there? (not yet processed)
+	}
 
 private:
 	DWORD ThreadRun();
@@ -64,12 +82,16 @@ private:
 	DWORD m_nThreadId;
 	bool m_bStop;
 
-	CNTEvent m_hEventDataStart;		// Data ready to work on. AVIThread waits on this
-	CNTEvent m_hEventDataDone;		// We are compressing. foreground waits on this.
+	CNTEvent m_EventDataStart;		// Data ready to work on. AVIThread waits on this
+	CNTEvent m_EventDataDone;		// We are done compressing a single frame. foreground waits on this.
 
-	// ??? Make a pool of these !
-	DWORD m_dwFrameDups;			// Dupe the current frame to catch up the frame rate.
-	CVideoFrame m_VideoFrame;		// buffer to keep current video frame 
+	// Make a pool of frames waiting to be compressed/written
+	// ASSUME: dont need a critical section on these since i assume int x=y assignment is atomic.
+#define AVI_FRAME_QTY 16	// make this variable ??? (full screen raw frames are HUGE!)
+	CAVIFrame m_aFrames[AVI_FRAME_QTY];		// buffer to keep current video frame 
+	int m_iFrameBusy;	// index to Frame ready to compress.
+	int m_iFrameFree;	// index to Frame ready to fill.
+	int m_iFrameCount;	// how many busy frames are there?
 };
 extern CAVIThread g_AVIThread;
 

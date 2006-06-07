@@ -75,7 +75,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 	if ( g_AVIFile.IsOpen())
 	{
 		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
-		g_AVIThread.WaitForNextFrame(true);
+		g_AVIThread.WaitForAllFrames();
 		g_AVIFile.CloseAVIFile();
 		g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordStart);	// re-open it later.
 	}
@@ -157,7 +157,7 @@ void CTaksiGraphX::RecordAVI_Stop()
 		return;
 
 	DEBUG_MSG(( "CTaksiGraphX:RecordAVI_Stop" LOG_CR));
-	g_AVIThread.WaitForNextFrame(true);
+	g_AVIThread.WaitForAllFrames();
 	g_AVIFile.CloseAVIFile();
 
 	_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
@@ -177,7 +177,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 	if ( dwFrameDups <= 0)	// i want this frame?
 		return true;
 
-	CVideoFrame* pFrame = g_AVIThread.WaitForNextFrame(false);	// dont get new frame til i finish the last one.
+	CAVIFrame* pFrame = g_AVIThread.WaitForNextFrame();	// dont get new frame til i finish the last one.
 	if (pFrame==NULL)
 	{
 		DEBUG_ERR(("CTaksiGraphX::RecordAVI_Frame() FAILED" LOG_CR ));

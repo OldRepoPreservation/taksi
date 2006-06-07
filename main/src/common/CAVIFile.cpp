@@ -75,7 +75,7 @@ void CVideoFrameForm::InitPadded( int cx, int cy, int iBPP, int iPad )
 
 void CVideoFrame::FreeFrame()
 {
-	if (m_pPixels == NULL) 
+	if ( !IsValidFrame()) 
 		return;
 	::HeapFree( ::GetProcessHeap(), 0, m_pPixels);
 	m_pPixels = NULL;
@@ -83,7 +83,7 @@ void CVideoFrame::FreeFrame()
 
 bool CVideoFrame::AllocForm( const CVideoFrameForm& FrameForm )
 {
-	if (m_pPixels)
+	if ( IsValidFrame())
 	{
 		if ( ! memcmp( &FrameForm, this, sizeof(FrameForm)))
 			return true;
@@ -91,7 +91,7 @@ bool CVideoFrame::AllocForm( const CVideoFrameForm& FrameForm )
 	}
 	((CVideoFrameForm&)*this) = FrameForm;
 	m_pPixels = (BYTE*) ::HeapAlloc( ::GetProcessHeap(), HEAP_ZERO_MEMORY, get_SizeBytes());
-	if (m_pPixels == NULL )
+	if ( ! IsValidFrame())
 		return false;
 	return true;
 }

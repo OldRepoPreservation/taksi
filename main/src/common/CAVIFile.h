@@ -48,6 +48,11 @@ public:
 		FreeFrame();
 	}
 
+	bool IsValidFrame() const
+	{
+		return m_pPixels != NULL;
+	}
+
 	void FreeFrame();
 	bool AllocForm( const CVideoFrameForm& form );
 	bool AllocPadXY( int cx, int cy, int iBPP=3, int iPad=sizeof(DWORD));	// padded to 4 bytes
