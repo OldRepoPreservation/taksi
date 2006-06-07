@@ -11,7 +11,6 @@
 CTaksiOGL g_OGL;
 
 //**************************************************************************
-// helper buffer for g_VideoFrame
 
 static PFNGLACTIVETEXTUREARBPROC s_glActiveTextureARB = NULL;
 static GLint s_iMaxTexUnits = 0;	// <= COUNTOF(s_TextureUnitNums)

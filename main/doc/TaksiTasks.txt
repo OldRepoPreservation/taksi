@@ -13,8 +13,8 @@ Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 
 TODO:
-Manual.txt completely out of date!
 Background thread queue N raw frames for compression.
+Manual.txt completely out of date!
 Audio
 Pause live record ?
 Better frame rate calculation ?

@@ -6,8 +6,7 @@
 
 CTaksiFrameRate g_FrameRate;	// measure current video frame rate.
 CAVIFile g_AVIFile;				// current video file we are recording.
-CAVIThread g_AVIThread;			// put all compression on a back thread.
-CVideoFrame g_VideoFrame;		// buffer to keep current video frame 
+CAVIThread g_AVIThread;			// put all compression on a back thread. Q raw data to be processed.
 
 //CWaveACMInt g_ACM;			// compress audio stream.
 //CWaveRecorder g_AudioInput;	// Raw PCM audio input. (loopback from output)
@@ -143,7 +142,7 @@ DWORD CAVIThread::ThreadRun()
 			break;
 
 		// compress and write
-		HRESULT hRes = g_AVIFile.WriteVideoFrame( g_VideoFrame, m_dwFrameDups ); 
+		HRESULT hRes = g_AVIFile.WriteVideoFrame( m_VideoFrame, m_dwFrameDups ); 
 		if ( SUCCEEDED(hRes))
 		{
 			if ( hRes )
@@ -171,19 +170,36 @@ DWORD __stdcall CAVIThread::ThreadEntryProc( void* pThis ) // static
 	return ((CAVIThread*)pThis)->ThreadRun();
 }
 
-DWORD CAVIThread::WaitForDataDone()
+CVideoFrame* CAVIThread::WaitForNextFrame( bool bFlush )
 {
-	// Wait for the thread to finish what it was doing.
+	// Get a new video frame to put raw data.
+	// If none available. Wait for the thread to finish what it was doing.
+	// bFlush = wait for them all to be done.
+
 	if ( m_nThreadId == 0 )
-		return 0;
+		return NULL;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
-	return ::WaitForSingleObject( m_hEventDataDone, INFINITE );
+	DWORD dwRet = ::WaitForSingleObject( m_hEventDataDone, INFINITE );
+	if ( dwRet != WAIT_OBJECT_0 )
+	{
+		DEBUG_ERR(( "CAVIThread::WaitForNextFrame FAILED" LOG_CR ));
+		return NULL;	// failed.
+	}
+
+	if ( bFlush )
+	{
+		m_VideoFrame.FreeFrame();	// re-alloc later.
+		return NULL;
+	}
+	if (!m_VideoFrame.AllocForm( g_AVIFile.m_FrameForm ))
+		return NULL;
+	return &m_VideoFrame;	// ready
 }
 
-void CAVIThread::SignalDataStart( DWORD dwFrameDups )	// ready to compress/write
+void CAVIThread::SignalFrameStart( CVideoFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
 {
 	// New data is ready so wake up the thread.
-	// ASSUME: WaitForDataDone() was just called.
+	// ASSUME: WaitForNextFrame() was just called.
 	if ( m_nThreadId == 0 )
 		return;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
@@ -219,6 +235,9 @@ HRESULT CAVIThread::StopAVIThread()
 		}
 	}
 	m_hThread.CloseHandle();
+
+	m_VideoFrame.FreeFrame();	// release buffer
+
 	return hRes;
 }
 

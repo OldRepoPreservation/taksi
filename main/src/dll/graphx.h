@@ -57,7 +57,7 @@ protected:
 private:
 	HRESULT RecordAVI_Start();
 	void RecordAVI_Stop();
-	void RecordAVI_Frame();
+	bool RecordAVI_Frame();
 
 	HRESULT MakeScreenShot( bool bHalfSize );
 

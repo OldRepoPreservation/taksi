@@ -62,6 +62,7 @@ struct AVI_FILE_HEADER
 
 void CVideoFrameForm::InitPadded( int cx, int cy, int iBPP, int iPad )
 {
+	// iPad = sizeof(DWORD)
 	m_Size.cx = cx;
 	m_Size.cy = cy;
 	m_iBPP = iBPP;
@@ -72,30 +73,35 @@ void CVideoFrameForm::InitPadded( int cx, int cy, int iBPP, int iPad )
 
 //**************************************************************** 
 
-void CVideoFrame::AllocPadXY( int cx, int cy, int iBPP, int iPad )
-{
-	// iPad = sizeof(DWORD)
-
-	if (m_pPixels)
-	{
-		CVideoFrameForm FrameForm;
-		FrameForm.InitPadded(cx,cy,iBPP,iPad);
-		if ( ! memcmp( &FrameForm, this, sizeof(FrameForm)))
-			return;
-		FreeFrame();
-	}
-
-	InitPadded(cx,cy,iBPP,iPad);
-	m_pPixels = (BYTE*) ::HeapAlloc( ::GetProcessHeap(), HEAP_ZERO_MEMORY, get_SizeBytes());
-	ASSERT(m_pPixels);
-}
-
 void CVideoFrame::FreeFrame()
 {
 	if (m_pPixels == NULL) 
 		return;
 	::HeapFree( ::GetProcessHeap(), 0, m_pPixels);
 	m_pPixels = NULL;
+}
+
+bool CVideoFrame::AllocForm( const CVideoFrameForm& FrameForm )
+{
+	if (m_pPixels)
+	{
+		if ( ! memcmp( &FrameForm, this, sizeof(FrameForm)))
+			return true;
+		FreeFrame();
+	}
+	((CVideoFrameForm&)*this) = FrameForm;
+	m_pPixels = (BYTE*) ::HeapAlloc( ::GetProcessHeap(), HEAP_ZERO_MEMORY, get_SizeBytes());
+	if (m_pPixels == NULL )
+		return false;
+	return true;
+}
+
+bool CVideoFrame::AllocPadXY( int cx, int cy, int iBPP, int iPad )
+{
+	// iPad = sizeof(DWORD)
+	CVideoFrameForm FrameForm;
+	FrameForm.InitPadded(cx,cy,iBPP,iPad);
+	return AllocForm(FrameForm);
 }
 
 HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const

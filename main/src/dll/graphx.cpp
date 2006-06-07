@@ -74,14 +74,11 @@ void CTaksiGraphX::RecordAVI_Reset()
 	// and set the flag so that the next Present() will restart it.
 	if ( g_AVIFile.IsOpen())
 	{
-		g_AVIThread.WaitForDataDone();
-		g_AVIFile.CloseAVIFile();
-
 		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
+		g_AVIThread.WaitForNextFrame(true);
+		g_AVIFile.CloseAVIFile();
 		g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordStart);	// re-open it later.
 	}
-
-	g_VideoFrame.FreeFrame();	// re-alloc later.
 
 	// is HWND still valid ? 
 	if ( ! ::IsWindow( g_Proc.m_Stats.m_hWnd ))
@@ -113,7 +110,8 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	int iDiv = (sg_Config.m_bVideoHalfSize) ? 2 : 1;
 
 	// allocate buffer for pixel data
-	g_VideoFrame.AllocPadXY( g_Proc.m_Stats.m_SizeWnd.cx/iDiv, g_Proc.m_Stats.m_SizeWnd.cy/iDiv );
+	CVideoFrameForm FrameForm;
+	FrameForm.InitPadded(g_Proc.m_Stats.m_SizeWnd.cx/iDiv, g_Proc.m_Stats.m_SizeWnd.cy/iDiv);
 
 	// What frame rate do we want for our movie?
 	double fFrameRate = sg_Config.m_fFrameRateTarget;
@@ -122,7 +120,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		fFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
 	}
 
-	HRESULT hRes = g_AVIFile.OpenAVIFile( szFileName, g_VideoFrame, fFrameRate, sg_Config.m_VideoCodec );
+	HRESULT hRes = g_AVIFile.OpenAVIFile( szFileName, FrameForm, fFrameRate, sg_Config.m_VideoCodec );
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
@@ -159,7 +157,7 @@ void CTaksiGraphX::RecordAVI_Stop()
 		return;
 
 	DEBUG_MSG(( "CTaksiGraphX:RecordAVI_Stop" LOG_CR));
-	g_AVIThread.WaitForDataDone();
+	g_AVIThread.WaitForNextFrame(true);
 	g_AVIFile.CloseAVIFile();
 
 	_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
@@ -169,7 +167,7 @@ void CTaksiGraphX::RecordAVI_Stop()
 	sg_Dll.UpdateMaster();
 }
 
-void CTaksiGraphX::RecordAVI_Frame()
+bool CTaksiGraphX::RecordAVI_Frame()
 {
 	// We are actively recording the AVI. a frame is ready.
 	ASSERT( g_AVIFile.IsOpen());
@@ -177,22 +175,28 @@ void CTaksiGraphX::RecordAVI_Frame()
 	// determine whether this frame needs to be grabbed when recording. or just skipped.
 	DWORD dwFrameDups = g_FrameRate.CheckFrameRate();
 	if ( dwFrameDups <= 0)	// i want this frame?
-		return;
+		return true;
 
-	g_AVIThread.WaitForDataDone();	// dont get new frame til i finish the last one.
+	CVideoFrame* pFrame = g_AVIThread.WaitForNextFrame(false);	// dont get new frame til i finish the last one.
+	if (pFrame==NULL)
+	{
+		DEBUG_ERR(("CTaksiGraphX::RecordAVI_Frame() FAILED" LOG_CR ));
+		return false;
+	}
 
 	// NOTE: I cant safely use sg_Config.m_bVideoHalfSize in real time.
-	bool bVideoHalfSize = ( g_VideoFrame.m_Size.cx < ( g_Proc.m_Stats.m_SizeWnd.cx - 4 ));
+	bool bVideoHalfSize = ( pFrame->m_Size.cx < ( g_Proc.m_Stats.m_SizeWnd.cx - 4 ));
 
 	CLOCK_START(b);
 	// get pixels from the backbuffer into the new buffer
-	GetFrame( g_VideoFrame, bVideoHalfSize );	// virtual
+	HRESULT hRes = GetFrame( *pFrame, bVideoHalfSize );	// virtual
 	CLOCK_STOP(b,"Clock GetFrame=%d");
 
 	// Move compression work to another thread
-	g_AVIThread.SignalDataStart(dwFrameDups);	// ready to compress/write
+	g_AVIThread.SignalFrameStart(pFrame,dwFrameDups);	// ready to compress/write
 
 	g_FrameRate.MeasureOverhead();	// keep track of recording overhead
+	return true;
 }
 
 //********************************************************
@@ -292,7 +296,10 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	// write AVI-file, if in recording mode. 
 	if ( g_AVIFile.IsOpen())
 	{
-		RecordAVI_Frame();
+		if ( ! RecordAVI_Frame())
+		{
+			// The record failed!
+		}
 	}
 
 	// draw the indicator. (after video and screen cap are done)

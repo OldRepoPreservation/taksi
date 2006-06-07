@@ -9,7 +9,6 @@
 #endif
 
 extern CAVIFile g_AVIFile;
-extern CVideoFrame g_VideoFrame;	// buffer to keep current video frame 
 
 struct CTaksiFrameRate
 {
@@ -45,27 +44,32 @@ extern CTaksiFrameRate g_FrameRate;
 
 struct CAVIThread
 {
-	// A worker thread to compress the current frame in the background
+	// A worker thread to compress frames and write AVI in the background
 public:
 	CAVIThread();
 	~CAVIThread();
 
 	HRESULT StartAVIThread();
 	HRESULT StopAVIThread();
-	DWORD WaitForDataDone();
-	void SignalDataStart( DWORD dwFrameDups );	// ready to compress/write
+
+	CVideoFrame* WaitForNextFrame( bool bFlush );
+	void SignalFrameStart( CVideoFrame* pFrame, DWORD dwFrameDups );	// ready to compress/write
 
 private:
 	DWORD ThreadRun();
 	static DWORD __stdcall ThreadEntryProc( void* pThis );
 
 private:
-	DWORD m_dwFrameDups;		// Dupe the current frame to catch up the frame rate.
-	CNTEvent m_hEventDataStart;		// Data ready to work on. AVIThread waits on this
-	CNTEvent m_hEventDataDone;		// We are compressing. foreground waits on this.
 	CNTHandle m_hThread;
 	DWORD m_nThreadId;
 	bool m_bStop;
+
+	CNTEvent m_hEventDataStart;		// Data ready to work on. AVIThread waits on this
+	CNTEvent m_hEventDataDone;		// We are compressing. foreground waits on this.
+
+	// ??? Make a pool of these !
+	DWORD m_dwFrameDups;			// Dupe the current frame to catch up the frame rate.
+	CVideoFrame m_VideoFrame;		// buffer to keep current video frame 
 };
 extern CAVIThread g_AVIThread;
 

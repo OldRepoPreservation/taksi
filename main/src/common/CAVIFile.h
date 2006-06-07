@@ -48,8 +48,9 @@ public:
 		FreeFrame();
 	}
 
-	void AllocPadXY( int cx, int cy, int iBPP=3, int iPad=sizeof(DWORD));	// padded to 4 bytes
 	void FreeFrame();
+	bool AllocForm( const CVideoFrameForm& form );
+	bool AllocPadXY( int cx, int cy, int iBPP=3, int iPad=sizeof(DWORD));	// padded to 4 bytes
 
 	HRESULT SaveAsBMP( const TCHAR* pszFilename ) const;
 
@@ -162,6 +163,9 @@ public:
 private:
 	int InitFileHeader( AVI_FILE_HEADER& afh );
 
+public:
+	CVideoFrameForm m_FrameForm;		// pixel format of each video frame.
+
 private:
 	CNTHandle m_File;	// the open AVI file.
 
@@ -171,7 +175,6 @@ private:
 	CAVIIndex m_Index;			// build an index as we go.
 
 	// Params set at OpenAVIFile().
-	CVideoFrameForm m_FrameForm;		// pixel format of each video frame.
 	double m_fFrameRate;		// What video framerate are we trying to use? (x/second)
 	CVideoCodec m_VideoCodec;	// What video compression params did we choose?
 
