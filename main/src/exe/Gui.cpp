@@ -13,15 +13,30 @@ CGui::CGui()
 {
 }
 
+int CGui::MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp ) // static
+{
+	TCHAR szName[ _MAX_PATH ];
+	int iLen = LoadString( g_hInst, ID_APP, szName, sizeof(szName)-1 );
+	if ( iLen <= 0 )
+	{
+		ASSERT(0);
+		return iLen;
+	}
+
+	if ( pszHookApp == NULL || pszHookApp[0] == '\0' )
+	{
+		return _sntprintf( pszTitle, _MAX_PATH, _T("%s v") _T(TAKSI_VERSION_S), szName ); 
+	}
+	else
+	{
+		return _sntprintf( pszTitle, _MAX_PATH, _T("%s - %s"), szName, pszHookApp ); 
+	}
+}
+
 bool CGui::UpdateWindowTitle()
 {
 	// Set the app title to reflect current hooked app.
-	TCHAR szName[ _MAX_PATH ];
-	if ( ! LoadString( g_hInst, ID_APP, szName, sizeof(szName)-1 ))
-	{
-		ASSERT(0);
-		return false;
-	}
+
 	const TCHAR* pszHookApp = NULL;
 	if ( sg_ProcStats.m_dwProcessId )
 	{
@@ -29,14 +44,9 @@ bool CGui::UpdateWindowTitle()
 	}
 
 	TCHAR szTitle[ _MAX_PATH ];
-	if ( pszHookApp == NULL || pszHookApp[0] == '\0' )
-	{
-		_sntprintf( szTitle, COUNTOF(szTitle), _T("%s v") _T(TAKSI_VERSION_S), szName ); 
-	}
-	else
-	{
-		_sntprintf( szTitle, COUNTOF(szTitle), _T("%s - %s"), szName, pszHookApp ); 
-	}
+	int iLen = MakeWindowTitle( szTitle, pszHookApp );
+	if ( iLen <= 0 )
+		return false;
 
 	SetWindowText( m_hWnd, szTitle );
 	return true;
@@ -169,6 +179,13 @@ BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 { 
     switch (message) 
     { 
+	case WM_INITDIALOG:
+		{
+			TCHAR szTitle[ _MAX_PATH ];
+			g_GUI.MakeWindowTitle( szTitle, NULL );
+			SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTitle );
+		}
+		break;
 	case WM_COMMAND: 
 		switch (LOWORD(wParam)) 
         { 

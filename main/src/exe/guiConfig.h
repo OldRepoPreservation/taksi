@@ -26,6 +26,8 @@ public:
 	static void OnCommandHelpURL();
 	static int OnCommandHelpAbout( HWND hWnd );
 
+	static int MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp );
+
 private:
 	static ATOM RegisterClass();
 	static LRESULT CALLBACK WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
