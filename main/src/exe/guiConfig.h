@@ -24,6 +24,7 @@ public:
 	void UpdateButtonToolTips();
 
 	static void OnCommandHelpURL();
+	static int OnCommandHelpAbout( HWND hWnd );
 
 private:
 	static ATOM RegisterClass();

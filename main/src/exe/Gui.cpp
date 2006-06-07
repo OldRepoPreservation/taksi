@@ -158,10 +158,33 @@ void CGui::UpdateButtonToolTips()
 
 void CGui::OnCommandHelpURL() // static
 {
+	// IDM_SC_HELP_URL
 	// NOTE: use the proper URL here? 
 	// _T("http://www.menasoft.com/taksi")
 	// _T("http://taksi.sourceforge.net/")
 	CHttpLink_GotoURL( _T("http://taksi.sourceforge.net/"), SW_SHOWNORMAL );
+}
+
+BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
+{ 
+    switch (message) 
+    { 
+	case WM_COMMAND: 
+		switch (LOWORD(wParam)) 
+        { 
+		case IDOK: 
+        case IDCANCEL: 
+			EndDialog(hwndDlg, wParam); 
+            return true; 
+		} 
+    } 
+    return false; 
+} 
+
+int CGui::OnCommandHelpAbout( HWND hWndParent )
+{
+	// IDM_SC_HELP_ABOUT
+	return DialogBox( g_hInst, MAKEINTRESOURCE(IDD_About), hWndParent, AboutDlgProc );
 }
 
 bool CGui::OnCommand( int id, int iNotify, HWND hControl )
@@ -221,6 +244,9 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 	case IDM_SC_HELP_URL:
 		OnCommandHelpURL();
 		return true;
+	case IDM_SC_HELP_ABOUT:
+		OnCommandHelpAbout(m_hWnd);
+		return true;
 	}
 	return false;
 }
@@ -261,6 +287,15 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		return 1;
 	}
 	return ::DefWindowProc(hWnd,uMsg,wParam,lParam);
+}
+
+static BOOL AppendMenuStr( HMENU hMenu, int id )
+{
+	// IDM_SC_HELP_URL
+	TCHAR szTmp[ _MAX_PATH ];
+	int iLen = LoadString( g_hInst, id, szTmp, sizeof(szTmp)-1 );
+	return AppendMenu( hMenu, MF_INSERT|MF_STRING|MF_BYCOMMAND, 
+		id, szTmp );
 }
 
 bool CGui::CreateGuiWindow( UINT nCmdShow )
@@ -327,11 +362,8 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 	HMENU hMenu = ::GetSystemMenu(m_hWnd,false);
 	if ( hMenu )
 	{
-		// IDM_SC_HELP_URL
-		TCHAR szTmp[ _MAX_PATH ];
-		LoadString( g_hInst, IDM_SC_HELP_URL, szTmp, sizeof(szTmp)-1 );
-		AppendMenu( hMenu, MF_INSERT|MF_STRING|MF_BYCOMMAND, 
-			IDM_SC_HELP_URL, szTmp );
+		AppendMenuStr(hMenu,IDM_SC_HELP_URL);
+		AppendMenuStr(hMenu,IDM_SC_HELP_ABOUT);
 	}
 
 	// build GUI controls

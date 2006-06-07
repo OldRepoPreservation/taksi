@@ -506,6 +506,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 {
 	// DLL_PROCESS_ATTACH
 	// We have attached to a new process. via the CBT most likely.
+	// This is called before anything else.
 
 	// Get Name of the process the DLL is attaching to
 	if ( ! ::GetModuleFileName(NULL, m_Stats.m_szProcessFile, sizeof(m_Stats.m_szProcessFile)))

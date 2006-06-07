@@ -94,7 +94,7 @@ for you captured videos.
 
 8. Configuration:
 -----------------
-Taksi uses configuration file, called "taksi.cfg". It is optional, so the 
+Taksi uses configuration file, called "taksi.INI". It is optional, so the 
 program can operate without it, using built-in default settings. 
 The configuration file is managed automatically by Taksi (it is read
 on start-up, and updated when "Save And Apply" button is clicked.).
@@ -105,11 +105,11 @@ The following options exist:
 1) Basic capture options:
 =========================
 
-Capture directory ("capture.dir"): 
+Capture directory ("CaptureDir"): 
 This is the directory, where your screenshots and video will be stored. 
 IMPORTANT: This directory must exist before any capture is attempted.
 
-Target frame rate ("movie.frameRate.target"):
+Target frame rate ("MovieFrameRateTarget"):
 Desired frame rate of the captured video. So-called "Adaptive" algorithm
 uses this setting. When Adaptive algorithm is used, Taksi will try to 
 capture the video that will run at specified frame rate, and appear to 

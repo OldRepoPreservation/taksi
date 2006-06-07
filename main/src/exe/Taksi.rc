@@ -251,15 +251,14 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
 CAPTION "About Taksi Desktop Video Recorder"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,157,7,50,14
     LTEXT           "Taksi",IDC_STATIC,7,7,140,8
-    LTEXT           "",IDC_STATIC,7,15,140,8
-    LTEXT           "",IDC_STATIC,7,24,140,8
-    LTEXT           "",IDC_STATIC,7,33,140,8
-    LTEXT           "",IDC_STATIC,7,41,140,8
-    LTEXT           "",IDC_STATIC,7,50,140,8
-    LTEXT           "",IDC_STATIC,7,58,140,8
-    LTEXT           "",IDC_STATIC,7,67,140,8
+    LTEXT           "Desktop Video Recorder",IDC_STATIC,7,15,140,8
+	LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,140,8
+	LTEXT           "",IDC_STATIC,7,33,140,8
+    LTEXT           "Copyright©2004 Anton Jouline (Juce)",IDC_STATIC,7,41,140,8
+    LTEXT           "http://taksi.sourceforge.net/",IDC_STATIC,7,50,140,8
+    LTEXT           "Copyright©1992-2006 Dennis Robinson",IDC_STATIC,7,58,140,8
+    LTEXT           "http://www.menasoft.com/taksi",IDC_STATIC,7,67,140,8
     ICON            ID_APP,ID_APP,186,70,20,20
 END
 
@@ -420,6 +419,7 @@ END
 STRINGTABLE 
 BEGIN
     IDM_SC_HELP_URL         "Taksi Help URL..."
+    IDM_SC_HELP_ABOUT       "Taksi Help About..."
 END
 
 #endif    // English (U.S.) resources
