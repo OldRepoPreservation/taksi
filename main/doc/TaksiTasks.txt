@@ -20,6 +20,7 @@ Pause live record ?
 Better frame rate calculation ?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 Context sensative help file.
+put debuglog files in the capture dir ?
 
 Suggest codecs appropriate to desired CPU usage. MSMpeg4 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??

@@ -564,6 +564,10 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDM_SC_HELP_URL:
 		g_GUI.OnCommandHelpURL();
 		break;
+	case IDM_SC_HELP_ABOUT:
+		g_GUI.OnCommandHelpAbout( m_hWnd );
+		return true;
+
 	case IDC_C_CaptureDirectoryExplore:
 		{
 		HINSTANCE hInstRet = ::ShellExecute( NULL, NULL, 

@@ -76,6 +76,7 @@
 #define IDS_STATE_Recording             2022
 #define IDS_STATE_QTY                   2023
 #define IDM_SC_HELP_URL                 0xE000
+#define IDM_SC_HELP_ABOUT               0xE010
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

@@ -37,7 +37,6 @@ Global
 		Makefile = Makefile
 		..\doc\manual.txt = ..\doc\manual.txt
 		..\doc\TaksiPic.jpg = ..\doc\TaksiPic.jpg
-		..\doc\TaksiPic.png = ..\doc\TaksiPic.png
 		..\doc\TaksiTasks.txt = ..\doc\TaksiTasks.txt
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
