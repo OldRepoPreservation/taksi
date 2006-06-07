@@ -227,7 +227,7 @@ void CTaksiOGL::GetFrameHalfSize(CVideoFrame& frame)
 {
 	// Gets current frame to be stored in video file.
 	// NOTE: Size MUST be 4 byte aligned!!
-	if ( m_SurfTemp.m_pPixels == NULL)
+	if ( ! m_SurfTemp.IsValidFrame())
 	{
 		// allocate big buffer for RAW pixel data
 		m_SurfTemp.AllocPadXY( g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy );

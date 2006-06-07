@@ -310,3 +310,7 @@ Break config structures out into Config.H file for organization
 FIX - hook Switch DX app multiple times causes crash. asymetric hook/unhook.
 Option to hook GDI or not.
 
+June 7,2006 
+==============
+Ver 0.747 test release.
+Background thread queue N raw frames for compression.

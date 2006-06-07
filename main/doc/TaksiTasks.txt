@@ -13,7 +13,7 @@ Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 
 TODO:
-Background thread queue N raw frames for compression.
+Adjust size of the background thread Q
 Manual.txt completely out of date!
 Audio
 Pause live record ?

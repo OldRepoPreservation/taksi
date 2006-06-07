@@ -19,6 +19,7 @@ void CTaksiFrameRate::InitFreqUnits()
 	LARGE_INTEGER freq = {0, 0};
 	if ( ::QueryPerformanceFrequency(&freq)) 
 	{
+		ASSERT( freq.HighPart == 0 );
 		DEBUG_MSG(( "QueryPerformanceFrequency hi=%u, lo=%u" LOG_CR, freq.HighPart, freq.LowPart));
 	}
 	else
@@ -51,6 +52,7 @@ DWORD CTaksiFrameRate::CheckFrameRate()
 
 	if ( g_Proc.m_pCustomConfig )
 	{
+		// using a custom frame rate/weight
 		double fFrameWeight = g_Proc.m_pCustomConfig->m_fFrameWeight;
 		if (fFrameWeight>0)
 		{
@@ -114,6 +116,9 @@ DWORD CTaksiFrameRate::CheckFrameRate()
 CAVIThread::CAVIThread()
 	: m_nThreadId(0)
 	, m_bStop(false)
+	, m_iFrameBusy(0)	// index to Frame ready to compress.
+	, m_iFrameFree(0)	// index to empty frame. ready to fill
+	, m_iFrameCount(0)
 {
 }
 CAVIThread::~CAVIThread()
@@ -127,22 +132,18 @@ DWORD CAVIThread::ThreadRun()
 	// m_hThread
 	DEBUG_MSG(( "CAVIThread::ThreadRun()" LOG_CR));
 
-	while ( ! m_bStop && m_hThread.IsValidHandle())
-	{
-		// and wait til i'm told to start
-		DWORD dwRet = ::WaitForSingleObject( m_hEventDataStart, INFINITE );
-		if ( dwRet != WAIT_OBJECT_0 )
-		{
-			// failure?
-			DEBUG_ERR(( "CAVIThread::WaitForSingleObject FAIL" LOG_CR ));
-			break;
-		}
+	goto do_wait;
 
-		if ( m_bStop )
-			break;
+	for (;;)
+	{
+		ASSERT( m_iFrameBusy != m_iFrameFree );
+		CAVIFrame* pFrame = &m_aFrames[ m_iFrameBusy ];
+		ASSERT(pFrame);
+		ASSERT(pFrame->IsValidFrame());
+		ASSERT(pFrame->m_dwFrameDups);
 
 		// compress and write
-		HRESULT hRes = g_AVIFile.WriteVideoFrame( m_VideoFrame, m_dwFrameDups ); 
+		HRESULT hRes = g_AVIFile.WriteVideoFrame( *pFrame, pFrame->m_dwFrameDups ); 
 		if ( SUCCEEDED(hRes))
 		{
 			if ( hRes )
@@ -155,10 +156,29 @@ DWORD CAVIThread::ThreadRun()
 		// Audio data ?
 		// g_AVIFile.WriteAudioFrame(xxx);
 
-		// Set my event when done. 
-		m_hEventDataDone.SetEvent();	// done
+		// we are done.
+		pFrame->m_dwFrameDups = 0;	// done.
+		m_iFrameBusy = ( m_iFrameBusy + 1 ) % AVI_FRAME_QTY;
+		m_iFrameCount--;
+		m_EventDataDone.SetEvent();	// done at least one frame!
+		if ( m_iFrameBusy != m_iFrameFree )	// more to do ?
+			continue;
+
+do_wait:
+		// and wait til i'm told to start
+		DWORD dwRet = ::WaitForSingleObject( m_EventDataStart, INFINITE );
+		if ( dwRet != WAIT_OBJECT_0 )
+		{
+			// failure?
+			DEBUG_ERR(( "CAVIThread::WaitForSingleObject FAIL" LOG_CR ));
+			break;
+		}
+
+		if ( m_bStop || ! m_hThread.IsValidHandle())
+			break;
 	}
 
+	m_iFrameCount = 0;
 	m_nThreadId = 0;		// it actually is closed!
 	DEBUG_MSG(( "CAVIThread::ThreadRun() END" LOG_CR ));
 	return 0;
@@ -170,7 +190,27 @@ DWORD __stdcall CAVIThread::ThreadEntryProc( void* pThis ) // static
 	return ((CAVIThread*)pThis)->ThreadRun();
 }
 
-CVideoFrame* CAVIThread::WaitForNextFrame( bool bFlush )
+void CAVIThread::WaitForAllFrames()
+{
+	// Just wait for all outstanding frames to complete.
+	// 
+	if ( m_nThreadId == 0 )
+		return;
+	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
+	while ( m_iFrameCount ) 
+	{
+		DWORD dwRet = ::WaitForSingleObject( m_EventDataDone, INFINITE );
+		if ( dwRet != WAIT_OBJECT_0 )
+		{
+			DEBUG_ERR(( "CAVIThread::WaitForNextFrame FAILED" LOG_CR ));
+			return;	// failed.
+		}
+		m_EventDataDone.ResetEvent();	// wait again til we get them all.
+	}
+	// Free all my frames?
+}
+
+CAVIFrame* CAVIThread::WaitForNextFrame()
 {
 	// Get a new video frame to put raw data.
 	// If none available. Wait for the thread to finish what it was doing.
@@ -179,33 +219,41 @@ CVideoFrame* CAVIThread::WaitForNextFrame( bool bFlush )
 	if ( m_nThreadId == 0 )
 		return NULL;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
-	DWORD dwRet = ::WaitForSingleObject( m_hEventDataDone, INFINITE );
-	if ( dwRet != WAIT_OBJECT_0 )
+
+	// just wait for a free frame. all busy.
+	if ( m_iFrameFree == m_iFrameBusy && m_iFrameCount >= AVI_FRAME_QTY )
 	{
-		DEBUG_ERR(( "CAVIThread::WaitForNextFrame FAILED" LOG_CR ));
-		return NULL;	// failed.
+		DWORD dwRet = ::WaitForSingleObject( m_EventDataDone, INFINITE );
+		if ( dwRet != WAIT_OBJECT_0 )
+		{
+			DEBUG_ERR(( "CAVIThread::WaitForNextFrame FAILED" LOG_CR ));
+			return NULL;	// failed.
+		}
 	}
 
-	if ( bFlush )
-	{
-		m_VideoFrame.FreeFrame();	// re-alloc later.
+	CAVIFrame* pFrame = &m_aFrames[ m_iFrameFree ];
+	ASSERT( pFrame );
+	ASSERT( pFrame->m_dwFrameDups == 0 );
+	if ( ! pFrame->AllocForm( g_AVIFile.m_FrameForm ))
 		return NULL;
-	}
-	if (!m_VideoFrame.AllocForm( g_AVIFile.m_FrameForm ))
-		return NULL;
-	return &m_VideoFrame;	// ready
+	return pFrame;	// ready
 }
 
-void CAVIThread::SignalFrameStart( CVideoFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
+void CAVIThread::SignalFrameStart( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
 {
 	// New data is ready so wake up the thread.
 	// ASSUME: WaitForNextFrame() was just called.
 	if ( m_nThreadId == 0 )
 		return;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
-	m_dwFrameDups = dwFrameDups;
-	m_hEventDataDone.ResetEvent();	// manual reset.
-	m_hEventDataStart.SetEvent();
+	ASSERT(dwFrameDups);
+	ASSERT(pFrame);
+	ASSERT( pFrame->m_dwFrameDups == 0 );
+	pFrame->m_dwFrameDups = dwFrameDups;
+	m_iFrameFree = ( m_iFrameFree + 1 ) % AVI_FRAME_QTY;	// its ready.
+	m_iFrameCount++;
+	m_EventDataDone.ResetEvent();	// manual reset.
+	m_EventDataStart.SetEvent();	// wake the thread if it needs it.
 }
 
 HRESULT CAVIThread::StopAVIThread()
@@ -216,7 +264,7 @@ HRESULT CAVIThread::StopAVIThread()
 
 	DEBUG_TRACE(( "CAVIThread::StopAVIThread" LOG_CR ));
 	m_bStop	= true;
-	m_hEventDataStart.SetEvent();	// wake up to exit.
+	m_EventDataStart.SetEvent();	// wake up to exit.
 
 	// Wait for it !
 	HRESULT hRes = S_OK;
@@ -234,10 +282,8 @@ HRESULT CAVIThread::StopAVIThread()
 			ASSERT( hRes == WAIT_TIMEOUT );
 		}
 	}
+
 	m_hThread.CloseHandle();
-
-	m_VideoFrame.FreeFrame();	// release buffer
-
 	return hRes;
 }
 
@@ -250,11 +296,11 @@ HRESULT CAVIThread::StartAVIThread()
 	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
 	m_bStop	= false;
 
-	if ( ! m_hEventDataStart.CreateEvent(NULL,false,false))
+	if ( ! m_EventDataStart.CreateEvent(NULL,false,false))
 	{
 		goto do_erroret;
 	}
-	if ( ! m_hEventDataDone.CreateEvent(NULL,true,true))	// manual reset.
+	if ( ! m_EventDataDone.CreateEvent(NULL,true,true))	// manual set/reset.
 	{
 		goto do_erroret;
 	}
