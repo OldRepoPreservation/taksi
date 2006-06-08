@@ -103,6 +103,7 @@ void CTaksiConfigData::InitConfig()
 {
 	m_szCaptureDir[0] = '\0';
 	m_bDebugLog = false;
+	m_szFileNamePostfix[0] = '\0';
 
 	// Video Format
 	m_fFrameRateTarget=20;
@@ -134,7 +135,7 @@ void CTaksiConfigData::InitConfig()
 void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 {
 	strncpy( m_szCaptureDir, config.m_szCaptureDir, sizeof(m_szCaptureDir)-1);
-
+	strncpy( m_szFileNamePostfix, config.m_szFileNamePostfix, sizeof(m_szFileNamePostfix));
 	m_fFrameRateTarget = config.m_fFrameRateTarget;
 	m_bVideoHalfSize = config.m_bVideoHalfSize;
 	m_VideoCodec.CopyCodec( config.m_VideoCodec );
@@ -166,21 +167,6 @@ WORD CTaksiConfigData::GetHotKey( TAKSI_HOTKEY_TYPE eHotKey ) const
 	if ( eHotKey < 0 || eHotKey >= TAKSI_HOTKEY_QTY )
 		return 0;
 	return m_wHotKey[eHotKey];
-}
-
-void CTaksiConfigData::put_CaptureDir(const TCHAR* pszPath)
-{
-	ASSERT(pszPath);
-	DEBUG_MSG(("CTaksiConfig::put_CaptureDir '%s' to '%s'" LOG_CR, m_szCaptureDir, pszPath ));
-	strncpy(m_szCaptureDir, pszPath, sizeof(m_szCaptureDir)-1);
-}
-
-void CTaksiConfigData::GetCaptureDir(TCHAR* pszPath, int iSizeMax) const
-{
-	if (pszPath == NULL) 
-		return;
-	int iLen = lstrlen(m_szCaptureDir);
-	strncpy( pszPath, m_szCaptureDir, iSizeMax-1 );
 }
 
 bool CTaksiConfigData::FixCaptureDir()
@@ -318,6 +304,8 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%d", m_bDebugLog);
 	case TAKSI_CFGPROP_CaptureDir:
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szCaptureDir);
+	case TAKSI_CFGPROP_FileNamePostfix:
+		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szFileNamePostfix );
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
 		return _snprintf(pszValue, iSizeMax, "%g", m_fFrameRateTarget);
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
@@ -363,6 +351,10 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	{
 	case TAKSI_CFGPROP_DebugLog:
 		m_bDebugLog = atoi(pszValue);
+		break;
+	case TAKSI_CFGPROP_FileNamePostfix:
+		if (! Str_GetQuoted( m_szFileNamePostfix, pszValue, sizeof(m_szFileNamePostfix)))
+			return false;
 		break;
 	case TAKSI_CFGPROP_CaptureDir:
 		if (! Str_GetQuoted( m_szCaptureDir, pszValue, sizeof(m_szCaptureDir)))

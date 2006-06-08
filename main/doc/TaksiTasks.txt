@@ -6,6 +6,7 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
+Half sized GDI not work.
 Non Frame GDI not working.
 Odd flash when switching DX applcations. must change focus 2 times ?
 GDI indicator drawn over overlapped windows. bleeds through.
@@ -13,6 +14,7 @@ Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 
 TODO:
+Comment tag
 Need message saying there is no codec selected!
 Need message explaining focus changing.
 Adjust size of the background thread Q

@@ -30,8 +30,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION TAKSI_VERSION_RES_N
- PRODUCTVERSION TAKSI_VERSION_RES_N
+ FILEVERSION 0,7,4,7
+ PRODUCTVERSION 0,7,4,7
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -48,9 +48,9 @@ BEGIN
         BEGIN
             VALUE "Comments", "Video-capture/Screenshot-making program for graphics applications."
             VALUE "FileDescription", "Taksi Server"
-            VALUE "FileVersion", TAKSI_VERSION_RES_S
-            VALUE "ProductVersion", TAKSI_VERSION_RES_S
-            VALUE "LegalCopyright", TAKSI_COPYRIGHT
+            VALUE "FileVersion", "0,7,4,7"
+            VALUE "ProductVersion", "0,7,4,7"
+            VALUE "LegalCopyright", "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson"
         END
     END
     BLOCK "VarFileInfo"
@@ -118,9 +118,11 @@ BEGIN
     EDITTEXT        IDC_C_CaptureDirectory,5,35,254,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Explore Folder...",IDC_C_CaptureDirectoryExplore,5,55,
                     95,12
-    PUSHBUTTON      "Browse...",IDC_C_CaptureDirectoryBrowse,220,54,41,12
+    PUSHBUTTON      "Browse...",IDC_C_CaptureDirectoryBrowse,218,54,41,12
     CONTROL         "Create Debug Log Files",IDC_C_DebugLog,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,82,156,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,73,156,10
+    EDITTEXT        IDC_C_FileNamePostfix,90,91,169,14,ES_AUTOHSCROLL
+    LTEXT           "File Name Postfix Note:",IDC_STATIC,7,94,77,8
 END
 
 IDD_GuiConfigTab2 DIALOGEX 4, 14, 274, 113
@@ -253,11 +255,14 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Taksi",IDC_ABOUT_1,7,7,140,8
     LTEXT           "Desktop Video Recorder",IDC_STATIC,7,15,140,8
-	LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,140,8
-	LTEXT           "",IDC_ABOUT_4,7,33,140,8
-    LTEXT           "Copyright©2004 Anton Jouline (Juce)",IDC_STATIC,7,41,140,8
+    LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,140,
+                    8
+    LTEXT           "",IDC_ABOUT_4,7,33,140,8
+    LTEXT           "Copyright©2004 Anton Jouline (Juce)",IDC_STATIC,7,41,
+                    140,8
     LTEXT           "http://taksi.sourceforge.net/",IDC_STATIC,7,50,140,8
-    LTEXT           "Copyright©1992-2006 Dennis Robinson",IDC_STATIC,7,58,140,8
+    LTEXT           "Copyright©1992-2006 Dennis Robinson",IDC_STATIC,7,58,
+                    140,8
     LTEXT           "http://www.menasoft.com/taksi",IDC_STATIC,7,67,140,8
     ICON            ID_APP,ID_APP,186,70,20,20
 END
@@ -404,13 +409,17 @@ END
 
 STRINGTABLE 
 BEGIN
-	IDC_C_SaveButton		"Save any changes to the INI file"
-	IDC_C_RestoreButton		"Restore previous settings last stored in the INI file"
-
+    IDC_C_RestoreButton     "Restore previous settings last stored in the INI file"
+    IDC_C_SaveButton        "Save any changes to the INI file"
     IDC_C_CaptureDirectoryBrowse 
                             "Browse... Select a directory from the windows file explorer."
     IDC_C_CaptureDirectoryExplore 
                             "Explore... View the current contents of the selected directory with the Windows File Explorer."
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_C_CustomAddButton   "New - Create a new custom config for some application not yet listed"
 END
 
 STRINGTABLE 
@@ -424,6 +433,10 @@ END
 STRINGTABLE 
 BEGIN
     IDM_SC_HELP_URL         "Taksi Help URL..."
+END
+
+STRINGTABLE 
+BEGIN
     IDM_SC_HELP_ABOUT       "Taksi Help About..."
 END
 
