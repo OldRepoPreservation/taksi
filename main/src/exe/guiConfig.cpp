@@ -559,6 +559,14 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		break;
 
 	case IDC_C_FileNamePostfix:
+		if ( iNotify == EN_CHANGE && !m_bDataUpdating )
+		{
+			int iLen = GetWindowText( m_hControlFileNamePostfix,
+				g_Config.m_szFileNamePostfix, sizeof(g_Config.m_szFileNamePostfix));
+			OnChanges();
+		}
+		break;
+
 	case IDC_C_CustomPattern:
 	case IDC_C_CustomFrameRate:
 	case IDC_C_CustomFrameWeight:
