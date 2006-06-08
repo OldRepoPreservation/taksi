@@ -320,4 +320,9 @@ Test on OpenGL samples.
 
 Ver 0.748 test release.
 Naming control - postfix saved file name note
+
+June 8,2006 
+==============
+Ver 0.749 test release.
 Move VS_VERSION_INFO from taksi.rc to taksiver.rc2 so it wont be destroyed by the resource editor.
+Pause mode for video record

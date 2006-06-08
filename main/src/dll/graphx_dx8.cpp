@@ -98,7 +98,7 @@ HRESULT CTaksiDX8::RestoreDeviceObjects()
     }
 
 	// create vertex buffer for TAKSI_INDICATE_QTY
-	for ( int i=0; i<TAKSI_INDICATE_QTY; i++ )
+	for ( int i=0; i<COUNTOF(s_pVB); i++ )
 	{
 		static CUSTOMVERTEX s_Vert[4] =
 		{
@@ -173,7 +173,7 @@ HRESULT CTaksiDX8::InvalidateDeviceObjects(bool bDetaching)
 		m_iRefCountMe--;
 	}
 
-	for ( int i=0; i<TAKSI_INDICATE_QTY; i++ )
+	for ( int i=0; i<COUNTOF(s_pVB); i++ )
 	{
 		if (s_pVB[i].IsValidRefObj())
 		{
@@ -641,7 +641,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 bool CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	ASSERT(m_pDevice);
-	ASSERT( eIndicate >= 0 && eIndicate < TAKSI_INDICATE_QTY );
+	ASSERT( eIndicate >= 0 && eIndicate < COUNTOF(s_pVB));
 	if (s_pVB[eIndicate] == NULL) 
 	{
 		HRESULT hRes = RestoreDeviceObjects();

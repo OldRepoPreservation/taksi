@@ -20,7 +20,7 @@ bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	if ( m_hWnd == NULL )
 		return false;
-	if ( eIndicate >= TAKSI_INDICATE_QTY )
+	if ( eIndicate < 0 || eIndicate >= TAKSI_INDICATE_QTY )
 		return false;
 	CWndDC dc;
 	// NOTE: I cant tell if the window is being overlapped?

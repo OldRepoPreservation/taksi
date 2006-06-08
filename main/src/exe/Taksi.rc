@@ -119,28 +119,31 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Hot Keys are pressed to activate Taksi from inside other applications",
                     IDC_STATIC,7,10,230,8
-    ICON            ID_APP,ID_APP,247,7,21,20
-    LTEXT           "Config Dialog Open",IDC_STATIC,7,32,62,8
+    ICON            ID_APP,ID_APP,247,7,20,20
+    LTEXT           "Config Dialog Open",IDC_STATIC,7,30,62,8
     CONTROL         "",IDC_C_KeyConfigOpen,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,75,29,46,14
-    LTEXT           "Video Record On",IDC_STATIC,147,32,54,8
-    CONTROL         "",IDC_C_KeyRecordStart,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,214,29,46,14
-    LTEXT           "App Hook Mode",IDC_STATIC,7,48,56,8
+                    WS_TABSTOP,75,27,46,14
+    LTEXT           "Video Record Start",IDC_STATIC,145,30,64,8
+    CONTROL         "",IDC_C_KeyRecordBegin,"msctls_hotkey32",WS_BORDER | 
+                    WS_TABSTOP,214,27,46,14
+    LTEXT           "App Hook Mode",IDC_STATIC,7,46,62,8
     CONTROL         "",IDC_C_KeyHookModeToggle,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,75,45,46,14
-    LTEXT           "Video Record Off",IDC_STATIC,148,48,56,8
-    CONTROL         "",IDC_C_KeyRecordStop,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,214,45,46,14
-    LTEXT           "Indicator On/Off",IDC_STATIC,7,64,54,8
+                    WS_TABSTOP,75,43,46,14
+    LTEXT           "Video Record Pause",IDC_STATIC,145,46,64,8
+    CONTROL         "",IDC_C_KeyRecordPause,"msctls_hotkey32",WS_BORDER | 
+                    WS_TABSTOP,214,43,46,14
+    LTEXT           "Indicator On/Off",IDC_STATIC,7,62,62,8
     CONTROL         "",IDC_C_KeyIndicatorToggle,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,75,61,46,14
-    LTEXT           "Screenshot",IDC_STATIC,147,64,37,8
+                    WS_TABSTOP,75,59,46,14
+    LTEXT           "Video Record Stop",IDC_STATIC,145,62,64,8
+    CONTROL         "",IDC_C_KeyRecordStop,"msctls_hotkey32",WS_BORDER | 
+                    WS_TABSTOP,214,59,46,14
+    LTEXT           "Screenshot",IDC_STATIC,145,78,64,8
     CONTROL         "",IDC_C_KeyScreenshot,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,214,61,46,14
-    LTEXT           "Small Screenshot",IDC_STATIC,147,80,55,8
+                    WS_TABSTOP,214,75,46,14
+    LTEXT           "Small Screenshot",IDC_STATIC,145,94,64,8
     CONTROL         "",IDC_C_KeySmallScreenshot,"msctls_hotkey32",WS_BORDER | 
-                    WS_TABSTOP,214,77,46,14
+                    WS_TABSTOP,214,91,46,14
     CONTROL         "Use Direct Input API for keys",IDC_C_UseDirectInput,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,126,10
 END
@@ -319,13 +322,15 @@ ID_APP                  ICON                    "res/Taksi.ico"
 IDB_ConfigOpen          BITMAP                  "res/BtnConfig.bmp"
 IDB_HookModeToggle      BITMAP                  "res/BtnHookMode.bmp"
 IDB_IndicatorToggle     BITMAP                  "res/BtnIndic.bmp"
-IDB_RecordStart         BITMAP                  "res/BtnRecordStart.bmp"
+IDB_RecordBegin         BITMAP                  "res/BtnRecordBegin.bmp"
+IDB_RecordPause         BITMAP                  "res/BtnRecordPause.bmp"
 IDB_RecordStop          BITMAP                  "res/BtnRecordStop.bmp"
 IDB_Screenshot          BITMAP                  "res/BtnScreenshot.bmp"
 IDB_SmallScreenshot     BITMAP                  "res/BtnSmallScreenshot.bmp"
 IDB_G_HookModeToggle    BITMAP                  "res/GrayHookMode.bmp"
 IDB_G_IndicatorToggle   BITMAP                  "res/GrayIndic.bmp"
-IDB_G_RecordStart       BITMAP                  "res/GrayRecordStart.bmp"
+IDB_G_RecordBegin       BITMAP                  "res/GrayRecordBegin.bmp"
+IDB_G_RecordPause       BITMAP                  "res/GrayRecordPause.bmp"
 IDB_G_RecordStop        BITMAP                  "res/GrayRecordStop.bmp"
 IDB_G_Screenshot        BITMAP                  "res/GrayScreenshot.bmp"
 IDB_G_SmallScreenshot   BITMAP                  "res/GraySmallScreenshot.bmp"
@@ -365,7 +370,8 @@ BEGIN
     IDB_ConfigOpen          "Open the configuration dialog window"
     IDB_HookModeToggle      "Change application hook by starting the Hook Focus Mode. Blue=Next selected application will be hooked. Green=Current application is ready to record"
     IDB_IndicatorToggle     "Toggle the indicator on and off"
-    IDB_RecordStart         "Start the video recorder"
+    IDB_RecordBegin         "Start the video recorder"
+    IDB_RecordPause         "Pause video recorder so it may restart in same file"
     IDB_RecordStop          "Stop the video recorder"
     IDB_Screenshot          "Take a full sized screen shot"
     IDB_SmallScreenshot     "Take a small sized screen shot"
@@ -391,6 +397,7 @@ BEGIN
     IDS_STATE_Ready         "Ready"
     IDS_STATE_Hooked        "Hooked"
     IDS_STATE_Recording     "Recording"
+	IDS_STATE_RecordPause	"Paused"
     IDS_STATE_QTY           "UNK"
 END
 

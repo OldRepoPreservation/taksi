@@ -48,6 +48,22 @@ bool CGui::UpdateWindowTitle()
 	if ( iLen <= 0 )
 		return false;
 
+	switch (sg_ProcStats.m_eState)
+	{
+	case TAKSI_INDICATE_Hooked:
+	case TAKSI_INDICATE_Recording:
+	case TAKSI_INDICATE_RecordPaused:
+		{
+			TCHAR szState[ _MAX_PATH ];
+			int iLenStr = LoadString( g_hInst, IDS_STATE_Ready + sg_ProcStats.m_eState - TAKSI_INDICATE_Ready,
+				szState, COUNTOF(szState)-1 );
+			if ( iLenStr > 0 )
+			{
+				iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, _T(" (%s)"), szState );
+			}
+		}
+	}
+
 	SetWindowText( m_hWnd, szTitle );
 	return true;
 }
@@ -59,21 +75,28 @@ bool CGui::IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const
 	case TAKSI_HOTKEY_ConfigOpen:
 		return true;
 	case TAKSI_HOTKEY_HookModeToggle:
+		// NOTE: this doesnt actually mean its not valid. just a different state.
 		return( ! sg_Dll.IsHookCBT());
 	case TAKSI_HOTKEY_IndicatorToggle:
+		// NOTE: this doesnt actually mean its not valid. just a different state.
 		if ( sg_Config.m_bShowIndicator )
 			return true;
 		return false;
-	case TAKSI_HOTKEY_RecordStart:
+	case TAKSI_HOTKEY_RecordBegin:
 	case TAKSI_HOTKEY_Screenshot:
 	case TAKSI_HOTKEY_SmallScreenshot:
 		if ( sg_ProcStats.m_dwProcessId == 0 )
 			return false;
-		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording )
+		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording ||
+			sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused )
 			return false;
 		return true;
+	case TAKSI_HOTKEY_RecordPause:
 	case TAKSI_HOTKEY_RecordStop:
-		return( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording );
+		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording ||
+			sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused )
+			return true;
+		return( false );
 	}
 	return false;
 }
@@ -141,11 +164,12 @@ void CGui::UpdateButtonToolTips()
 	for ( int i=0; i<BTN_QTY; i++ )
 	{
 		TCHAR szHelp[ _MAX_PATH ];
-		LoadString( g_hInst, i + IDB_ConfigOpen, szHelp, sizeof(szHelp)-1 );
+		int iLen = LoadString( g_hInst, i + IDB_ConfigOpen, szHelp, sizeof(szHelp)-1 );
+		ASSERT( iLen > 0 );
 
 		TCHAR* pszText;
 		TCHAR szHotKey[ _MAX_PATH ];
-		int iLen = GetHotKeyName( szHotKey, COUNTOF(szHotKey), (TAKSI_HOTKEY_TYPE) i ); 
+		iLen = GetHotKeyName( szHotKey, COUNTOF(szHotKey), (TAKSI_HOTKEY_TYPE) i ); 
 		if ( iLen > 0 )
 		{
 			TCHAR szText[ _MAX_PATH ];
@@ -154,7 +178,7 @@ void CGui::UpdateButtonToolTips()
 		}
 		else
 		{
-			pszText = szHelp;
+			pszText = szHelp;	// no hotkey mapped.
 		}
 
 		HWND hWndCtrl = GetDlgItem(i + IDB_ConfigOpen);
@@ -245,9 +269,13 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
 		UpdateButtonStates();
 		return true;
-	case TAKSI_HOTKEY_RecordStart:
+	case TAKSI_HOTKEY_RecordBegin:
+	case TAKSI_HOTKEY_RecordPause:
 	case TAKSI_HOTKEY_RecordStop:
-	case IDB_RecordStart:
+	case TAKSI_HOTKEY_Screenshot:
+	case TAKSI_HOTKEY_SmallScreenshot:
+	case IDB_RecordBegin:
+	case IDB_RecordPause:
 	case IDB_RecordStop:
 	case IDB_Screenshot:
 	case IDB_SmallScreenshot:
@@ -326,6 +354,19 @@ static BOOL AppendMenuStr( HMENU hMenu, int id )
 		id, szTmp );
 }
 
+#if 0
+void CGui::CreateTrayIcon()
+{
+	// ??? everyone expects this feature these days.
+
+	if ( ! m_bUseTrayIcon )
+		return;
+
+	// Set up my tray menu.
+
+}
+#endif
+
 bool CGui::CreateGuiWindow( UINT nCmdShow )
 {
 	// CreateDialog - IDD_Gui
@@ -383,25 +424,27 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 		NULL );          // no extra data
 	if ( m_hWnd == NULL )
 	{
+		ASSERT(0);
 		return false;
 	}
 
 	// SysMenu
 	HMENU hMenu = ::GetSystemMenu(m_hWnd,false);
-	if ( hMenu )
+	if ( hMenu == NULL )
 	{
-		AppendMenuStr(hMenu,IDM_SC_HELP_URL);
-		AppendMenuStr(hMenu,IDM_SC_HELP_ABOUT);
+		ASSERT(0);
+		return false;
 	}
+	AppendMenuStr(hMenu,IDM_SC_HELP_URL);
+	AppendMenuStr(hMenu,IDM_SC_HELP_ABOUT);
 
 	// build GUI controls
 	// NOTE: Bitmap text font is : Small Fonts 7 ?
 	if ( ! m_ToolTips.Create( m_hWnd, WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON ))
 	{
 		DEBUG_ERR(("No tooltips" LOG_CR));
+		ASSERT(0);
 	}
-
-	//m_ToolTips.SetDelayTime(TTDT_INITIAL,1);
 
 	int x=0;
 	for ( int i=0; i<BTN_QTY; i++ )
@@ -423,9 +466,12 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 
 	UpdateButtonToolTips();
 	UpdateButtonStates();
+	// CreateTrayIcon();
 
 	// Show the window
 	::ShowWindow(m_hWnd, nCmdShow);
+
+	m_ToolTips.SetDelayTime(TTDT_INITIAL,200);
 	m_ToolTips.Start();
 	return true;
 }

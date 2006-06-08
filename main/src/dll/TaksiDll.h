@@ -93,6 +93,7 @@ private:
 
 	// Make a pool of frames waiting to be compressed/written
 	// ASSUME: dont need a critical section on these since i assume int x=y assignment is atomic.
+	//  One thread reads the other writes. so it should be safe.
 #define AVI_FRAME_QTY 8	// make this variable ??? (full screen raw frames are HUGE!)
 	CAVIFrame m_aFrames[AVI_FRAME_QTY];		// buffer to keep current video frame 
 	int m_iFrameBusy;	// index to Frame ready to compress.
@@ -117,6 +118,7 @@ public:
 		, m_pCustomConfig(NULL)
 		, m_bIsProcessSpecial(false)
 		, m_bStopGraphXMode(false)
+		, m_bRecordPause(false)
 	{
 		m_Stats.InitProcStats();
 		m_Stats.m_dwProcessId = ::GetCurrentProcessId();
@@ -125,6 +127,7 @@ public:
 
 	bool IsProcPrime() const
 	{
+		// is this the prime hooked process?
 		return( m_Stats.m_dwProcessId == sg_ProcStats.m_dwProcessId );
 	}
 
@@ -141,6 +144,7 @@ public:
 
 	int MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt );
 	void UpdateStat( TAKSI_PROCSTAT_TYPE eProp );
+	void put_RecordPause( bool bRecordPause );
 
 public:
 	CTaksiProcStats m_Stats;	// For display in the Taksi.exe app.
@@ -154,7 +158,8 @@ public:
 
 	// if set to true, then CBT should not take any action at all.
 	bool m_bIsProcessSpecial;		// Is Master TAKSI.EXE or special app.
-	bool m_bStopGraphXMode;			// I'm not the main app anymore.
+	bool m_bStopGraphXMode;			// I'm not the main app anymore. unhook the graphics mode.
+	bool m_bRecordPause;			// paused video record by command.
 };
 extern CTaksiProcess g_Proc;
 
@@ -165,8 +170,8 @@ extern HINSTANCE g_hInst;	// the DLL instance handle for the process.
 
 // perf measure tool
 #if 0 // def _DEBUG
-#define CLOCK_START(v) TIMEFAST_t tClock_##v = ::GetPerformanceCounter();
-#define CLOCK_STOP(v,pszMsg) LOG_MSG(( pszMsg, ::GetPerformanceCounter() - tClock_##v ));
+#define CLOCK_START(v) TIMEFAST_t _tClock_##v = ::GetPerformanceCounter();
+#define CLOCK_STOP(v,pszMsg) LOG_MSG(( pszMsg, ::GetPerformanceCounter() - _tClock_##v ));
 #else
 #define CLOCK_START(v)
 #define CLOCK_STOP(v,pszMsg)

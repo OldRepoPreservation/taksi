@@ -82,7 +82,7 @@ enum TAKSI_INDICATE_TYPE
 	TAKSI_INDICATE_Ready = 0,
 	TAKSI_INDICATE_Hooked,	// CBT is hooked. (looking for new app to load)
 	TAKSI_INDICATE_Recording,	// actively recording right now
-	//TAKSI_INDICATE_Paused,	// ??
+	TAKSI_INDICATE_RecordPaused,	
 	//TAKSI_INDICATE_Error,		// sit in error state til cleared ??
 	TAKSI_INDICATE_QTY,
 };

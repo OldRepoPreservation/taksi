@@ -37,8 +37,7 @@ void CGuiConfig::OnChanges()
 {
 	SetStatusText( _T("CHANGES MADE"));
 	SetSaveState( true );
-	ASSERT( sg_Dll.m_hMasterWnd );
-	PostMessage( sg_Dll.m_hMasterWnd, WM_APP_UPDATE, 0, 0 );
+	sg_Dll.UpdateMaster();
 }
 
 //******************************************************
@@ -145,7 +144,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 	{
 		//TAKSI_INDICATE_TYPE
 		int id = stats.m_eState;
-		if ( id < 0 || id > TAKSI_INDICATE_QTY )
+		if ( id < 0 || id >= TAKSI_INDICATE_QTY )
 			id = TAKSI_INDICATE_QTY;
 		LoadString( g_hInst, id + IDS_STATE_Ready, szTmp, sizeof(szTmp)-1 );
 		SetWindowText( m_hControlStatState, szTmp );
@@ -633,7 +632,8 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_KeyConfigOpen:
 	case IDC_C_KeyHookModeToggle:
 	case IDC_C_KeyIndicatorToggle:
-	case IDC_C_KeyRecordStart:
+	case IDC_C_KeyRecordBegin:
+	case IDC_C_KeyRecordPause:
 	case IDC_C_KeyRecordStop:
 	case IDC_C_KeyScreenshot:
 	case IDC_C_KeySmallScreenshot:
@@ -765,6 +765,8 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_RestoreButton));
 
 	TabCtrl_SetToolTips( m_hControlTab, m_ToolTips.m_hWnd );
+
+	//m_ToolTips.SetDelayTime(TTDT_INITIAL,400);
 	m_ToolTips.Start();
 
 	// Initialize all controls
