@@ -773,6 +773,10 @@ do_retry:
 	pChunkJunk[0] = ckidAVIPADDING; // "JUNK"
 	pChunkJunk[1] = iJunkChunkSize - 8;
 
+	// Put some possibly useful id stuff in the junk area. why not
+	_snprintf( (char*)( &pChunkJunk[2] ), iJunkChunkSize,
+		"TAKSI v" TAKSI_VERSION_S " built:" __DATE__ " AVI recorded: XXX" );
+
 	::WriteFile(m_File, pChunkJunk, iJunkChunkSize, &dwBytesWritten, NULL);
 	::HeapFree(hHeap,0,pChunkJunk);
 	}

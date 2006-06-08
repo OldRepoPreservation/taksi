@@ -14,7 +14,7 @@ Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 
 TODO:
-Comment tag
+Comment tag inside AVI file. TAKSI vX date
 Need message saying there is no codec selected!
 Need message explaining focus changing.
 Adjust size of the background thread Q
