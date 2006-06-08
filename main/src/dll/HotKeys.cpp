@@ -285,7 +285,7 @@ void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	case TAKSI_HOTKEY_IndicatorToggle:
 		sg_Config.m_bShowIndicator = !sg_Config.m_bShowIndicator;
 		return;
-	case TAKSI_HOTKEY_RecordStart:
+	case TAKSI_HOTKEY_RecordBegin:
 		// toggle video capturing mode
 		if ( g_AVIFile.IsOpen())
 		{
@@ -293,9 +293,10 @@ void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 		}
 		else
 		{
-			SetHotKey(TAKSI_HOTKEY_RecordStart);
+			SetHotKey(TAKSI_HOTKEY_RecordBegin);
 		}
 		return;
+	case TAKSI_HOTKEY_RecordPause:
 	case TAKSI_HOTKEY_RecordStop:
 	case TAKSI_HOTKEY_Screenshot:
 	case TAKSI_HOTKEY_SmallScreenshot:

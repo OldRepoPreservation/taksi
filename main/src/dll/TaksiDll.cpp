@@ -329,6 +329,13 @@ void CTaksiProcess::UpdateStat( TAKSI_PROCSTAT_TYPE eProp )
 	}
 }
 
+void CTaksiProcess::put_RecordPause( bool bRecordPause )
+{
+	if ( m_bRecordPause == bRecordPause )
+		return;
+	m_bRecordPause = bRecordPause;
+}
+
 int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
 {
 	// pszExt = "avi" or "bmp"

@@ -33,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/Taksi.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -81,7 +81,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/Taksi.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -184,6 +184,12 @@
 				RelativePath=".\res\BtnIndic.bmp">
 			</File>
 			<File
+				RelativePath=".\res\BtnRecordBegin.bmp">
+			</File>
+			<File
+				RelativePath=".\res\BtnRecordPause.bmp">
+			</File>
+			<File
 				RelativePath=".\res\BtnRecordStart.bmp">
 			</File>
 			<File
@@ -200,6 +206,12 @@
 			</File>
 			<File
 				RelativePath=".\res\GrayIndic.bmp">
+			</File>
+			<File
+				RelativePath=".\res\GrayRecordBegin.bmp">
+			</File>
+			<File
+				RelativePath=".\res\GrayRecordPause.bmp">
 			</File>
 			<File
 				RelativePath=".\res\GrayRecordStart.bmp">

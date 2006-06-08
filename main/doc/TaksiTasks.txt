@@ -7,35 +7,36 @@ dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
 Half sized GDI not work.
-Non Frame GDI not working.
+Non Frame GDI not working properly.
 Odd flash when switching DX applcations. must change focus 2 times ?
 GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
+Very unpredictable crash after record in gdi with firefox ?
 
 TODO:
-Comment tag inside AVI file. TAKSI vX date
+Make better button graphics
 Need message saying there is no codec selected!
-Need message explaining focus changing.
-Adjust size of the background thread Q
-Manual.txt completely out of date!
+Need message explaining focus changing/hooking.
+Allow adjust of the size of the background thread Q
+makefile, Manual.txt completely out of date!
 Audio
-Pause live record ?
 Better frame rate calculation ?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 Context sensative help file.
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
 
-Suggest codecs appropriate to desired CPU usage. MSMpeg4 seems good.
+Comment tag inside AVI file. TAKSI vX date + user comments?
+Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??
 AVI may not be the best format. has too much overhead. is MPG or WMV better ?
 http://guru.multimedia.cx/category/container-formats/
-smaller AVI index ?
+smaller AVI index ? only index every nth frame or an index every 10 seconds ?
 reflect state in tooltip ?
-tray icon menu
-context/sys menu to take actions.
+shell tray icon menu. with context/sys menu to take actions.
 add a watermark or logo ?
+color reduction for GDI. reduce to a smaller number of colors ?
 
 AUDIO TASK:
 Get audio from WaveIn (assumes loopback) ? (much easier)
@@ -45,3 +46,4 @@ Hook Audio stream from output?
  Without a loopback input the output must be hooked at a very low (kernel) level.
  Hook audio output (Wave,DirectSound) device at kernel level
 
+Does windows media encoder record audio? How do others do it?

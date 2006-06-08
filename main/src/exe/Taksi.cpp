@@ -42,6 +42,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	sg_Config.CopyConfig( g_Config );
 
 	lstrcpy( sg_ProcStats.m_szLastError, _TEXT("Select an application to hook"));
+	InitCommonControls();
 
 #ifdef _DEBUG
 	CTaksiDll* pDll = &sg_Dll;

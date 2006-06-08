@@ -116,7 +116,8 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_ConfigOpen]=0x0;
 	m_wHotKey[TAKSI_HOTKEY_HookModeToggle]=0x75;
 	m_wHotKey[TAKSI_HOTKEY_IndicatorToggle]=0x74;
-	m_wHotKey[TAKSI_HOTKEY_RecordStart]=0x7b;
+	m_wHotKey[TAKSI_HOTKEY_RecordBegin]=0x7b;
+	m_wHotKey[TAKSI_HOTKEY_RecordPause]=0;
 	m_wHotKey[TAKSI_HOTKEY_RecordStop]=0x7b;
 	m_wHotKey[TAKSI_HOTKEY_Screenshot]=0x77;
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
@@ -311,7 +312,8 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
 	case TAKSI_CFGPROP_VKey_HookModeToggle:
 	case TAKSI_CFGPROP_VKey_IndicatorToggle:
-	case TAKSI_CFGPROP_VKey_RecordStart:
+	case TAKSI_CFGPROP_VKey_RecordBegin:
+	case TAKSI_CFGPROP_VKey_RecordPause:
 	case TAKSI_CFGPROP_VKey_RecordStop:
 	case TAKSI_CFGPROP_VKey_Screenshot:
 	case TAKSI_CFGPROP_VKey_SmallScreenshot:
@@ -371,7 +373,8 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
 	case TAKSI_CFGPROP_VKey_HookModeToggle:
 	case TAKSI_CFGPROP_VKey_IndicatorToggle:
-	case TAKSI_CFGPROP_VKey_RecordStart:
+	case TAKSI_CFGPROP_VKey_RecordBegin:
+	case TAKSI_CFGPROP_VKey_RecordPause:
 	case TAKSI_CFGPROP_VKey_RecordStop:
 	case TAKSI_CFGPROP_VKey_Screenshot:
 	case TAKSI_CFGPROP_VKey_SmallScreenshot:

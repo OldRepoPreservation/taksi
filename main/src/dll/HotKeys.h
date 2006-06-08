@@ -68,7 +68,7 @@ public:
 	void DoHotKey( TAKSI_HOTKEY_TYPE eHotKey );
 	bool IsHotKey( TAKSI_HOTKEY_TYPE eHotKey ) const
 	{
-		return( m_dwHotKeyMask & (1<<eHotKey));
+		return(( m_dwHotKeyMask & (1<<eHotKey)) ? true : false );
 	}
 	void SetHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	{
