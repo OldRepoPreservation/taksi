@@ -83,7 +83,7 @@ public:
 	void DetachHotKeys();
 
 public:
-	bool m_bAttachedHotKeys;	// hooked the keyboard for this process.
+	bool m_bAttachedHotKeys;	// hooked the keyboard or DI for this process.
 	DWORD m_dwHotKeyMask;	// TAKSI_HOTKEY_TYPE mask
 };
 extern CTaksiHotKeys g_HotKeys;

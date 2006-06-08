@@ -158,6 +158,8 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		return HRESULT_FROM_WIN32(dwLastError);
 	}
 
+	// ??? bHalfSize not used !!
+
 	return S_OK;
 }
 

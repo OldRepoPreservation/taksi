@@ -25,6 +25,7 @@ Better frame rate calculation ?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 Context sensative help file.
 put debuglog files in the capture dir ?
+render the mouse cursor in graphics modes.
 
 Suggest codecs appropriate to desired CPU usage. MSMpeg4 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??
@@ -34,6 +35,7 @@ smaller AVI index ?
 reflect state in tooltip ?
 tray icon menu
 context/sys menu to take actions.
+add a watermark or logo ?
 
 AUDIO TASK:
 Get audio from WaveIn (assumes loopback) ? (much easier)
