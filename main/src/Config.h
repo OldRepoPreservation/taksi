@@ -77,13 +77,12 @@ struct LIBSPEC CTaksiConfigData
 	bool SetHotKey(TAKSI_HOTKEY_TYPE eHotKey, WORD vKey);
 	WORD GetHotKey(TAKSI_HOTKEY_TYPE eHotKey) const;
 
-	void put_CaptureDir(const TCHAR* pszPath);
-	void GetCaptureDir(TCHAR* pszPath, int iSizeMax) const;
 	bool FixCaptureDir();
 
 public:
 	// CAN be set from CGuiConfig
 	TCHAR  m_szCaptureDir[_MAX_PATH];	// files go here!
+	TCHAR  m_szFileNamePostfix[64];
 	bool   m_bDebugLog;					// keep log files or not?
 
 	float  m_fFrameRateTarget;			// What do we want our movies frame rate to be? (f/sec)

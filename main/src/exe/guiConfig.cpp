@@ -234,6 +234,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	// Dest Dir
 	SetWindowText( m_hControlCaptureDirectory, config.m_szCaptureDir );
 	SendMessage( m_hControlDebugLog, BM_SETCHECK, config.m_bDebugLog ? BST_CHECKED : BST_UNCHECKED, 0 );
+	SetWindowText( m_hControlFileNamePostfix, config.m_szFileNamePostfix );
 
 	// Format
 	TCHAR szTmp[_MAX_PATH];
@@ -312,6 +313,9 @@ void CGuiConfig::OnCommandSave()
 		SetWindowText( m_hControlCaptureDirectory, g_Config.m_szCaptureDir); 
 		m_bDataUpdating = false;
 	}
+
+	iLen = GetWindowText( m_hControlFileNamePostfix,
+		g_Config.m_szFileNamePostfix, sizeof(g_Config.m_szFileNamePostfix));
 
 	char szTmp[_MAX_PATH];
 	GetWindowText( m_hControlFrameRate, szTmp, sizeof(szTmp));
@@ -546,18 +550,24 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 
 	case IDC_C_CaptureDirectory:
+		if ( iNotify == EN_CHANGE && !m_bDataUpdating )
+		{
+			int iLen = GetWindowText( m_hControlCaptureDirectory,
+				g_Config.m_szCaptureDir, sizeof(g_Config.m_szCaptureDir));
+			OnChanges();
+		}
+		break;
+
+	case IDC_C_FileNamePostfix:
 	case IDC_C_CustomPattern:
 	case IDC_C_CustomFrameRate:
 	case IDC_C_CustomFrameWeight:
 	case IDC_C_FrameRate:
 		// ignore EN_UPDATE
-		if ( iNotify == EN_CHANGE )
+		if ( iNotify == EN_CHANGE && !m_bDataUpdating )
 		{
-			if (!m_bDataUpdating)
-			{
-				// modify status text
-				OnChanges();
-			}
+			// modify status text
+			OnChanges();
 		}
 		break;
 
@@ -734,7 +744,13 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 #undef GuiConfigControl
 
 	// show credits
-	SendMessage(m_hControlCustomSettingsList, CB_LIMITTEXT, _MAX_PATH-1, 0);
+#define UPDATE_EDIT_LIMIT(c,i,p) SendMessage(m_hControl##i, CB_LIMITTEXT, sizeof(((c*)0)->p)-1, 0)
+
+	UPDATE_EDIT_LIMIT( CTaksiConfig, CaptureDirectory, m_szCaptureDir );
+	UPDATE_EDIT_LIMIT( CTaksiConfig, FileNamePostfix, m_szFileNamePostfix );
+	UPDATE_EDIT_LIMIT( CTaksiConfigCustom, CustomPattern, m_szPattern );
+	UPDATE_EDIT_LIMIT( CTaksiConfigCustom, CustomSettingsList, m_szAppId );
+
 	SetSaveState( false );
 
 	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_SaveButton));

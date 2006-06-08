@@ -26,7 +26,7 @@
 #define IDB_G_Screenshot                212
 #define IDB_G_SmallScreenshot           213
 #define IDC_ABOUT_1                     1001
-#define IDC_ABOUT_4						1004
+#define IDC_ABOUT_4                     1004
 #define IDC_C_TAB                       1009
 #define IDC_C_StatusText                1010
 #define IDC_C_RestoreButton             1011
@@ -35,6 +35,7 @@
 #define IDC_C_CaptureDirectoryBrowse    1021
 #define IDC_C_CaptureDirectoryExplore   1022
 #define IDC_C_DebugLog                  1023
+#define IDC_C_FileNamePostfix           1024
 #define IDC_C_FrameRate                 1030
 #define IDC_C_VideoCodecButton          1031
 #define IDC_C_VideoCodec                1032
@@ -88,7 +89,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1085
+#define _APS_NEXT_CONTROL_VALUE         1086
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

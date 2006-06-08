@@ -6,6 +6,7 @@ GuiConfigControl(CaptureDirectory,			1,	"displays capture directory path")
 GuiConfigControl(CaptureDirectoryBrowse,	1,	"browse files dialog")
 GuiConfigControl(CaptureDirectoryExplore,	1,  "")
 GuiConfigControl(DebugLog,					1,	"Create Debug Logs")
+GuiConfigControl(FileNamePostfix,			1,	"File name postfix note")
 
 GuiConfigControl(FrameRate,					2,	"displays adaptive frame rate")
 GuiConfigControl(VideoCodecButton,			2,	"button to choose video codec from a dialog")

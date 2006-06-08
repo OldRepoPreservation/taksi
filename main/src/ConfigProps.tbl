@@ -7,6 +7,7 @@ ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")
 
 ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end with a backslash)")
 ConfigProp(DebugLog,				m_bDebugLog,	"Debug Log kept?")
+ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name with this")
 
 ConfigProp(GDIFrame,				m_bGDIFrame,	"Record the GDI frame or just the client area")
 ConfigProp(GDIUse,					m_bGDIUse,		"hook GDI mode at all?")

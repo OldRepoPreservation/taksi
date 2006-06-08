@@ -338,11 +338,12 @@ int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
 	::GetLocalTime(&time);
 
 	int iLen = _sntprintf( pszFileName, _MAX_PATH-1,
-		_T("%s%s-%d%02d%02d-%02d%02d%02d%01d.%s"), 
+		_T("%s%s-%d%02d%02d-%02d%02d%02d%01d%s.%s"), 
 		sg_Config.m_szCaptureDir, m_szProcessTitleNoExt, 
 		time.wYear, time.wMonth, time.wDay,
 		time.wHour, time.wMinute, time.wSecond,
 		time.wMilliseconds/100,	// uniqueness to tenths of a sec. 
+		sg_Config.m_szFileNamePostfix,
 		pszExt );
 
 	return iLen;
