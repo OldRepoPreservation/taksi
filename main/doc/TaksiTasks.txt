@@ -6,6 +6,7 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
+The same application has multiple main windows. or multiple instances.
 Half sized GDI not work.
 Non Frame GDI not working properly.
 Odd flash when switching DX applcations. must change focus 2 times ?

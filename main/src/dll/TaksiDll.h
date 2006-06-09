@@ -137,7 +137,7 @@ public:
 
 	void StopGraphXMode();
 	void DetachGraphXMode();
-	HRESULT AttachGraphXMode();
+	HRESULT AttachGraphXMode( HWND hWnd );
 
 	bool OnDllProcessAttach();
 	bool OnDllProcessDetach();

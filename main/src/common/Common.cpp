@@ -103,6 +103,28 @@ int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc )
 	return i;
 }
 
+HWND FindWindowTop( HWND hWnd )
+{
+	if ( ! ::IsWindow(hWnd))
+		return NULL;
+
+	DWORD dwStyle = GetWindowStyle(hWnd);
+	for (;;)
+	{
+		if ( ! (dwStyle&WS_CHILD))	// WS_POPUP | WS_OVERLAPPED
+			break;
+		HWND hWndParent = ::GetParent(hWnd);
+		if ( hWndParent == NULL )
+			break;
+		dwStyle = GetWindowStyle(hWndParent);
+		if ( ! (dwStyle&WS_VISIBLE))
+			break;
+		hWnd = hWndParent;
+	}
+
+	return hWnd;
+}
+
 HWND FindWindowForProcessID( DWORD dwProcessID )
 {
 	// look through all the top level windows for the window that has this processid.

@@ -326,3 +326,8 @@ June 8,2006
 Ver 0.749 test release.
 Move VS_VERSION_INFO from taksi.rc to taksiver.rc2 so it wont be destroyed by the resource editor.
 Pause mode for video record
+
+June 9,2006 
+==============
+Ver 0.750 test release.
+Attempt to fix hooking GDI mode with multiple main windows or instances.
