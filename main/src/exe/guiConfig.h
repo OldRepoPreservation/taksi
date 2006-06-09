@@ -21,8 +21,6 @@ public:
 	CGui();
 
 	bool CreateGuiWindow( UINT nCmdShow );
-	void UpdateButtonStates();
-	void UpdateButtonToolTips();
 
 	static void OnCommandHelpURL();
 	static int OnCommandHelpAbout( HWND hWnd );
@@ -30,13 +28,19 @@ public:
 	static int MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp );
 
 private:
+	void UpdateButtonStates();
+	void UpdateButtonToolTips();
+
+	bool OnCreate( HWND hWnd, CREATESTRUCT* pCreate );
+	bool OnCommandKey( TAKSI_HOTKEY_TYPE eKey );
+	bool OnCommand( int id, int iNotify, HWND hControl );
+
 	static ATOM RegisterClass();
 	static LRESULT CALLBACK WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	bool UpdateWindowTitle();
+	void CreateTrayIcon();
 
-	bool OnCommandKey( TAKSI_HOTKEY_TYPE eKey );
-	bool OnCommand( int id, int iNotify, HWND hControl );
 	int GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const;
 	LRESULT UpdateButton( TAKSI_HOTKEY_TYPE eKey );
 

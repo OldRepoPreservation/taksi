@@ -9,6 +9,15 @@
 
 CGui g_GUI;
 
+static BOOL AppendMenuStr( HMENU hMenu, int id )
+{
+	// IDM_SC_HELP_URL
+	TCHAR szTmp[ _MAX_PATH ];
+	int iLen = LoadString( g_hInst, id, szTmp, sizeof(szTmp)-1 );
+	return AppendMenu( hMenu, MF_INSERT|MF_STRING|MF_BYCOMMAND, 
+		id, szTmp );
+}
+
 CGui::CGui()
 {
 }
@@ -330,12 +339,79 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 	return false;
 }
 
+void CGui::CreateTrayIcon()
+{
+	// everyone expects this feature these days. 
+	// so give the people what they want.
+#if 0
+	// ??? TODO
+	if ( ! m_bUseTrayIcon )
+		return;
+
+	// Set up my tray menu.
+#endif
+
+}
+
+bool CGui::OnCreate( HWND hWnd, CREATESTRUCT* pCreate )
+{
+	// WM_CREATE 
+	DEBUG_MSG(( "CGui::WM_CREATE" LOG_CR ));
+	ASSERT(pCreate);
+	m_hWnd = hWnd;
+
+	// SysMenu
+	HMENU hMenu = ::GetSystemMenu(m_hWnd,false);
+	if ( hMenu == NULL )
+	{
+		ASSERT(0);
+		return false;
+	}
+	AppendMenuStr(hMenu,IDM_SC_HELP_URL);
+	AppendMenuStr(hMenu,IDM_SC_HELP_ABOUT);
+
+	// build GUI controls
+	// NOTE: Bitmap text font is : Small Fonts 7 ?
+	if ( ! m_ToolTips.Create( m_hWnd, WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON ))
+	{
+		DEBUG_ERR(("No tooltips" LOG_CR));
+		ASSERT(0);
+	}
+
+	BITMAP* pbmi = (BITMAP*)( pCreate->lpCreateParams );
+	ASSERT(pbmi);
+
+	int x=0;
+	for ( int i=0; i<BTN_QTY; i++ )
+	{
+		HWND hWndCtrl = CreateWindow( _T("BUTTON"), _T(""), 
+			WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON|BS_BITMAP,
+			pbmi->bmWidth*i, 0, 
+			pbmi->bmWidth, pbmi->bmHeight,
+			m_hWnd,
+			(HMENU)(INT_PTR)( i + IDB_ConfigOpen_1 ),
+			g_hInst,
+			NULL );
+		ASSERT(hWndCtrl);
+
+		// set the proper bitmap for the button.
+		ASSERT(m_Bitmap[i].get_HBitmap());
+		::SendMessage( hWndCtrl, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM) m_Bitmap[i].get_HBitmap());
+	}
+
+	UpdateButtonToolTips();
+	UpdateButtonStates();
+	CreateTrayIcon();
+	return true;
+}
+
 LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) // static
 {
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		DEBUG_MSG(( "CGui::WM_CREATE" LOG_CR ));
+		if ( ! g_GUI.OnCreate( hWnd, (CREATESTRUCT*) lParam ))
+			return -1;	// destroy me.
 		break;
 	case WM_MOVE:
 		{
@@ -377,28 +453,6 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	}
 	return ::DefWindowProc(hWnd,uMsg,wParam,lParam);
 }
-
-static BOOL AppendMenuStr( HMENU hMenu, int id )
-{
-	// IDM_SC_HELP_URL
-	TCHAR szTmp[ _MAX_PATH ];
-	int iLen = LoadString( g_hInst, id, szTmp, sizeof(szTmp)-1 );
-	return AppendMenu( hMenu, MF_INSERT|MF_STRING|MF_BYCOMMAND, 
-		id, szTmp );
-}
-
-#if 0
-void CGui::CreateTrayIcon()
-{
-	// ??? everyone expects this feature these days.
-
-	if ( ! m_bUseTrayIcon )
-		return;
-
-	// Set up my tray menu.
-
-}
-#endif
 
 bool CGui::CreateGuiWindow( UINT nCmdShow )
 {
@@ -454,57 +508,17 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 		HWND_DESKTOP,           // no parent window.
 		NULL,           // no menu
 		g_hInst,           // no creator
-		NULL );          // no extra data
+		&bmi );          // extra data
 	if ( m_hWnd == NULL )
 	{
 		ASSERT(0);
 		return false;
 	}
 
-	// SysMenu
-	HMENU hMenu = ::GetSystemMenu(m_hWnd,false);
-	if ( hMenu == NULL )
-	{
-		ASSERT(0);
-		return false;
-	}
-	AppendMenuStr(hMenu,IDM_SC_HELP_URL);
-	AppendMenuStr(hMenu,IDM_SC_HELP_ABOUT);
-
-	// build GUI controls
-	// NOTE: Bitmap text font is : Small Fonts 7 ?
-	if ( ! m_ToolTips.Create( m_hWnd, WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON ))
-	{
-		DEBUG_ERR(("No tooltips" LOG_CR));
-		ASSERT(0);
-	}
-
-	int x=0;
-	for ( int i=0; i<BTN_QTY; i++ )
-	{
-		HWND hWndCtrl = CreateWindow( _T("BUTTON"), _T(""), 
-			WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON|BS_BITMAP,
-			bmi.bmWidth*i, 0, 
-			bmi.bmWidth, bmi.bmHeight,
-			m_hWnd,
-			(HMENU)(INT_PTR)( i + IDB_ConfigOpen_1 ),
-			g_hInst,
-			NULL );
-		ASSERT(hWndCtrl);
-
-		// set the proper bitmap for the button.
-		ASSERT(m_Bitmap[i].get_HBitmap());
-		::SendMessage( hWndCtrl, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM) m_Bitmap[i].get_HBitmap());
-	}
-
-	UpdateButtonToolTips();
-	UpdateButtonStates();
-	// CreateTrayIcon();
-
 	// Show the window
 	::ShowWindow(m_hWnd, nCmdShow);
 
-	m_ToolTips.SetDelayTime(TTDT_INITIAL,200);
+	//m_ToolTips.SetDelayTime(TTDT_INITIAL,200);
 	m_ToolTips.Start();
 	return true;
 }

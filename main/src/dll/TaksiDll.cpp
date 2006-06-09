@@ -555,7 +555,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		lstrcpy( m_szProcessTitleNoExt, pszTitle );
 	}
 
-	bool bProcMaster = CheckProcessMaster();
+	bool bProcMaster = m_bIsProcessSpecial = CheckProcessMaster();
 	if ( bProcMaster )
 	{
 		// First time here!

@@ -718,6 +718,8 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 		return false;
 	}
 
+	TabCtrl_SetToolTips( m_hControlTab, m_ToolTips.m_hWnd );
+
 	for ( int i=0; i<COUNTOF(m_hWndTab); i++ )
 	{
 		m_hWndTab[i] = CreateDialogParam( g_hInst, 
@@ -763,8 +765,6 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 
 	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_SaveButton));
 	m_ToolTips.AddToolForControl( GetDlgItem(IDC_C_RestoreButton));
-
-	TabCtrl_SetToolTips( m_hControlTab, m_ToolTips.m_hWnd );
 
 	//m_ToolTips.SetDelayTime(TTDT_INITIAL,400);
 	m_ToolTips.Start();
