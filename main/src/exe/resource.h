@@ -11,22 +11,26 @@
 #define IDD_GuiConfigTab5               115
 #define IDD_GuiConfigTab6               116
 #define IDD_About                       143
-#define IDB_ConfigOpen                  200
-#define IDB_HookModeToggle              201
-#define IDB_IndicatorToggle             202
-#define IDB_RecordBegin                 203
-#define IDB_RecordPause                 204
-#define IDB_RecordStop                  205
-#define IDB_Screenshot                  206
-#define IDB_SmallScreenshot             207
-#define IDB_G_ConfigOpen                208
-#define IDB_G_HookModeToggle            209
-#define IDB_G_IndicatorToggle           210
-#define IDB_G_RecordBegin               211
-#define IDB_G_RecordPause               212
-#define IDB_G_RecordStop                213
-#define IDB_G_Screenshot                214
-#define IDB_G_SmallScreenshot           215
+
+#define IDB_ConfigOpen_1                 200
+#define IDB_HookModeToggle_1              201
+#define IDB_IndicatorToggle_1             202
+#define IDB_RecordBegin_1                 203
+#define IDB_RecordPause_1                 204
+#define IDB_RecordStop_1                  205
+#define IDB_Screenshot_1                  206
+#define IDB_SmallScreenshot_1             207
+
+#define IDB_RecordBegin_G               208
+#define IDB_RecordPause_G               209
+#define IDB_RecordStop_G                210
+#define IDB_Screenshot_G                211
+#define IDB_SmallScreenshot_G           212
+
+#define IDB_HookModeToggle_2            213
+#define IDB_IndicatorToggle_2           214
+#define IDB_RecordPause_2               215
+
 #define IDC_ABOUT_1                     1001
 #define IDC_ABOUT_4                     1004
 #define IDC_C_TAB                       1009

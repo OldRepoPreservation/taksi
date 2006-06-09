@@ -68,46 +68,73 @@ bool CGui::UpdateWindowTitle()
 	return true;
 }
 
-bool CGui::IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const
+int CGui::GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const
 {
+	// RETURN: 
+	//  The id of the bitmap to represent the state.
+	//  <0 = disabled (cant take action!)
+
 	switch (eKey)
 	{
 	case TAKSI_HOTKEY_ConfigOpen:
-		return true;
+		return IDB_ConfigOpen_1;	// only 1 state.
+
 	case TAKSI_HOTKEY_HookModeToggle:
-		// NOTE: this doesnt actually mean its not valid. just a different state.
-		return( ! sg_Dll.IsHookCBT());
+		if ( sg_Dll.IsHookCBT())
+			return IDB_HookModeToggle_2;
+		return( IDB_HookModeToggle_1 );
+
 	case TAKSI_HOTKEY_IndicatorToggle:
-		// NOTE: this doesnt actually mean its not valid. just a different state.
 		if ( sg_Config.m_bShowIndicator )
-			return true;
-		return false;
+			return IDB_IndicatorToggle_1;
+		return IDB_IndicatorToggle_2;
+	}
+
+	bool bIsRecording = ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording ||
+			sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused );
+
+	switch (eKey)
+	{
 	case TAKSI_HOTKEY_RecordBegin:
+		if ( sg_ProcStats.m_dwProcessId == 0 )
+			return -IDB_RecordBegin_G;
+		if ( bIsRecording )
+			return -IDB_RecordBegin_G;
+		return IDB_RecordBegin_1;
+
 	case TAKSI_HOTKEY_Screenshot:
+		if ( sg_ProcStats.m_dwProcessId == 0 )
+			return -IDB_Screenshot_G;
+		return IDB_Screenshot_1;
+
 	case TAKSI_HOTKEY_SmallScreenshot:
 		if ( sg_ProcStats.m_dwProcessId == 0 )
-			return false;
-		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording ||
-			sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused )
-			return false;
-		return true;
+			return -IDB_SmallScreenshot_G;
+		return IDB_SmallScreenshot_1;
+
 	case TAKSI_HOTKEY_RecordPause:
+		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused )
+			return IDB_RecordPause_2;
+		if ( bIsRecording )
+			return IDB_RecordPause_1;
+		return( -IDB_RecordPause_G );
+
 	case TAKSI_HOTKEY_RecordStop:
-		if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording ||
-			sg_ProcStats.m_eState == TAKSI_INDICATE_RecordPaused )
-			return true;
-		return( false );
+		if ( bIsRecording )
+			return IDB_RecordStop_1;
+		return( -IDB_RecordStop_G );
 	}
-	return false;
+	ASSERT(0);
+	return -IDB_ConfigOpen_1;
 }
 
 LRESULT CGui::UpdateButton( TAKSI_HOTKEY_TYPE eKey )
 {
-	bool bGray = ! IsButtonValid(eKey);
-	int i = eKey+((bGray)?BTN_QTY:0);
-	return ::SendDlgItemMessage( m_hWnd, IDB_ConfigOpen + eKey,
+	int id = abs( GetButtonState(eKey)) - IDB_ConfigOpen_1;
+	ASSERT( id >= 0 && id < COUNTOF(m_Bitmap));
+	return ::SendDlgItemMessage( m_hWnd, IDB_ConfigOpen_1 + eKey,
 		BM_SETIMAGE, IMAGE_BITMAP, 
-		(LPARAM) m_Bitmap[i].get_HBitmap());
+		(LPARAM) m_Bitmap[id].get_HBitmap());
 }
 
 void CGui::UpdateButtonStates()
@@ -164,7 +191,7 @@ void CGui::UpdateButtonToolTips()
 	for ( int i=0; i<BTN_QTY; i++ )
 	{
 		TCHAR szHelp[ _MAX_PATH ];
-		int iLen = LoadString( g_hInst, i + IDB_ConfigOpen, szHelp, sizeof(szHelp)-1 );
+		int iLen = LoadString( g_hInst, i + IDB_ConfigOpen_1, szHelp, sizeof(szHelp)-1 );
 		ASSERT( iLen > 0 );
 
 		TCHAR* pszText;
@@ -181,7 +208,7 @@ void CGui::UpdateButtonToolTips()
 			pszText = szHelp;	// no hotkey mapped.
 		}
 
-		HWND hWndCtrl = GetDlgItem(i + IDB_ConfigOpen);
+		HWND hWndCtrl = GetDlgItem(i + IDB_ConfigOpen_1);
 		ASSERT(hWndCtrl);
 		if ( ! m_ToolTips.AddTool( hWndCtrl, pszText ))
 		{
@@ -229,12 +256,21 @@ int CGui::OnCommandHelpAbout( HWND hWndParent )
 	return DialogBox( g_hInst, MAKEINTRESOURCE(IDD_About), hWndParent, AboutDlgProc );
 }
 
+bool CGui::OnCommandKey( TAKSI_HOTKEY_TYPE eKey )
+{
+	if ( GetButtonState(eKey) <= 0 )
+		return false;
+	sg_Dll.m_dwHotKeyMask |= (1<<eKey);
+	UpdateButtonStates();
+	return true;
+}
+
 bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 {
 	switch (id)
 	{
 	case TAKSI_HOTKEY_ConfigOpen:
-	case IDB_ConfigOpen:
+	case IDB_ConfigOpen_1:
 		if ( g_GUIConfig.m_hWnd == NULL )
 		{
 			g_GUIConfig.m_hWnd = CreateDialog( g_hInst, 
@@ -252,7 +288,7 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		}
 		return true;
 	case TAKSI_HOTKEY_HookModeToggle:
-	case IDB_HookModeToggle:
+	case IDB_HookModeToggle_1:
 		if ( sg_Dll.IsHookCBT())
 		{
 			sg_Dll.HookCBT_Uninstall();
@@ -264,29 +300,26 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		UpdateButtonStates();
 		return true;
 	case TAKSI_HOTKEY_IndicatorToggle:
-	case IDB_IndicatorToggle:
+	case IDB_IndicatorToggle_1:
 		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
 		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
 		UpdateButtonStates();
 		return true;
+
 	case TAKSI_HOTKEY_RecordBegin:
 	case TAKSI_HOTKEY_RecordPause:
 	case TAKSI_HOTKEY_RecordStop:
 	case TAKSI_HOTKEY_Screenshot:
 	case TAKSI_HOTKEY_SmallScreenshot:
-	case IDB_RecordBegin:
-	case IDB_RecordPause:
-	case IDB_RecordStop:
-	case IDB_Screenshot:
-	case IDB_SmallScreenshot:
-		{
-		TAKSI_HOTKEY_TYPE eKey = (TAKSI_HOTKEY_TYPE)( TAKSI_HOTKEY_ConfigOpen + (id - IDB_ConfigOpen));
-		if ( ! IsButtonValid(eKey))
-			return false;
-		sg_Dll.m_dwHotKeyMask |= (1<<eKey);
-		}
-		UpdateButtonStates();
-		return true;
+		return OnCommandKey( (TAKSI_HOTKEY_TYPE) id );
+
+	case IDB_RecordBegin_1:
+	case IDB_RecordPause_1:
+	case IDB_RecordStop_1:
+	case IDB_Screenshot_1:
+	case IDB_SmallScreenshot_1:
+		return OnCommandKey( (TAKSI_HOTKEY_TYPE)( TAKSI_HOTKEY_ConfigOpen + (id - IDB_ConfigOpen_1)));
+
 	case IDM_SC_HELP_URL:
 		OnCommandHelpURL();
 		return true;
@@ -395,7 +428,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 
 	for ( int i=0; i<COUNTOF(m_Bitmap); i++ )
 	{
-		m_Bitmap[i].Attach( ::LoadBitmap( g_hInst, MAKEINTRESOURCE(i+IDB_ConfigOpen)));
+		m_Bitmap[i].Attach( ::LoadBitmap( g_hInst, MAKEINTRESOURCE(i+IDB_ConfigOpen_1)));
 		// ASSERT(m_Bitmap[i].get_HBitmap());
 	}
 
@@ -454,7 +487,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 			bmi.bmWidth*i, 0, 
 			bmi.bmWidth, bmi.bmHeight,
 			m_hWnd,
-			(HMENU)(INT_PTR)( i + IDB_ConfigOpen ),
+			(HMENU)(INT_PTR)( i + IDB_ConfigOpen_1 ),
 			g_hInst,
 			NULL );
 		ASSERT(hWndCtrl);

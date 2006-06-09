@@ -11,6 +11,7 @@
 #include "../common/CWndGDI.h"
 #include "../common/CWindow.h"
 #include "../common/CWndToolTip.h"
+#include "resource.h"
 
 struct CTaksiConfigCustom;
 
@@ -34,8 +35,9 @@ private:
 
 	bool UpdateWindowTitle();
 
+	bool OnCommandKey( TAKSI_HOTKEY_TYPE eKey );
 	bool OnCommand( int id, int iNotify, HWND hControl );
-	bool IsButtonValid( TAKSI_HOTKEY_TYPE eKey ) const;
+	int GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const;
 	LRESULT UpdateButton( TAKSI_HOTKEY_TYPE eKey );
 
 	static int GetVirtKeyName( TCHAR* pszName, int iLen, BYTE bVirtKey );
@@ -43,7 +45,7 @@ private:
 
 public:
 #define BTN_QTY TAKSI_HOTKEY_QTY
-	CWndGDI m_Bitmap[BTN_QTY*2];
+	CWndGDI m_Bitmap[ ( IDB_RecordPause_2 - IDB_ConfigOpen_1 ) + 1 ];
 	CWndToolTip m_ToolTips;
 };
 extern CGui g_GUI;
