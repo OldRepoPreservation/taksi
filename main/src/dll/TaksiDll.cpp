@@ -489,6 +489,7 @@ HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 	{
 		hWnd = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
 	}
+	m_hWndHookTry = hWnd;
 
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
@@ -510,6 +511,7 @@ void CTaksiProcess::StopGraphXMode()
 	g_AVIThread.StopAVIThread();	// kill my work thread, i'm done
 	g_AVIFile.CloseAVIFile();	// close AVI file, if we were in recording mode 
 	g_HotKeys.DetachHotKeys();
+	m_hWndHookTry = NULL;	// Not trying to do anything anymore.
 }
 
 void CTaksiProcess::DetachGraphXMode()
@@ -579,20 +581,24 @@ bool CTaksiProcess::OnDllProcessAttach()
 
 	// determine process handle that is loading this DLL. 
 	m_Stats.m_dwProcessId = ::GetCurrentProcessId();
-	m_hProc = ::GetModuleHandle(NULL);
+	m_hWndHookTry = NULL;
 
 	// save handle to process' heap
 	m_hHeap = ::GetProcessHeap();
 
 	// do not hook on selected applications. set m_bIsProcessSpecial
-	// (such as: myself, Explorer.EXE)
-	CheckProcessCustom();	// determine frame capturing algorithm 
-
-	if ( m_bIsProcessSpecial && ! bProcMaster )
+	if ( ! bProcMaster )
 	{
-		LOG_MSG(( "Special process ignored." LOG_CR ));
-		return true;
+		// (such as: myself, Explorer.EXE)
+		CheckProcessCustom();	// determine frame capturing algorithm 
+		if ( m_bIsProcessSpecial && ! bProcMaster )
+		{
+			LOG_MSG(( "Special process ignored." LOG_CR ));
+			return true;
+		}
 	}
+
+	g_FrameRate.InitFreqUnits();
 
 	// log information on which process mapped the DLL
 	sg_Dll.LogMessage( _T("mapped: "));
@@ -620,14 +626,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
 	DEBUG_TRACE(( "sg_Dll.m_bMasterExiting=%d" LOG_CR, sg_Dll.m_bMasterExiting));
 
-	g_FrameRate.InitFreqUnits();
-
-	// see if any of supported API DLLs are already loaded.
-	// If not, we'll just try again later.
-	if ( AttachGraphXMode(NULL))
-	{
-	}
-
+	// ASSUME HookCBTProc will call AttachGraphXMode later
 	return true;
 }
 

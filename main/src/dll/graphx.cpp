@@ -226,7 +226,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		{
 			LOG_MSG(( "PresentFrameBegin: New Prime Focus." LOG_CR));
 			sg_ProcStats.CopyProcStats( g_Proc.m_Stats );
-			sg_Dll.HookCBT_Uninstall();
+			sg_Dll.HookCBT_Uninstall(); // thread safe?
 		}
 	}
 	else if ( ! g_Proc.IsProcPrime())

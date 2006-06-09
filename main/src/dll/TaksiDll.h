@@ -149,12 +149,12 @@ public:
 public:
 	CTaksiProcStats m_Stats;	// For display in the Taksi.exe app.
 	TCHAR m_szProcessTitleNoExt[_MAX_PATH]; // use as prefix for captured files.
-
-	HINSTANCE m_hProc;		// handle to the process i'm attached to.
-	HANDLE m_hHeap;			// the process heap to allocate on for me.
+	HANDLE m_hHeap;					// the process heap to allocate on for me.
 
 	CTaksiConfigCustom* m_pCustomConfig; // custom config for this app/process.
 	DWORD m_dwConfigChangeCount;		// my last reconfig check id.
+
+	HWND m_hWndHookTry;				// The last window we tried to hook 
 
 	// if set to true, then CBT should not take any action at all.
 	bool m_bIsProcessSpecial;		// Is Master TAKSI.EXE or special app.
