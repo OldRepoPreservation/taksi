@@ -181,49 +181,46 @@
 				RelativePath=".\res\BtnHookMode.bmp">
 			</File>
 			<File
+				RelativePath=".\res\BtnHookMode2.bmp">
+			</File>
+			<File
 				RelativePath=".\res\BtnIndic.bmp">
+			</File>
+			<File
+				RelativePath=".\res\BtnIndic2.bmp">
 			</File>
 			<File
 				RelativePath=".\res\BtnRecordBegin.bmp">
 			</File>
 			<File
+				RelativePath=".\res\BtnRecordBeginG.bmp">
+			</File>
+			<File
 				RelativePath=".\res\BtnRecordPause.bmp">
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordStart.bmp">
+				RelativePath=".\res\BtnRecordPause2.bmp">
+			</File>
+			<File
+				RelativePath=".\res\BtnRecordPauseG.bmp">
 			</File>
 			<File
 				RelativePath=".\res\BtnRecordStop.bmp">
 			</File>
 			<File
+				RelativePath=".\res\BtnRecordStopG.bmp">
+			</File>
+			<File
 				RelativePath=".\res\BtnScreenshot.bmp">
+			</File>
+			<File
+				RelativePath=".\res\BtnScreenshotG.bmp">
 			</File>
 			<File
 				RelativePath=".\res\BtnSmallScreenshot.bmp">
 			</File>
 			<File
-				RelativePath=".\res\GrayHookMode.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayIndic.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayRecordBegin.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayRecordPause.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayRecordStart.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayRecordStop.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GrayScreenshot.bmp">
-			</File>
-			<File
-				RelativePath=".\res\GraySmallScreenshot.bmp">
+				RelativePath=".\res\BtnSmallScreenshotG.bmp">
 			</File>
 			<File
 				RelativePath=".\res\Taksi.ico">
