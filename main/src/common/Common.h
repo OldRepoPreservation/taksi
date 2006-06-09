@@ -25,3 +25,5 @@ extern int Mem_ConvertToString( char* pszDst, int iSizeDstMax, const BYTE* pSrc,
 extern int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc );
 
 extern HWND FindWindowForProcessID( DWORD dwProcessID );
+extern HWND FindWindowTop( HWND hWnd );
+

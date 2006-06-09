@@ -133,7 +133,8 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		if ( g_Proc.m_bIsProcessSpecial )
 			break;
 		LOG_MSG(( "HookCBTProc: nCode=%08x" LOG_CR, (DWORD)nCode ));
-		if ( g_Proc.AttachGraphXMode() == S_OK )
+		ASSERT(wParam);
+		if ( g_Proc.AttachGraphXMode( (HWND) wParam ) == S_OK )
 		{
 			g_Proc.CheckProcessCustom();	// determine frame capturing algorithm 
 		}
@@ -469,16 +470,29 @@ void CTaksiProcess::CheckProcessCustom()
 	LOG_MSG(( "CheckProcessCustom: No custom config match." LOG_CR ));
 }
 
-HRESULT CTaksiProcess::AttachGraphXMode()
+HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 {
 	// see if any of supported graphics API DLLs are already loaded. (and can be hooked)
-	// NOTE: They are not truly attached til PresentFrameBegin() is called.
+	// ARGS:
+	//  hWnd = the window that is getting focus now.
+	//  NULL = the Process just attached.
+	// NOTE: 
+	//  Not truly attached til PresentFrameBegin() is called.
+	// TODO:
+	//  Graphics modes should usurp GDI
+	//  Allow changing windows inside the same process.???
 
 	if (m_bIsProcessSpecial)	// Dont hook special apps like My EXE or Explorer.
 		return S_FALSE;
 
+	if ( hWnd )
+	{
+		hWnd = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
+	}
+
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
+	// NOTE: We can only use ONE!
 
 	HRESULT hRes;
 	for ( int i=0; i<COUNTOF(s_GraphxModes); i++ )
@@ -610,7 +624,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 
 	// see if any of supported API DLLs are already loaded.
 	// If not, we'll just try again later.
-	if ( AttachGraphXMode())
+	if ( AttachGraphXMode(NULL))
 	{
 	}
 
