@@ -20,8 +20,8 @@ BEGIN
 		BEGIN
 			VALUE "Comments", "Desktop Video-capture/Screenshot-making program for 3D-graphics applications.\0"
 			VALUE "FileDescription", "Taksi Engine Dll\0"
-            VALUE "FileVersion", TAKSI_VERSION_S
-            VALUE "ProductVersion", TAKSI_VERSION_S
+            VALUE "FileVersion", TAKSI_VERSION_RES_S
+            VALUE "ProductVersion", TAKSI_VERSION_RES_S
 			VALUE "LegalCopyright", TAKSI_COPYRIGHT
 		END
 	END
