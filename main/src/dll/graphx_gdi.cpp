@@ -14,7 +14,7 @@ CTaksiGDI g_GDI;
 
 bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
-	// Draw my indicator on the window. Hooked WM_PAINT
+	// Draw my indicator on the window. Hooked WM_PAINT, or WM_NCPAINT
 
 	m_dwTimeLastDrawIndicator = GetTickCount();
 
@@ -24,7 +24,7 @@ bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		return false;
 	CWndDC dc;
 	// NOTE: I cant tell if the window is being overlapped?
-	if ( ! dc.GetDCEx( m_hWnd, DCX_WINDOW|DCX_PARENTCLIP )) 
+	if ( ! dc.GetDCEx( m_hWnd, DCX_WINDOW|DCX_PARENTCLIP )) // DCX_CLIPSIBLINGS
 		return false;
 	// eIndicate = color.
 	const BYTE* pColorDX = (const BYTE*) &sm_IndColors[eIndicate];
@@ -34,12 +34,24 @@ bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	{
 		return false;
 	}
+
 	RECT rect = { INDICATOR_X, INDICATOR_Y, INDICATOR_X+INDICATOR_Width, INDICATOR_Y+INDICATOR_Height };
+
+#if 0
+	RECT rectW = rect;
+	LPPOINT pPoint = (LPPOINT)&rectW;
+	ClientToScreen( m_hWnd, pPoint+0 );
+	ClientToScreen( m_hWnd, pPoint+1 );
+	::InvalidateRect( NULL, &rectW, false );
+#endif
+
 	if ( ! ::FillRect( dc, &rect, brush.get_HBrush()))
 	{
 		return false;
 	}
-
+#if 0
+	::ValidateRect( NULL, &rectW );
+#endif
 	return true;
 }
 
@@ -76,6 +88,7 @@ HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
 
 void CTaksiGDI::DrawMouse( HDC hMemDC )
 {
+	// Draw the cursor on the sampled bitmap.
 	POINT xPoint; 
 	::GetCursorPos( &xPoint ); 
 	xPoint.x -= m_WndRect.left;
@@ -187,7 +200,9 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	case WM_MOVE:
 		g_GDI.m_bGotFrameInfo = false;	// must update this.
 		break;
+#if 1
 	case WM_PAINT:
+		// painting the client area.
 		if (g_GDI.m_iReentrant)
 		{
 			DEBUG_ERR(( "CTaksiGDI::WM_PAINT reentrant!" LOG_CR ));
@@ -201,6 +216,24 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		g_GDI.m_iReentrant--;
 		return lRes;
 		}
+#else
+	case WM_NCPAINT:
+		// painting the non-client area.		
+		if (g_GDI.m_iReentrant)
+		{
+			DEBUG_ERR(( "CTaksiGDI::WM_PAINT reentrant!" LOG_CR ));
+		}
+		else
+		{
+		g_GDI.m_iReentrant++;
+		g_GDI.PresentFrameBegin(true);	// must be after the real WM_PAINT.
+		g_GDI.PresentFrameEnd();
+		LRESULT lRes = ::CallWindowProc( g_GDI.m_WndProcOld, hWnd, uMsg, wParam, lParam );
+		g_GDI.m_iReentrant--;
+		return lRes;
+		}
+		break;
+#endif
 	case WM_TIMER: 
 		if ( wParam != IDT_TIMER )	// the app owns this timer.
 			break;
