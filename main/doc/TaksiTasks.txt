@@ -26,6 +26,7 @@ Graphics Mode Text overlay - display frame rate/ Megs of data written as text on
 Context sensative help file.
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
+hook callbacks might not be on the same thread?
 
 Comment tag inside AVI file. TAKSI vX date + user comments?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
