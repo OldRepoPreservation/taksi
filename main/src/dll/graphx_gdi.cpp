@@ -265,6 +265,7 @@ bool CTaksiGDI::HookFunctions()
 	}
 	if ( m_hWnd == NULL )	// must find the window first.
 	{
+		m_hWnd = g_Proc.m_hWndHookTry;
 		m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
 		if ( m_hWnd == NULL )
 			return false;
