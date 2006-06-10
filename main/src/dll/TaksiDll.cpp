@@ -41,7 +41,8 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 {
 	CloseLogFile();
 	if ( ! sg_Config.m_bDebugLog)
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_CANCELLED);
+
 	m_File.AttachHandle( ::CreateFile( pszFileName,            // file to create 
 		GENERIC_WRITE,                // open for writing 
 		0,                            // do not share 
@@ -54,6 +55,7 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		DWORD dwLastError = ::GetLastError();
 		return HRESULT_FROM_WIN32(dwLastError);
 	}
+
 	return S_OK;
 }
 
@@ -610,20 +612,21 @@ bool CTaksiProcess::OnDllProcessAttach()
 
 #ifdef USE_LOGFILE
 	// open log file, specific for this process
-	TCHAR szLogName[ _MAX_PATH ];
-	lstrcpy(szLogName, sg_Dll.m_szDllDir );
-	lstrcat(szLogName, _T("Taksi_")); 
-	lstrcat(szLogName, m_szProcessTitleNoExt); 
-	lstrcat(szLogName, _T(".log"));
-
-	HRESULT hRes = g_Log.OpenLogFile(szLogName);
-	if ( IS_ERROR(hRes))
+	if ( sg_Config.m_bDebugLog )
 	{
-		LOG_MSG(( "Log start FAIL. %d" LOG_CR, hRes ));
-	}
-	else
-	{
-		DEBUG_TRACE(( "Log started." LOG_CR));
+		TCHAR szLogName[ _MAX_PATH ];
+		int iLen = _sntprintf( szLogName, COUNTOF(szLogName)-1, 
+			_T("%sTaksi_%s.log"), 
+			sg_Dll.m_szDllDir, m_szProcessTitleNoExt ); 
+		HRESULT hRes = g_Log.OpenLogFile(szLogName);
+		if ( IS_ERROR(hRes))
+		{
+			LOG_MSG(( "Log start FAIL. 0x%x" LOG_CR, hRes ));
+		}
+		else
+		{
+			DEBUG_TRACE(( "Log started." LOG_CR));
+		}
 	}
 #endif
 

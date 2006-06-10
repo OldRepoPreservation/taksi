@@ -15,6 +15,7 @@ CTaksiGDI g_GDI;
 bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	// Draw my indicator on the window. Hooked WM_PAINT, or WM_NCPAINT
+	// ??? Figire out the best way to draw indicator and prevent bleed through
 
 	m_dwTimeLastDrawIndicator = GetTickCount();
 
