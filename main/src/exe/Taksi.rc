@@ -24,6 +24,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -199,7 +200,7 @@ BEGIN
     LTEXT           "Process Name",IDC_STATIC,7,36,61,8
     EDITTEXT        IDC_C_StatProcessName,90,33,173,14,ES_AUTOHSCROLL | 
                     ES_READONLY
-    LTEXT           "Last Error Description",IDC_STATIC,7,52,76,8
+    LTEXT           "Last Event Description",IDC_STATIC,7,52,76,8
     EDITTEXT        IDC_C_StatLastError,90,49,172,14,ES_AUTOHSCROLL | 
                     ES_READONLY
     LTEXT           "Frame Rate",IDC_STATIC,7,68,45,8
@@ -212,6 +213,7 @@ BEGIN
     EDITTEXT        IDC_C_StatDataRecorded,90,81,66,14,ES_AUTOHSCROLL | 
                     ES_READONLY
     LTEXT           "MB",IDC_STATIC,167,84,35,8
+    PUSHBUTTON      "C",IDC_C_StatsClear,250,83,12,12
 END
 
 IDD_About DIALOGEX 0, 0, 214, 97
@@ -344,9 +346,20 @@ IDB_RecordPause_2       BITMAP                  "res/BtnRecordPause2.bmp"
 STRINGTABLE 
 BEGIN
     ID_APP                  "Taksi"
-    IDS_STATUS_SAVED        "SAVED"
-    IDS_STATUS_FAILSAVE     "FAILED SAVE"
     IDD_GuiConfigTab1       "Directory"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_CHANGES      "CHANGES MADE"
+    IDS_STATUS_RESTORED     "RESTORED"
+    IDS_STATUS_SAVED        "SAVED"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_FAILSAVE     "FAILED SAVE"
+    IDS_SELECT_APP_HOOK     "Select an application to hook"
 END
 
 STRINGTABLE 
@@ -412,13 +425,7 @@ END
 STRINGTABLE 
 BEGIN
     IDM_SC_HELP_ABOUT       "Taksi Help About..."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_STATUS_CHANGES      "CHANGES MADE"
-    IDS_STATUS_RESTORED     "RESTORED"
-	IDS_SELECT_APP_HOOK		"Select an application to hook"
+	IDC_C_StatsClear	"Clear the stats values"
 END
 
 #endif    // English (U.S.) resources

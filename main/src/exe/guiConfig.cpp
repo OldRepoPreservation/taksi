@@ -126,6 +126,7 @@ void CGuiConfig::Custom_Init( CTaksiConfigCustom* pCustom )
 void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 {
 	// Periodically update  this if it has changed.
+	// dwMask = mask of TAKSI_PROCSTAT_TYPE 
 	TCHAR szTmp[_MAX_PATH];
 
 	if ( dwMask & (1<<TAKSI_PROCSTAT_ProcessFile))
@@ -484,6 +485,25 @@ bool CGuiConfig::OnCommandCaptureBrowse()
 
 //**************************************************************
 
+bool CGuiConfig::OnHelp( LPHELPINFO pHelpInfo )
+{
+	// WM_HELP
+	// Try to give some help on the control?
+	ASSERT(pHelpInfo);
+	DEBUG_MSG(( "WM_HELP on %d" LOG_CR, pHelpInfo->iCtrlId ));
+
+	TCHAR szTmp[ _MAX_PATH ];
+    int iLen = LoadString( g_hInst, pHelpInfo->iCtrlId, szTmp, sizeof(szTmp));
+	if ( iLen <= 0 )
+	{
+		DlgTODO( g_GUIConfig, "TODO: No context help for this" );
+		return true;
+	}
+
+	::MessageBox( m_hWnd, szTmp, _T("Taksi"), MB_OK );
+	return true;
+}
+
 bool CGuiConfig::OnTimer( UINT idTimer )
 {
 	// IDD_GuiConfigTab6
@@ -688,6 +708,17 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		OnCommandCustomDeleteButton();
 		return true;
 
+	case IDC_C_StatsClear:
+		sg_ProcStats.m_szLastError[0] = '\0';
+		sg_ProcStats.m_fFrameRate = 0;			// measured frame rate. recording or not.
+		sg_ProcStats.m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
+		UpdateProcStats( sg_ProcStats,
+			(1<<TAKSI_PROCSTAT_LastError) |
+			(1<<TAKSI_PROCSTAT_FrameRate) |
+			(1<<TAKSI_PROCSTAT_DataRecorded) );
+		SetStatusText( _T(""));
+		return true;
+
 	default:
 		return false;
 	}
@@ -776,25 +807,6 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	::SetTimer( m_hWnd, IDT_UpdateStats, 1000, NULL );
 
 	SetStatusText( _TEXT("Taksi: Version " TAKSI_VERSION_S " " __DATE__ "."));
-	return true;
-}
-
-bool CGuiConfig::OnHelp( LPHELPINFO pHelpInfo )
-{
-	// WM_HELP
-	// Try to give some help on the control?
-	ASSERT(pHelpInfo);
-	DEBUG_MSG(( "WM_HELP on %d" LOG_CR, pHelpInfo->iCtrlId ));
-
-	TCHAR szTmp[ _MAX_PATH ];
-    int iLen = LoadString( g_hInst, pHelpInfo->iCtrlId, szTmp, sizeof(szTmp));
-	if ( iLen <= 0 )
-	{
-		DlgTODO( g_GUIConfig, "TODO: No context help for this" );
-		return true;
-	}
-
-	::MessageBox( m_hWnd, szTmp, _T("Taksi"), MB_OK );
 	return true;
 }
 
