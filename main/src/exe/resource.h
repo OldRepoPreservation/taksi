@@ -70,6 +70,7 @@
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
+#define IDC_C_StatsClear                1086
 #define IDS_GuiConfigHelp1              2000
 #define IDS_GuiConfigHelp2              2001
 #define IDS_GuiConfigHelp3              2002
@@ -85,8 +86,7 @@
 #define IDS_STATUS_RESTORED             3102
 #define IDS_STATUS_SAVED                3103
 #define IDS_STATUS_FAILSAVE             3104
-#define IDS_SELECT_APP_HOOK				3106
-
+#define IDS_SELECT_APP_HOOK             3106
 #define IDM_SC_HELP_URL                 0xE000
 #define IDM_SC_HELP_ABOUT               0xE010
 #define IDC_STATIC                      -1
@@ -98,7 +98,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1086
+#define _APS_NEXT_CONTROL_VALUE         1087
 #define _APS_NEXT_SYMED_VALUE           10005
 #endif
 #endif
