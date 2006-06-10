@@ -10,6 +10,17 @@
 HINSTANCE g_hInst = NULL;
 CTaksiConfig g_Config;
 
+const TCHAR* CheckIntResource( const TCHAR* pszText, TCHAR* pszTmp )
+{
+	// Interpret MAKEINTRESOURCE()
+	if ( ! ISINTRESOURCE(pszText))	// MAKEINTRESOURCE()
+		return pszText;
+	int iLen = LoadString( g_hInst, GETINTRESOURCE(pszText), pszTmp, _MAX_PATH-1 );
+	if ( iLen <= 0 )
+		return _T("");
+	return pszTmp;
+}
+
 void DlgTODO( HWND hWnd, const TCHAR* pszMsg )
 {
 	// Explain to the user why this doesnt work yet.
@@ -41,7 +52,8 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	g_Config.ReadIniFileFromDir(NULL);
 	sg_Config.CopyConfig( g_Config );
 
-	lstrcpy( sg_ProcStats.m_szLastError, _TEXT("Select an application to hook"));
+	LoadString( g_hInst, IDS_SELECT_APP_HOOK, 
+		sg_ProcStats.m_szLastError, COUNTOF(sg_ProcStats.m_szLastError));
 	InitCommonControls();
 
 #ifdef _DEBUG
