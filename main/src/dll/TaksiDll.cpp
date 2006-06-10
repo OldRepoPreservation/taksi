@@ -37,7 +37,7 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] =
 
 //**************************************************************************************
 
-bool CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
+HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 {
 	CloseLogFile();
 	if ( ! sg_Config.m_bDebugLog)
@@ -49,7 +49,12 @@ bool CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		OPEN_ALWAYS,                  // overwrite existing 
 		FILE_ATTRIBUTE_NORMAL,        // normal file 
 		NULL ));                        // no attr. template 
-	return m_File.IsValidHandle();
+	if ( ! m_File.IsValidHandle())
+	{
+		DWORD dwLastError = ::GetLastError();
+		return HRESULT_FROM_WIN32(dwLastError);
+	}
+	return S_OK;
 }
 
 void CTaksiLogFile::CloseLogFile()
@@ -565,7 +570,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 			return false;
 		}
 		sg_ProcStats.InitProcStats();
-		sg_Config.InitConfig();
+		sg_Config.InitConfig();		// Read from the INI file shortly.
 	}
 	else
 	{
@@ -611,9 +616,10 @@ bool CTaksiProcess::OnDllProcessAttach()
 	lstrcat(szLogName, m_szProcessTitleNoExt); 
 	lstrcat(szLogName, _T(".log"));
 
-	if ( ! g_Log.OpenLogFile(szLogName))
+	HRESULT hRes = g_Log.OpenLogFile(szLogName);
+	if ( IS_ERROR(hRes))
 	{
-		LOG_MSG(( "Log start FAIL." LOG_CR));
+		LOG_MSG(( "Log start FAIL. %d" LOG_CR, hRes ));
 	}
 	else
 	{
@@ -621,10 +627,13 @@ bool CTaksiProcess::OnDllProcessAttach()
 	}
 #endif
 
-	DEBUG_TRACE(( "m_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
-	DEBUG_TRACE(( "m_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
-	DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
-	DEBUG_TRACE(( "sg_Dll.m_bMasterExiting=%d" LOG_CR, sg_Dll.m_bMasterExiting));
+	if ( ! bProcMaster )	// not read INI yet.
+	{
+		DEBUG_TRACE(( "m_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
+		DEBUG_TRACE(( "m_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
+		DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
+		DEBUG_TRACE(( "sg_Dll.m_bMasterExiting=%d" LOG_CR, sg_Dll.m_bMasterExiting));
+	}
 
 	// ASSUME HookCBTProc will call AttachGraphXMode later
 	return true;

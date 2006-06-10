@@ -11,6 +11,8 @@
 #include "../common/CWaveDevice.h"
 
 #define IDT_UpdateStats 100
+#define UPDATE_EDIT_LIMIT(c,i,p)	SendMessage(m_hControl##i, CB_LIMITTEXT, sizeof(((c*)0)->p)-1, 0)
+#define UPDATE_CHECK(i,v)			SendMessage(m_hControl##i, BM_SETCHECK, (v)? BST_CHECKED : BST_UNCHECKED, 0 )
 
 CGuiConfig g_GUIConfig;
 CWaveACMInt g_ACM;
@@ -234,7 +236,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 
 	// Dest Dir
 	SetWindowText( m_hControlCaptureDirectory, config.m_szCaptureDir );
-	SendMessage( m_hControlDebugLog, BM_SETCHECK, config.m_bDebugLog ? BST_CHECKED : BST_UNCHECKED, 0 );
+	UPDATE_CHECK(DebugLog,config.m_bDebugLog);
 	SetWindowText( m_hControlFileNamePostfix, config.m_szFileNamePostfix );
 
 	// Format
@@ -243,7 +245,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	SetWindowText( m_hControlFrameRate, szTmp);
 
 	UpdateVideoCodec( config.m_VideoCodec );
-	SendMessage( m_hControlVideoHalfSize, BM_SETCHECK, config.m_bVideoHalfSize ? BST_CHECKED : BST_UNCHECKED, 0 );
+	UPDATE_CHECK(VideoHalfSize,config.m_bVideoHalfSize);
 
 	UpdateAudioCodec( config.m_AudioCodec );
 	UpdateAudioDevices( config.m_iAudioDevice );
@@ -256,14 +258,14 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 			HKM_SETHOTKEY, config.GetHotKey((TAKSI_HOTKEY_TYPE)i), 0 );
 	}
 
-	SendMessage( m_hControlUseDirectInput, BM_SETCHECK, config.m_bUseDirectInput ? BST_CHECKED : BST_UNCHECKED, 0 );
+	UPDATE_CHECK(UseDirectInput,config.m_bUseDirectInput);
 
 	// custom configs
 	Custom_Init(config.m_pCustomList);
 
 	// Display options
-	SendMessage( m_hControlGDIUse, BM_SETCHECK, config.m_bGDIUse ? BST_CHECKED : BST_UNCHECKED, 0 );
-	SendMessage( m_hControlGDIFrame, BM_SETCHECK, config.m_bGDIFrame ? BST_CHECKED : BST_UNCHECKED, 0 );
+	UPDATE_CHECK(GDIUse,config.m_bGDIUse);
+	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
 
 	m_bDataUpdating = false;
 }
@@ -560,13 +562,13 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 
 	case IDC_C_DebugLog:
-		g_Config.m_bDebugLog = OnCommandCheck( m_hControlDebugLog );
+		sg_Config.m_bDebugLog = g_Config.m_bDebugLog = OnCommandCheck( m_hControlDebugLog );
 		return true;
 	case IDC_C_GDIUse:
-		g_Config.m_bGDIUse = OnCommandCheck( m_hControlGDIUse );
+		sg_Config.m_bGDIUse = g_Config.m_bGDIUse = OnCommandCheck( m_hControlGDIUse );
 		return true;
 	case IDC_C_GDIFrame:
-		g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
+		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
 		return true;
 
 	case IDC_C_CaptureDirectory:
@@ -624,7 +626,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		OnCommandVideoCodecButton();
 		return true;
 	case IDC_C_VideoHalfSize:
-		g_Config.m_bVideoHalfSize = OnCommandCheck( m_hControlVideoHalfSize );
+		sg_Config.m_bVideoHalfSize = g_Config.m_bVideoHalfSize = OnCommandCheck( m_hControlVideoHalfSize );
 		return true;
 
 	case IDC_C_AudioDevices:
@@ -663,7 +665,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 
 	case IDC_C_UseDirectInput:
-		g_Config.m_bUseDirectInput = OnCommandCheck( m_hControlUseDirectInput );
+		sg_Config.m_bUseDirectInput = g_Config.m_bUseDirectInput = OnCommandCheck( m_hControlUseDirectInput );
 		return true;
 
 	case IDC_C_CustomSettingsList:
@@ -786,8 +788,6 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 #undef GuiConfigControl
 
 	// show credits
-#define UPDATE_EDIT_LIMIT(c,i,p) SendMessage(m_hControl##i, CB_LIMITTEXT, sizeof(((c*)0)->p)-1, 0)
-
 	UPDATE_EDIT_LIMIT( CTaksiConfig, CaptureDirectory, m_szCaptureDir );
 	UPDATE_EDIT_LIMIT( CTaksiConfig, FileNamePostfix, m_szFileNamePostfix );
 	UPDATE_EDIT_LIMIT( CTaksiConfigCustom, CustomPattern, m_szPattern );
