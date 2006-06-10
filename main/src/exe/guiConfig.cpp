@@ -23,7 +23,8 @@ CGuiConfig::CGuiConfig()
 
 void CGuiConfig::SetStatusText( const TCHAR* pszText )
 {
-	SetDlgItemText( m_hWnd, IDC_C_StatusText, pszText );
+	TCHAR szTmp[ _MAX_PATH ];
+	SetDlgItemText( m_hWnd, IDC_C_StatusText, CheckIntResource(pszText,szTmp));
 }
 
 void CGuiConfig::SetSaveState( bool bChanged )
@@ -35,7 +36,7 @@ void CGuiConfig::SetSaveState( bool bChanged )
 
 void CGuiConfig::OnChanges()
 {
-	SetStatusText( _T("CHANGES MADE"));
+	SetStatusText( MAKEINTRESOURCE(IDS_STATUS_CHANGES));
 	SetSaveState( true );
 	sg_Dll.UpdateMaster();
 }
@@ -294,7 +295,7 @@ void CGuiConfig::OnCommandRestore(void)
 	sg_Dll.UpdateConfigCustom();	// indicate global changes have been made.
 
 	// modify status text
-	SetStatusText( "RESTORED");
+	SetStatusText( MAKEINTRESOURCE(IDS_STATUS_RESTORED));
 	SetSaveState( false );
 }
 
@@ -332,12 +333,12 @@ void CGuiConfig::OnCommandSave()
 	{
 		// Apply new settings globally
 		sg_Dll.UpdateConfigCustom();	// make global change.
-		SetStatusText( "SAVED");
+		SetStatusText( MAKEINTRESOURCE(IDS_STATUS_SAVED));
 		SetSaveState( false );
 	}
 	else
 	{
-		SetStatusText( "FAIL SAVE");
+		SetStatusText( MAKEINTRESOURCE(IDS_STATUS_FAILSAVE));
 	}
 }
 

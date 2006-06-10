@@ -11,26 +11,22 @@
 #define IDD_GuiConfigTab5               115
 #define IDD_GuiConfigTab6               116
 #define IDD_About                       143
-
-#define IDB_ConfigOpen_1                 200
-#define IDB_HookModeToggle_1              201
-#define IDB_IndicatorToggle_1             202
-#define IDB_RecordBegin_1                 203
-#define IDB_RecordPause_1                 204
-#define IDB_RecordStop_1                  205
-#define IDB_Screenshot_1                  206
-#define IDB_SmallScreenshot_1             207
-
+#define IDB_ConfigOpen_1                200
+#define IDB_HookModeToggle_1            201
+#define IDB_IndicatorToggle_1           202
+#define IDB_RecordBegin_1               203
+#define IDB_RecordPause_1               204
+#define IDB_RecordStop_1                205
+#define IDB_Screenshot_1                206
+#define IDB_SmallScreenshot_1           207
 #define IDB_RecordBegin_G               208
 #define IDB_RecordPause_G               209
 #define IDB_RecordStop_G                210
 #define IDB_Screenshot_G                211
 #define IDB_SmallScreenshot_G           212
-
 #define IDB_HookModeToggle_2            213
 #define IDB_IndicatorToggle_2           214
 #define IDB_RecordPause_2               215
-
 #define IDC_ABOUT_1                     1001
 #define IDC_ABOUT_4                     1004
 #define IDC_C_TAB                       1009
@@ -70,7 +66,6 @@
 #define IDC_C_StatFrameRate             1063
 #define IDC_C_StatDataRecorded          1064
 #define IDC_C_StatFormat                1065
-
 #define IDC_C_OverlayVerbose            1072
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
@@ -86,6 +81,12 @@
 #define IDS_STATE_Recording             2022
 #define IDS_STATE_RecordPause           2023
 #define IDS_STATE_QTY                   2024
+#define IDS_STATUS_CHANGES              3101
+#define IDS_STATUS_RESTORED             3102
+#define IDS_STATUS_SAVED                3103
+#define IDS_STATUS_FAILSAVE             3104
+#define IDS_SELECT_APP_HOOK				3106
+
 #define IDM_SC_HELP_URL                 0xE000
 #define IDM_SC_HELP_ABOUT               0xE010
 #define IDC_STATIC                      -1
@@ -98,6 +99,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1086
-#define _APS_NEXT_SYMED_VALUE           105
+#define _APS_NEXT_SYMED_VALUE           10005
 #endif
 #endif

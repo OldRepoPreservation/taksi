@@ -12,6 +12,8 @@
 #ifndef COUNTOF			// similar to MFC _countof()
 #define COUNTOF(a) 		(sizeof(a)/sizeof((a)[0]))	// dimensionof() ? = count of elements of an array
 #endif
+#define ISINTRESOURCE(p)	(HIWORD((DWORD)(p))==0)	// MAKEINTRESOURCE()
+#define GETINTRESOURCE(p)	LOWORD((DWORD)(p))
 
 typedef LONGLONG TIMEFAST_t;
 extern LIBSPEC TIMEFAST_t GetPerformanceCounter();
