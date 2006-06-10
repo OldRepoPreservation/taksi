@@ -43,7 +43,7 @@ public:
 	{
 		CloseLogFile();
 	}
-	bool OpenLogFile( const TCHAR* pszFileName );
+	HRESULT OpenLogFile( const TCHAR* pszFileName );
 	void CloseLogFile();
 	virtual int EventStr( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, const LOGCHAR* pszMsg );
 public:
