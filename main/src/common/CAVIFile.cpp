@@ -294,6 +294,13 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 		CloseCodec();	
 	}
 
+	if ( m_v.fccHandler == MAKEFOURCC('D','I','B',' '))
+	{
+		// this just means NOT compressed! m_v.hic would be NULL anyhow.
+		DEBUG_MSG(("CVideoCodec::OpenCodec DIB" LOG_CR ));
+		return S_OK;
+	}
+
 	m_v.hic = ::ICOpen( m_v.fccType, m_v.fccHandler, wMode );
 	if ( m_v.hic == NULL)
 	{
@@ -321,11 +328,15 @@ void CVideoCodec::CloseCodec()
 
 bool CVideoCodec::CompSupportsConfigure() const
 {
+	if ( m_v.hic == NULL )
+		return false;
 	return ICQueryConfigure(m_v.hic);
 }
 LRESULT CVideoCodec::CompConfigureDlg( HWND hWndApp )
 {
 	// a config dialog specific to the chosen codec.
+	if ( m_v.hic == NULL )
+		return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 	return ICConfigure(m_v.hic,hWndApp);
 }
 
@@ -338,9 +349,8 @@ bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 		CVideoCodec codec;
 		codec.CopyCodec( *this );
 		HRESULT hRes = codec.OpenCodec(ICMODE_QUERY);
-		if ( IS_ERROR(hRes))
+		if ( IS_ERROR(hRes) || codec.m_v.hic == NULL )
 			return false;
-		ASSERT( codec.m_v.hic );
 		bool bRet = codec.GetCodecInfo(icInfo);
 		codec.DestroyCodec();
 		return bRet;
@@ -370,6 +380,14 @@ LRESULT CVideoCodec::GetCompFormat( const BITMAPINFO* lpbiIn, BITMAPINFO* lpbiOu
 	//  -2 = ICERR_BADFORMAT;
 
 	ASSERT(lpbiIn);
+	if ( m_v.hic == NULL )
+	{
+		if ( lpbiOut == NULL )	// just ret the size.
+			return sizeof(BITMAPINFO);
+		memcpy( lpbiOut, lpbiIn, sizeof(BITMAPINFO));
+		return S_OK;
+	}
+
 	LRESULT lRes = ::ICCompressGetFormat( m_v.hic, lpbiIn, lpbiOut );
 	if (lRes != ICERR_OK)
 	{
@@ -408,6 +426,13 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 	{
 		return S_FALSE;
 	}
+	if ( m_v.hic == NULL )
+	{
+		m_bCompressing = false;
+		m_v.lpbiOut = lpbiIn;
+		return S_OK;
+	}
+
 	DEBUG_MSG(( "CVideoCodec::CompStart" LOG_CR ));
 
 	if ( ! ::ICSeqCompressFrameStart( &m_v, lpbiIn ))
@@ -418,6 +443,7 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 		return hRes;
 	}
 
+	ASSERT(m_v.lpbiOut);
 	m_bCompressing = true;
 	DEBUG_MSG(("CVideoCodec:CompStart: ICSeqCompressFrameStart success." LOG_CR));
 	return S_OK;
@@ -427,7 +453,7 @@ void CVideoCodec::CompEnd()
 {
 	// End the compression stream.
 	// ASSUME: CompStart() was called.
-	if ( ! m_bCompressing )
+	if ( ! m_bCompressing || m_v.hic == NULL )
 		return;
 	DEBUG_MSG(( "CVideoCodec:CompEnd" LOG_CR ));
 	m_bCompressing = false;
@@ -442,7 +468,7 @@ bool CVideoCodec::CompFrame( CVideoFrame& frame, void*& rpCompRet, LONG& nSize, 
 	// RETURN:
 	//  bIsKey = this was used as the key frame?
 
-	if ( ! m_bCompressing )
+	if ( ! m_bCompressing || m_v.hic == NULL )
 	{
 		// DEBUG_TRACE(("CVideoCodec::CompFrame: NOT ACTIVE!." LOG_CR));
 		rpCompRet = frame.m_pPixels;
@@ -776,6 +802,7 @@ do_retry:
 		return hRes;
 	}
 
+	ASSERT(m_VideoCodec.m_v.lpbiOut);
 	return S_OK;
 }
 
@@ -791,6 +818,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 		return OLE_E_BLANK;
 	if ( m_fFrameRate <= 0 )
 		return OLE_E_BLANK;
+	ASSERT(m_VideoCodec.m_v.lpbiOut);
 
 	//***************************************************
 	m_File.AttachHandle( ::CreateFile( pszFileName, // file to create 
