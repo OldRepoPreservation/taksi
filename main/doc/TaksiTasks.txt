@@ -16,7 +16,7 @@ Should prefer graphics hook over GDI hook.
 Very unpredictable crash after record in gdi with firefox ?
 
 TODO:
-Make better button graphics
+Better error tracking and suggestions for failed codecs.
 Need message saying there is no codec selected!
 Need message explaining focus changing/hooking.
 Allow adjust of the size of the background thread Q
