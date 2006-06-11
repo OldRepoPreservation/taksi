@@ -16,9 +16,10 @@ GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 Very unpredictable crash after record in gdi with firefox ?
-diff uncompressed frames with last
 
 TODO:
+crc diff uncompressed frames with last. empty frame.
+stats should show capture mode.
 Need message explaining focus changing/hooking.
 Allow adjust of the size of the background thread Q
 makefile, Manual.txt completely out of date!
