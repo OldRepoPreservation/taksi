@@ -23,6 +23,18 @@ struct CVideoFrameForm
 		m_Size.cx = 0;
 		m_Size.cy = 0;
 	}
+	bool IsFrameFormInit() const
+	{
+		if ( m_Size.cx <= 0 )
+			return false;
+		if ( m_Size.cy <= 0 )
+			return false;
+		if ( m_iPitch <= 0 )
+			return false;
+		if ( m_iBPP <= 0 )
+			return false;
+		return true;
+	}
 	int get_SizeBytes() const
 	{
 		return m_iPitch * m_Size.cy;
@@ -157,16 +169,20 @@ public:
 		return m_File.IsValidHandle();
 	}
 
-	HRESULT OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
+	HRESULT OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
+	HRESULT OpenAVIFile( const TCHAR* pszFileName );
+	HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec );
+
 	HRESULT WriteAudioFrame( const BYTE* pWaveData );
 	HRESULT WriteVideoFrame( CVideoFrame& frame, int iTimes );
-	void CloseAVIFile();
+	void CloseAVI();
 
 #ifdef _DEBUG
 	static bool _stdcall UnitTest();
 #endif
 
 private:
+	void InitBitmapIn( BITMAPINFO& biIn ) const;
 	int InitFileHeader( AVI_FILE_HEADER& afh );
 
 public:

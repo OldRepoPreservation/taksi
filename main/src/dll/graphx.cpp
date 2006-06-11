@@ -77,7 +77,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 	{
 		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
 		g_AVIThread.WaitForAllFrames();
-		g_AVIFile.CloseAVIFile();
+		g_AVIFile.CloseAVI();
 		if ( ! g_Proc.m_bRecordPause )
 		{
 			g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordBegin);	// re-open it later.
@@ -129,12 +129,23 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		fFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
 	}
 
-	HRESULT hRes = g_AVIFile.OpenAVIFile( szFileName, FrameForm, fFrameRate, sg_Config.m_VideoCodec );
+	HRESULT hRes = g_AVIFile.OpenAVICodec( FrameForm, fFrameRate, sg_Config.m_VideoCodec );
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
 		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
-			"Cant open AVI stream. Error=0x%x.", hRes );
+			"Cant open AVI codec. Error=0x%x. Try a different video codec?", hRes );
+		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
+		DEBUG_ERR(("g_AVIFile.OpenAVIFile FAIL %d." LOG_CR, hRes ));
+		return hRes;
+	}
+	
+	hRes = g_AVIFile.OpenAVIFile( szFileName );
+	if ( FAILED(hRes))
+	{
+		// ? strerror()
+		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+			"Cant open AVI file. Error=0x%x.", hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 		DEBUG_ERR(("g_AVIFile.OpenAVIFile FAIL %d." LOG_CR, hRes ));
 		return hRes;
@@ -167,7 +178,7 @@ void CTaksiGraphX::RecordAVI_Stop()
 
 	DEBUG_MSG(( "CTaksiGraphX:RecordAVI_Stop" LOG_CR));
 	g_AVIThread.WaitForAllFrames();
-	g_AVIFile.CloseAVIFile();
+	g_AVIFile.CloseAVI();
 
 	_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 		"AVI file recorded. Stopped." );

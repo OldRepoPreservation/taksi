@@ -6,6 +6,8 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
+Some Codec MUST have mult of 4 input even tho they dont fail. MSMPEG4
+Support auto alternate codec if codec fails ?
 The same application has multiple main windows. or multiple instances.
 Half sized GDI not work.
 Non Frame GDI not working properly.
@@ -16,8 +18,6 @@ Should prefer graphics hook over GDI hook.
 Very unpredictable crash after record in gdi with firefox ?
 
 TODO:
-Better error tracking and suggestions for failed codecs.
-Need message saying there is no codec selected!
 Need message explaining focus changing/hooking.
 Allow adjust of the size of the background thread Q
 makefile, Manual.txt completely out of date!

@@ -581,9 +581,21 @@ CAVIFile::CAVIFile()
 
 CAVIFile::~CAVIFile() 
 {
-	CloseAVIFile();
+	CloseAVI();
 	m_Index.FlushIndexChunk(m_File);
 	// m_VideoCodec.DestroyCodec();
+}
+
+void CAVIFile::InitBitmapIn( BITMAPINFO& biIn ) const
+{
+	// prepare BITMAPINFO for compressor
+	ZeroMemory( &biIn, sizeof(biIn));
+	biIn.bmiHeader.biSize = sizeof(biIn.bmiHeader);
+	biIn.bmiHeader.biWidth = m_FrameForm.m_Size.cx;
+	biIn.bmiHeader.biHeight = m_FrameForm.m_Size.cy;
+	biIn.bmiHeader.biPlanes = 1;
+	biIn.bmiHeader.biBitCount = m_FrameForm.m_iBPP*8;	// always write 24-bit AVIs.
+	biIn.bmiHeader.biCompression = BI_RGB;
 }
 
 int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
@@ -665,16 +677,15 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 	return iPadFile;
 }
 
-HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
+HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
 {
-	// Opens a new file, and writes the AVI header 
-	// prepare filename
-	// we could use mmioOpen() ??
 	// NOTE:
 	//  FrameForm = could be modified to match a format i can use.
+	// NOTE: 
+	//  Attempt to pick a different codec if this one fails ?
 
-	ASSERT(pszFileName);
-	LOG_MSG(("OpenAVIFile: szFileName: %s" LOG_CR, pszFileName ));
+	if ( fFrameRate <= 0 )
+		return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
 
 	// Store my params i'm going to use.
 	m_FrameForm = FrameForm;
@@ -705,14 +716,8 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameF
 	}
 
 	// prepare BITMAPINFO for compressor
-	static BITMAPINFO biIn;
-	ZeroMemory( &biIn, sizeof(biIn));
-	biIn.bmiHeader.biSize = sizeof(biIn.bmiHeader);
-	biIn.bmiHeader.biWidth = m_FrameForm.m_Size.cx;
-	biIn.bmiHeader.biHeight = m_FrameForm.m_Size.cy;
-	biIn.bmiHeader.biPlanes = 1;
-	biIn.bmiHeader.biBitCount = m_FrameForm.m_iBPP*8;	// always write 24-bit AVIs.
-	biIn.bmiHeader.biCompression = BI_RGB;
+	static BITMAPINFO biIn; // This need to be 'static' ???
+	InitBitmapIn(biIn);
 
 #if 0 //def _DEBUG
 	// print compressor settings
@@ -770,6 +775,22 @@ do_retry:
 		DEBUG_ERR(( "CAVIFile:CompStart FAILED (%d x %d) (0x%x)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy, hRes ));
 		return hRes;
 	}
+
+	return S_OK;
+}
+
+HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
+{
+	// Opens a new file, and writes the AVI header 
+	// prepare filename
+	// we could use mmioOpen() ??
+
+	ASSERT(pszFileName);
+	LOG_MSG(("OpenAVIFile: szFileName: %s" LOG_CR, pszFileName ));
+	if ( ! m_FrameForm.IsFrameFormInit())
+		return OLE_E_BLANK;
+	if ( m_fFrameRate <= 0 )
+		return OLE_E_BLANK;
 
 	//***************************************************
 	m_File.AttachHandle( ::CreateFile( pszFileName, // file to create 
@@ -838,7 +859,18 @@ do_retry:
 	return S_OK;
 }
 
-void CAVIFile::CloseAVIFile()
+#if 0
+HRESULT CAVIFile::OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
+{
+	HRESULT hRes = OpenAVICodec( FrameForm, fFrameRate, VideoCodec, pAudioCodec );
+
+	hRes = OpenAVIFile( pszFileName );
+
+	return hRes;
+}
+#endif
+
+void CAVIFile::CloseAVI()
 {
 	// finish sequence compression
 	if ( ! m_File.IsValidHandle())
@@ -889,6 +921,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 
 	if ( ! m_File.IsValidHandle()) 
 		return 0;
+	// Make sure the codec is open?
 	if ( nTimes <= 0 ) 
 		return 0;
 	ASSERT( ! memcmp( &frame, &m_FrameForm, sizeof(m_FrameForm)));
