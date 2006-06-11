@@ -16,6 +16,7 @@ GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
 Very unpredictable crash after record in gdi with firefox ?
+diff uncompressed frames with last
 
 TODO:
 Need message explaining focus changing/hooking.
