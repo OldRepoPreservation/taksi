@@ -36,7 +36,6 @@ AVI may not be the best format. has too much overhead. is MPG or WMV better ?
 http://guru.multimedia.cx/category/container-formats/
 smaller AVI index ? only index every nth frame or an index every 10 seconds ?
 reflect state in tooltip ?
-shell tray icon menu. with context/sys menu to take actions.
 add a watermark or logo ?
 color reduction for GDI. reduce to a smaller number of colors ?
 

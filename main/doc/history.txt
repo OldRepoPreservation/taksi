@@ -332,5 +332,8 @@ June 9,2006
 Ver 0.750 test release.
 Attempt to fix hooking GDI mode with multiple main windows or instances.
 
-Ver 0.751
+Ver 0.752
 Unique error codes for VFW errors.
+
+Ver 0.753
+Tray Icon and tray menu support for all functions. USE_TRAYICON conditional compile

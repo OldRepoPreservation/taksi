@@ -8,6 +8,8 @@
 #pragma once
 #endif
 
+#define USE_TRAYICON	// Tray icon or not ?
+
 #ifdef USE_DX
 extern bool Test_DirectX8(HWND hWnd );
 extern bool Test_DirectX9(HWND hWnd );

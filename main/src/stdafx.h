@@ -54,6 +54,7 @@ extern LIBSPEC CTaksiLogFile g_Log;
 // Messages to the Master Window.
 #define WM_APP_UPDATE		(WM_APP + 0) // WM_USER ?
 #define WM_APP_REHOOKCBT	(WM_APP + 1) // WM_USER ?
+#define WM_APP_TRAY_NOTIFICATION (WM_APP+2)
 
 #define IDC_HOTKEY_FIRST 200	// WM_COMMAND message = IDC_HOTKEY_FIRST + TAKSI_HOTKEY_TYPE (same as IDB_ConfigOpen)
 
