@@ -41,6 +41,7 @@ public:
 protected:
 	virtual bool HookFunctions()
 	{
+		ASSERT( IsValidDll());
 		DEBUG_MSG(( "CTaksiGraphX::HookFunctions" LOG_CR ));
 		return true;
 	}

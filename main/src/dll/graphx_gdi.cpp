@@ -122,15 +122,15 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	// Create hBitmap for temporary use.
 	CWndDC ScreenDC;
 	if ( ! ScreenDC.GetDC( NULL ))
-		return E_FAIL;
+		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
 	CWndDC MemDC;
 	if ( ! MemDC.CreateCompatibleDC( ScreenDC ))
-		return E_FAIL;
+		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
 
 	CWndGDI Bitmap( ScreenDC.CreateCompatibleBitmap( g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy ));
 	if ( Bitmap.m_hObject == NULL )
 	{
-		return E_FAIL; 
+		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
 	ASSERT( Bitmap.get_HBitmap());
 
@@ -140,7 +140,9 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	BOOL bBltRet = BitBlt( MemDC, 0, 0, g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy, ScreenDC, 
 		m_WndRect.left, m_WndRect.top, SRCCOPY );
 	if ( ! bBltRet)
-		return E_FAIL;
+	{
+		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+	}
 	DrawMouse(MemDC);	// Draw Mouse cursor if they want that.
 	}
 #ifdef _DEBUG
@@ -167,9 +169,9 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		(LPBITMAPINFO)&bmih, DIB_RGB_COLORS );
 	if ( iRet<=0 )
 	{
-		DWORD dwLastError = ::GetLastError();
-		DEBUG_ERR(( "GetDIBits FAILED (%d)" LOG_CR, dwLastError ));
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( CONVERT10_E_OLESTREAM_BITMAP_TO_DIB );
+		DEBUG_ERR(( "GetDIBits FAILED (0x%x)" LOG_CR, hRes ));
+		return hRes;
 	}
 
 	// ??? bHalfSize not used !!
@@ -256,10 +258,7 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 bool CTaksiGDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
-	if (!IsValidDll())
-	{
-		return false;
-	}
+	ASSERT( IsValidDll());
 	if ( ! sg_Config.m_bGDIUse )	// not allowed.
 	{
 		return false;

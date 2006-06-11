@@ -113,7 +113,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 			_T("Video Window Size TOO SMALL."));
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
-		return E_FAIL;
+		return DISP_E_BUFFERTOOSMALL;
 	}
 
 	int iDiv = (sg_Config.m_bVideoHalfSize) ? 2 : 1;
@@ -383,15 +383,16 @@ HRESULT CTaksiGraphX::AttachGraphXMode()
 	if ( !FindDll(pszName)) // already loaded?
 	{
 		DEBUG_TRACE(( "AttachGraphXMode NO '%s'" LOG_CR, pszName ));
-		return E_FAIL;
+		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
 	}
 
+	ASSERT( IsValidDll());
 	LOG_MSG(( "AttachGraphXMode '%s'" LOG_CR, pszName ));
 
 	m_bHookedFunctions = HookFunctions();	// virtual
 	if ( ! m_bHookedFunctions )
 	{
-		return E_FAIL;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
 	// NOTE: a hook is not truly complete til PresentFrameBegin() is called.

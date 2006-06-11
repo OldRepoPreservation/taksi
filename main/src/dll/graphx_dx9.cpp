@@ -579,7 +579,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		break;
 	default:
 		DEBUG_ERR(( "GetFrameFullSize: surface format not supported." LOG_CR));
-		return E_FAIL;
+		return HRESULT_FROM_WIN32(ERROR_CTX_BAD_VIDEO_MODE);
 	}
 
 	IRefPtr<IDirect3DSurface9> pBackBuffer;
@@ -864,10 +864,7 @@ bool CTaksiDX9::HookFunctions()
 	// the JMP instruction back into the beginning of IDirect3DDevice9::Present, and
 	// returns.
 	
-	if (!IsValidDll())
-	{
-		return false;
-	}
+	ASSERT( IsValidDll());
 	if (!sg_Dll.m_nDX9_Present || !sg_Dll.m_nDX9_Reset)
 	{
 		LOG_MSG(( "CTaksiDX9::HookFunctions: No info on Present and/or Reset." LOG_CR));

@@ -52,8 +52,8 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		NULL ));                        // no attr. template 
 	if ( ! m_File.IsValidHandle())
 	{
-		DWORD dwLastError = ::GetLastError();
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		return hRes;
 	}
 
 	return S_OK;

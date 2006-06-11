@@ -308,10 +308,7 @@ bool CTaksiOGL::HookFunctions()
 	// the JMP instruction back into the beginning of wglSwapBuffers, and
 	// returns.
 	
-	if (!IsValidDll())
-	{
-		return false;
-	}
+	ASSERT( IsValidDll());
   	
 	// initialize function pointers
 #define GRAPHXOGLFUNC(a,b,c) s_##a = (PFN##a) GetProcAddress(#a);\

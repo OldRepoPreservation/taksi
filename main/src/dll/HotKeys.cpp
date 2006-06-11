@@ -49,8 +49,9 @@ HRESULT CTaksiDI::SetupDirectInput()
 	s_DirectInput8Create = (DIRECTINPUT8CREATE)GetProcAddress("DirectInput8Create");
 	if (!s_DirectInput8Create) 
 	{
-		LOG_MSG(( "SetupDirectInput: lookup for DirectInput8Create failed." LOG_CR));
-		return E_FAIL;
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CALL_NOT_IMPLEMENTED));
+		LOG_MSG(( "SetupDirectInput: lookup for DirectInput8Create failed. (0x%x)" LOG_CR, hRes ));
+		return hRes;
 	}
 
 	static const BYTE sm_vKeysExt[ COUNTOF(m_bScanExt) ] = 
@@ -333,7 +334,7 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 	// if we're not done at this point, use keyboard hook
 	// install keyboard hook 
 	if ( ! g_UserKeyboard.InstallHookKeys(false))
-		return E_FAIL;
+		return Check_GetLastError(MK_E_MUSTBOTHERUSER);
 	return S_OK;
 }
 

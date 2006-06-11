@@ -324,11 +324,9 @@ HRESULT CAVIThread::StartAVIThread()
 	{
 		m_nThreadId = 0;
 do_erroret:
-		DWORD dwLastError = ::GetLastError();
-		if ( dwLastError == 0 )
-			dwLastError = E_FAIL;
-		DEBUG_ERR(( "CAVIThread:Unable to create new thread %d" LOG_CR, dwLastError ));
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
+		DEBUG_ERR(( "CAVIThread:Unable to create new thread 0x%x" LOG_CR, hRes ));
+		return hRes;
 	}
 	return S_OK;
 }
