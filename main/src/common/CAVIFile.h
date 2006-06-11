@@ -73,12 +73,13 @@ public:
 	void InitCodec();
 	void DestroyCodec();
 	void CopyCodec( const CVideoCodec& codec );
+	static HRESULT GetHError( LRESULT lRes );
 
 	// serializers
 	int GetStr( char* pszValue, int iSizeMax) const;
 	bool put_Str( const char* pszValue );
 
-    bool OpenCodec( WORD wMode = ICMODE_FASTCOMPRESS );
+    HRESULT OpenCodec( WORD wMode = ICMODE_FASTCOMPRESS );
 	void CloseCodec();
 
 	bool CompChooseDlg( HWND hWnd, LPSTR lpszTitle );
@@ -88,7 +89,7 @@ public:
 	bool GetCodecInfo( ICINFO& icInfo ) const;
 	LRESULT GetCompFormat( const BITMAPINFO* lpbiIn, BITMAPINFO* lpbiOut=NULL ) const;
 
-	bool CompStart( BITMAPINFO* lpbi = NULL );
+	HRESULT CompStart( BITMAPINFO* lpbi = NULL );
 	bool CompFrame( CVideoFrame& frame, void*& rpCompRet, LONG& nSizeRet, BOOL& bIsKey );
 	void CompEnd();
 
@@ -185,5 +186,7 @@ private:
 
 	CWaveFormat m_AudioCodec;
 };
+
+extern HRESULT Check_GetLastError( HRESULT hDefault = E_FAIL );
 
 #endif // _INC_CAVIFile_H

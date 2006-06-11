@@ -71,6 +71,16 @@ void CVideoFrameForm::InitPadded( int cx, int cy, int iBPP, int iPad )
 	m_iPitch = (iRem == 0) ? iPitchUn : (iPitchUn + iPad - iRem);
 }
 
+HRESULT Check_GetLastError( HRESULT hResDefault )
+{
+	// Something failed so find out why
+	// hResDefault = E_FAIL or CONVERT10_E_OLESTREAM_BITMAP_TO_DIB
+	DWORD dwLastError = ::GetLastError();
+	if ( dwLastError == 0 )
+		dwLastError = hResDefault; // no idea why this failed.
+	return HRESULT_FROM_WIN32(dwLastError);
+}
+
 //**************************************************************** 
 
 void CVideoFrame::FreeFrame()
@@ -119,9 +129,9 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 		NULL ));                        // no attr. template 
 	if ( ! File.IsValidHandle()) 
 	{
-		DWORD dwLastError = GetLastError();
-		LOG_MSG(("CVideoFrame::SaveAsBMP: failed save to file. %d" LOG_CR, dwLastError ));
-		return HRESULT_FROM_WIN32(dwLastError);	// 
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		LOG_MSG(("CVideoFrame::SaveAsBMP: failed save to file. 0x%x" LOG_CR, hRes ));
+		return hRes;	// 
 	}
 
 	// fill in the headers
@@ -155,6 +165,29 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 }
 
 //******************************************************************************
+
+HRESULT CVideoCodec::GetHError( LRESULT lRes ) // static
+{
+	// convert the return code into a standard error code.
+	switch(lRes)
+	{
+	case ICERR_OK:	return S_OK;
+	case ICERR_UNSUPPORTED: return HRESULT_FROM_WIN32(ERROR_UNSUPPORTED_TYPE);
+	case ICERR_BADFORMAT: return HRESULT_FROM_WIN32(ERROR_COLORSPACE_MISMATCH); //?
+	case ICERR_MEMORY: return HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
+	case ICERR_INTERNAL: return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
+	case ICERR_BADFLAGS: return HRESULT_FROM_WIN32(ERROR_INVALID_FLAG_NUMBER);
+	case ICERR_BADPARAM: return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
+	case ICERR_BADSIZE: return HRESULT_FROM_WIN32(ERROR_INVALID_FORM_SIZE);
+	case ICERR_BADHANDLE: return HRESULT_FROM_WIN32(ERROR_INVALID_HANDLE);
+	case ICERR_CANTUPDATE: return CACHE_E_NOCACHE_UPDATED; //?
+	case ICERR_ABORT: return HRESULT_FROM_WIN32(ERROR_OPERATION_ABORTED);
+	case ICERR_ERROR: return HRESULT_FROM_WIN32(ERROR_INVALID_TRANSFORM);
+	case ICERR_BADBITDEPTH: return HRESULT_FROM_WIN32(ERROR_INVALID_PIXEL_FORMAT);
+	case ICERR_BADIMAGESIZE: return HRESULT_FROM_WIN32(ERROR_DS_MAX_OBJ_SIZE_EXCEEDED);
+	}
+	return ERROR_METAFILE_NOT_SUPPORTED;	// unknown error.
+}
 
 void CVideoCodec::InitCodec()
 {
@@ -251,7 +284,7 @@ void CVideoCodec::DumpSettings()
 }
 #endif
 
-bool CVideoCodec::OpenCodec( WORD wMode )
+HRESULT CVideoCodec::OpenCodec( WORD wMode )
 {
 	// Open a compressor or decompressor codec.
 	// wMode = ICMODE_FASTCOMPRESS, fccType = 
@@ -264,15 +297,15 @@ bool CVideoCodec::OpenCodec( WORD wMode )
 	m_v.hic = ::ICOpen( m_v.fccType, m_v.fccHandler, wMode );
 	if ( m_v.hic == NULL)
 	{
-		DWORD dwLastError = ::GetLastError();
-		DEBUG_WARN(("CVideoCodec::Open: ICOpen(0%x,0%x) RET NULL (%d)" LOG_CR,
-			m_v.fccType, m_v.fccHandler, dwLastError ));
-		return false;
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_DETECT_DRIVER_FAILURE));
+		DEBUG_WARN(("CVideoCodec::Open: ICOpen(0%x,0%x) RET NULL (0x%x)" LOG_CR,
+			m_v.fccType, m_v.fccHandler, hRes ));
+		return hRes;
 	}
 
 	DEBUG_MSG(("CVideoCodec::OpenCodec:ICOpen(0%x,0%x) OK hic=%08x" LOG_CR, 
 		m_v.fccType, m_v.fccHandler, (UINT_PTR)m_v.hic ));
-	return true;
+	return S_OK;
 }
 
 void CVideoCodec::CloseCodec()
@@ -304,7 +337,8 @@ bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 		// open a temporary version of this.
 		CVideoCodec codec;
 		codec.CopyCodec( *this );
-		if ( ! codec.OpenCodec(ICMODE_QUERY))
+		HRESULT hRes = codec.OpenCodec(ICMODE_QUERY);
+		if ( IS_ERROR(hRes))
 			return false;
 		ASSERT( codec.m_v.hic );
 		bool bRet = codec.GetCodecInfo(icInfo);
@@ -364,7 +398,7 @@ LRESULT CVideoCodec::GetCompFormat( const BITMAPINFO* lpbiIn, BITMAPINFO* lpbiOu
 	return ICERR_OK;
 }
 
-bool CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
+HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 {
 	// open the compression stream.
 	// MUST call CompEnd() and CloseCodec() after this.
@@ -372,21 +406,21 @@ bool CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 	ASSERT(lpbiIn);
 	if ( m_bCompressing )	// already started?!
 	{
-		return true;
+		return S_FALSE;
 	}
 	DEBUG_MSG(( "CVideoCodec::CompStart" LOG_CR ));
 
 	if ( ! ::ICSeqCompressFrameStart( &m_v, lpbiIn ))
 	{
-		DWORD dwLastError = ::GetLastError();
-		DEBUG_ERR(("CVideoCodec::CompStart: ICSeqCompressFrameStart (%d x %d) FAILED (%d)." LOG_CR, 
-			lpbiIn->bmiHeader.biWidth, lpbiIn->bmiHeader.biHeight, dwLastError ));
-		return false;
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TRANSFORM_NOT_SUPPORTED));
+		DEBUG_ERR(("CVideoCodec::CompStart: ICSeqCompressFrameStart (%d x %d) FAILED (0x%x)." LOG_CR, 
+			lpbiIn->bmiHeader.biWidth, lpbiIn->bmiHeader.biHeight, hRes ));
+		return hRes;
 	}
 
 	m_bCompressing = true;
 	DEBUG_MSG(("CVideoCodec:CompStart: ICSeqCompressFrameStart success." LOG_CR));
-	return true;
+	return S_OK;
 }
 
 void CVideoCodec::CompEnd()
@@ -654,10 +688,11 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameF
 	m_Index.FlushIndexChunk();	// kill any previous index.
 
 	// open compressor
-	if ( ! m_VideoCodec.OpenCodec(ICMODE_FASTCOMPRESS))
+	HRESULT hRes = m_VideoCodec.OpenCodec(ICMODE_FASTCOMPRESS);
+	if ( IS_ERROR(hRes))
 	{
-		DEBUG_ERR(( "CAVIFile:OpenCodec FAILED" LOG_CR ));
-		return E_FAIL;
+		DEBUG_ERR(( "CAVIFile:OpenCodec FAILED 0x%x" LOG_CR, hRes ));
+		return hRes;
 	}
 
 	if ( pAudioCodec )
@@ -683,13 +718,13 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameF
 	// print compressor settings
 	// m_VideoCodec.DumpSettings();
 
-	LRESULT dwFormatSize = m_VideoCodec.GetCompFormat(&biIn,NULL);
-	if ( dwFormatSize <= 0 )
+	LRESULT lFormatSize = m_VideoCodec.GetCompFormat(&biIn,NULL);
+	if ( lFormatSize <= 0 )
 	{
 		// dwFormatSize = -2 = ICERR_BADFORMAT 
 		DEBUG_ERR(("CAVIFile:GetCompFormat=%d BAD FORMAT?!" LOG_CR, dwFormatSize));
 		//ASSERT(0);
-		return E_FAIL;
+		return m_VideoCodec.GetHError(lFormatSize);
 	}
 
 	DEBUG_MSG(("CAVIFile:GetCompFormatSize=%d" LOG_CR, dwFormatSize));
@@ -702,7 +737,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameF
 		// lRes = -2 = ICERR_BADFORMAT, should be 0x28 = sizeof(biIn.bmiHeader)
 		DEBUG_ERR(( "CAVIFile:GetCompFormat FAILED %d" LOG_CR, lRes ));
 		//ASSERT(0);
-		return E_FAIL;
+		return m_VideoCodec.GetHError(lRes);
 	}
 
 	// The codec doesnt like odd sizes !!
@@ -717,7 +752,8 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName, CVideoFrameForm& FrameF
 
 	// initialize compressor
 do_retry:
-	if ( ! m_VideoCodec.CompStart(&biIn))
+	hRes = m_VideoCodec.CompStart(&biIn);
+	if ( IS_ERROR(hRes))
 	{
 		// re-try the aligned size.
 		if (( FrameForm.m_Size.cx & 3 ) || ( FrameForm.m_Size.cy & 3 ))
@@ -731,8 +767,8 @@ do_retry:
 			goto do_retry;
 		}
 
-		DEBUG_ERR(( "CAVIFile:CompStart FAILED (%d x %d)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy ));
-		return E_FAIL;
+		DEBUG_ERR(( "CAVIFile:CompStart FAILED (%d x %d) (0x%x)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy, hRes ));
+		return hRes;
 	}
 
 	//***************************************************
@@ -745,9 +781,9 @@ do_retry:
 		NULL));                         // no attr. template 
 	if ( ! m_File.IsValidHandle()) 
 	{
-		DWORD dwLastError = ::GetLastError();
-		DEBUG_ERR(( "CAVIFile:OpenAVIFile CreateFile FAILED %d" LOG_CR, dwLastError ));
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		DEBUG_ERR(( "CAVIFile:OpenAVIFile CreateFile FAILED 0x%x" LOG_CR, hRes ));
+		return hRes;
 	}
 
 	AVI_FILE_HEADER afh;
@@ -757,9 +793,9 @@ do_retry:
 	::WriteFile(m_File, &afh, sizeof(afh), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(afh))
 	{
-		DWORD dwLastError = ::GetLastError();
-		DEBUG_ERR(( "CAVIFile:OpenAVIFile WriteFile FAILED %d" LOG_CR, dwLastError ));
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		DEBUG_ERR(( "CAVIFile:OpenAVIFile WriteFile FAILED %d" LOG_CR, hRes ));
+		return hRes;
 	}
 
 	int iJunkChunkSize = AVI_MOVILIST_OFFSET - sizeof(afh);
@@ -782,8 +818,8 @@ do_retry:
 	}
 	if ( dwBytesWritten != iJunkChunkSize )
 	{
-		DWORD dwLastError = ::GetLastError();
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		return hRes;
 	}
 
 	// ASSERT( SetFilePointer(m_hFile, 0, NULL, FILE_CURRENT) == AVI_MOVILIST_OFFSET );
@@ -795,8 +831,8 @@ do_retry:
 	::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(dwTags))
 	{
-		DWORD dwLastError = ::GetLastError();
-		return HRESULT_FROM_WIN32(dwLastError);
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		return hRes;
 	}
 
 	return S_OK;
@@ -896,9 +932,9 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 		::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(dwTags))
 		{
-			DWORD dwLastError = ::GetLastError();
-			DEBUG_ERR(("CAVIFile:WriteVideoFrame:WriteFile FAIL=%d" LOG_CR, dwLastError ));
-			return HRESULT_FROM_WIN32(dwLastError);
+			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			DEBUG_ERR(("CAVIFile:WriteVideoFrame:WriteFile FAIL=0x%x" LOG_CR, hRes ));
+			return hRes;
 		}
 		::WriteFile(m_File, pCompBuf, (DWORD) nSizeComp, &dwBytesWritten, NULL);
 

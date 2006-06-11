@@ -569,7 +569,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		break;
 	default:
 		DEBUG_ERR(( "GetFrame: surface s_bbFormat not supported." LOG_CR));
-		return E_FAIL;
+		return HRESULT_FROM_WIN32(ERROR_CTX_BAD_VIDEO_MODE);
 	}
 
 	IRefPtr<IDirect3DSurface8> pBackBuffer;
@@ -817,10 +817,7 @@ bool CTaksiDX8::HookFunctions()
 	// the JMP instruction back into the beginning of IDirect3DDevice8::Present, and
 	// returns.
 	
-	if (!IsValidDll())
-	{
-		return false;
-	}
+	ASSERT( IsValidDll());
 	if (!sg_Dll.m_nDX8_Present || !sg_Dll.m_nDX8_Reset)
 	{
 		LOG_MSG(( "CTaksiDX8::HookFunctions: No info on Present and/or Reset." LOG_CR ));
