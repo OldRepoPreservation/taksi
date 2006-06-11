@@ -331,3 +331,6 @@ June 9,2006
 ==============
 Ver 0.750 test release.
 Attempt to fix hooking GDI mode with multiple main windows or instances.
+
+Ver 0.751
+Unique error codes for VFW errors.
