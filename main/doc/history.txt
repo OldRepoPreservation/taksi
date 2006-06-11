@@ -337,3 +337,4 @@ Unique error codes for VFW errors.
 
 Ver 0.753
 Tray Icon and tray menu support for all functions. USE_TRAYICON conditional compile
+Supports uncompressed video. Why would anyone want that ?
