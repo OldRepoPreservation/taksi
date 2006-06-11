@@ -516,7 +516,7 @@ void CTaksiProcess::StopGraphXMode()
 {
 	// this can be called in the PresentFrameEnd
 	g_AVIThread.StopAVIThread();	// kill my work thread, i'm done
-	g_AVIFile.CloseAVIFile();	// close AVI file, if we were in recording mode 
+	g_AVIFile.CloseAVI();	// close AVI file, if we were in recording mode 
 	g_HotKeys.DetachHotKeys();
 	m_hWndHookTry = NULL;	// Not trying to do anything anymore.
 }
