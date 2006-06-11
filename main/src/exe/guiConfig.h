@@ -39,7 +39,12 @@ private:
 	static LRESULT CALLBACK WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	bool UpdateWindowTitle();
-	void CreateTrayIcon();
+#ifdef USE_TRAYICON
+	void OnInitMenuPopup( HMENU hMenu );
+	BOOL TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip );
+	void TrayIcon_OnEvent( LPARAM lParam );
+	void TrayIcon_Create();
+#endif
 
 	int GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const;
 	LRESULT UpdateButton( TAKSI_HOTKEY_TYPE eKey );
@@ -51,6 +56,11 @@ public:
 #define BTN_QTY TAKSI_HOTKEY_QTY
 	CWndGDI m_Bitmap[ ( IDB_RecordPause_2 - IDB_ConfigOpen_1 ) + 1 ];
 	CWndToolTip m_ToolTips;
+
+#ifdef USE_TRAYICON
+	HMENU m_hTrayIconMenuDummy;
+	HMENU m_hTrayIconMenu;
+#endif
 };
 extern CGui g_GUI;
 

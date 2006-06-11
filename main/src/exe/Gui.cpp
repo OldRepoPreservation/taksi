@@ -7,6 +7,10 @@
 #include "resource.h"
 #include "guiConfig.h"
 
+#ifdef USE_TRAYICON
+#include <shellapi.h>
+#endif
+
 CGui g_GUI;
 
 static BOOL AppendMenuStr( HMENU hMenu, int id )
@@ -19,6 +23,10 @@ static BOOL AppendMenuStr( HMENU hMenu, int id )
 }
 
 CGui::CGui()
+#ifdef USE_TRAYICON
+	: m_hTrayIconMenuDummy(NULL)
+	, m_hTrayIconMenu(NULL)
+#endif
 {
 }
 
@@ -335,23 +343,120 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 	case IDM_SC_HELP_ABOUT:
 		OnCommandHelpAbout(m_hWnd);
 		return true;
+
+#ifdef USE_TRAYICON
+	case IDC_SHOW_NORMAL:	// SC_RESTORE
+		ShowWindow(m_hWnd, SW_NORMAL);
+		return true;
+	case SC_CLOSE:
+		DestroyWindow();
+		return true;
+	case SC_MINIMIZE:
+		// hide the window.
+		ShowWindow( m_hWnd, SW_HIDE );
+		return true;
+#endif
 	}
 	return false;
 }
 
-void CGui::CreateTrayIcon()
+#ifdef USE_TRAYICON
+
+void CGui::OnInitMenuPopup( HMENU hMenu )
+{
+	// WM_INITMENUPOPUP
+	for ( int i=0; i<TAKSI_HOTKEY_QTY; i++ )
+	{
+		int iState = GetButtonState( (TAKSI_HOTKEY_TYPE) i );
+		UINT uCommand = MF_BYCOMMAND;
+		uCommand |=	(( iState < 0 ) ? (MF_GRAYED|MF_DISABLED) : MF_ENABLED );
+		int id = IDB_ConfigOpen_1+i;
+		UINT uRet;
+		if ( i == TAKSI_HOTKEY_HookModeToggle )
+		{
+			uCommand |= (iState==IDB_HookModeToggle_1) ? MF_UNCHECKED : MF_CHECKED;
+			uRet = CheckMenuItem( hMenu, id, uCommand );
+		}
+		else if ( i == TAKSI_HOTKEY_IndicatorToggle )
+		{
+			uCommand |= (iState==IDB_IndicatorToggle_1) ? MF_CHECKED : MF_UNCHECKED;
+			uRet = CheckMenuItem( hMenu, id, uCommand );
+		}
+		else
+		{
+			uRet = EnableMenuItem( hMenu, id, uCommand	);
+		}
+		ASSERT( uRet != -1 );
+	}
+}
+
+BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip)
+{
+	// dwMessage = NIM_ADD;
+	NOTIFYICONDATA tnd;
+	tnd.cbSize = sizeof(NOTIFYICONDATA);
+	tnd.hWnd = m_hWnd;
+	tnd.uID = ID_APP;
+	tnd.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
+	tnd.uCallbackMessage = WM_APP_TRAY_NOTIFICATION;
+	tnd.hIcon = hIcon;
+	lstrcpyn(tnd.szTip, pszTip, sizeof(tnd.szTip));
+
+	return Shell_NotifyIcon(dwMessage, &tnd);
+}
+
+void CGui::TrayIcon_OnEvent( LPARAM lParam )
+{
+	switch (lParam )
+	{
+	case WM_RBUTTONUP:
+		{
+		// Make first menu item the default (bold font)
+		SetMenuDefaultItem( m_hTrayIconMenu, IsWindowVisible(m_hWnd) ? 1 : 0, true);
+
+		// Display the menu at the current mouse location. There's a "bug"
+		// (Microsoft calls it a feature) in Windows 95 that requires calling
+		// SetForegroundWindow. To find out more, search for Q135788 in MSDN.
+		SetForegroundWindow(m_hWnd);
+		POINT mouse;
+		GetCursorPos(&mouse);
+		TrackPopupMenu(m_hTrayIconMenu, 0, mouse.x, mouse.y, 0, m_hWnd, NULL);
+		}
+		break;
+
+	case WM_LBUTTONDBLCLK:
+		if ( IsWindowVisible(m_hWnd))
+		{
+			SetForegroundWindow(m_hWnd);
+			SendMessage( m_hWnd, WM_COMMAND, IDB_ConfigOpen_1, 0);
+		}
+		else
+		{
+			ShowWindow(m_hWnd,SW_NORMAL);
+			SetForegroundWindow(m_hWnd);
+		}
+		break;
+	}
+}
+
+void CGui::TrayIcon_Create()
 {
 	// everyone expects this feature these days. 
 	// so give the people what they want.
-#if 0
-	// ??? TODO
-	if ( ! m_bUseTrayIcon )
-		return;
-
 	// Set up my tray menu.
-#endif
+	m_hTrayIconMenuDummy = LoadMenu(g_hInst, MAKEINTRESOURCE(IDM_TRAYICON));
+	m_hTrayIconMenu = GetSubMenu(m_hTrayIconMenuDummy, 0);
 
+	TrayIcon_Command(NIM_ADD, NULL, NULL);
+
+	TCHAR szBuff[ _MAX_PATH ];
+    LoadString( g_hInst, IDS_APP_DESC, szBuff, sizeof(szBuff));
+
+	HICON hIcon = (HICON) LoadImage(g_hInst,MAKEINTRESOURCE(ID_APP), IMAGE_ICON, 16, 16, 0);
+	TrayIcon_Command( NIM_MODIFY, hIcon, szBuff);
+	DestroyIcon(hIcon);
 }
+#endif
 
 bool CGui::OnCreate( HWND hWnd, CREATESTRUCT* pCreate )
 {
@@ -401,7 +506,9 @@ bool CGui::OnCreate( HWND hWnd, CREATESTRUCT* pCreate )
 
 	UpdateButtonToolTips();
 	UpdateButtonStates();
-	CreateTrayIcon();
+#ifdef USE_TRAYICON
+	TrayIcon_Create();
+#endif
 	return true;
 }
 
@@ -427,7 +534,11 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		// Exit the application when the window closes
 		DEBUG_MSG(( "CGui::WM_DESTROY" LOG_CR ));
 		g_GUI.m_ToolTips.DestroyWindow();
+#ifdef USE_TRAYICON
+		g_GUI.TrayIcon_Command( NIM_DELETE, NULL, NULL);
+#endif
 		sg_Dll.m_hMasterWnd = NULL;
+		g_GUI.m_hWnd = NULL;
 		::PostQuitMessage(1);
 		break;
 	case WM_SYSCOMMAND:	// off the sys menu.
@@ -450,6 +561,19 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		sg_Dll.HookCBT_Install();
 		g_GUI.UpdateButtonStates();
 		return 1;
+
+#ifdef USE_TRAYICON
+	case WM_INITMENUPOPUP:
+		// Set the gray levels of the menu items.
+		if ( ! HIWORD(lParam))
+		{
+			g_GUI.OnInitMenuPopup( (HMENU) wParam );
+		}
+		break;
+	case WM_APP_TRAY_NOTIFICATION:
+		g_GUI.TrayIcon_OnEvent( lParam );
+		break;
+#endif
 	}
 	return ::DefWindowProc(hWnd,uMsg,wParam,lParam);
 }
