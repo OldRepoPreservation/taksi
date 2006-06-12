@@ -147,7 +147,7 @@
 				RelativePath=".\Taksi.rc">
 			</File>
 			<File
-				RelativePath=".\TaksiVer.rc2">
+				RelativePath=".\TaksiVer.rch">
 			</File>
 			<File
 				RelativePath=".\Test_dx8.cpp">

@@ -1,3 +1,5 @@
+// this is not editable via VS editor!
+#ifndef APSTUDIO_INVOKED
 #include "../TaksiVersion.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -35,3 +37,4 @@ BEGIN
     END
 END
 
+#endif
