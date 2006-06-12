@@ -73,6 +73,11 @@ static HRESULT CreateVB( IDirect3DDevice9* pDevice, IRefPtr<IDirect3DVertexBuffe
 		DEBUG_ERR(( "s_pVB->Lock() FAILED. %d" LOG_CR, hRes ));
 		return hRes;
 	}
+	if ( pVertices == NULL )
+	{
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
+	}
 	memcpy(pVertices, pVertSrc, iSizeSrc);
 	pVB->Unlock();
 	return S_OK;
@@ -264,11 +269,13 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 {
 	// Copies pixel's RGB data into dest buffer. Alpha information is discarded. 
 
+	ASSERT(frame.m_pPixels);
 	int width = frame.m_Size.cx;
 	int height = frame.m_Size.cy;
 
 	// copy data
 	BYTE* pSrcRow = (BYTE*)lockedSrcRect.pBits;
+	ASSERT(pSrcRow);
 	int iSrcPitch = lockedSrcRect.Pitch;
 
 	//DEBUG_TRACE(( "iSrcPitch = %d" LOG_CR, iSrcPitch));
@@ -376,6 +383,7 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 	// Copies pixel's RGB data into dest buffer. Alpha information is discarded. 
 	//DEBUG_TRACE(( "GetFrameHalfSize: called." LOG_CR));
 
+	ASSERT(frame.m_pPixels);
 	int width = g_Proc.m_Stats.m_SizeWnd.cx;
 	int height = g_Proc.m_Stats.m_SizeWnd.cy;
 	int dHeight = frame.m_Size.cx;
@@ -383,7 +391,9 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 
 	// copy data
 	BYTE* pSrcRow = (BYTE*)lockedSrcRect.pBits;
+	ASSERT(pSrcRow);
 	INT iSrcPitch = lockedSrcRect.Pitch;
+	ASSERT(iSrcPitch);
 
 	//DEBUG_TRACE(( "iSrcPitch = %d" LOG_CR, iSrcPitch));
 	//DEBUG_TRACE(( "frame.m_iPitch = %d" LOG_CR, frame.m_iPitch));
