@@ -6,19 +6,16 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
-Some Codec MUST have mult of 4 input even tho they dont fail. MSMPEG4
-Support auto alternate codec if codec fails ?
-The same application has multiple main windows. or multiple instances.
+Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
+Support auto switch to alternate codec if codec fails ?
 Half sized GDI not work.
 Non Frame GDI not working properly.
-Odd flash when switching DX applcations. must change focus 2 times ?
+switching hook not always working correctly. 2 instances of the same app?
 GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 Should prefer graphics hook over GDI hook. 
-Very unpredictable crash after record in gdi with firefox ?
 
 TODO:
-check menu for paused mode.
 crc diff uncompressed frames with last. empty frame.
 stats should show capture mode.
 Need message explaining focus changing/hooking.
@@ -30,8 +27,8 @@ Graphics Mode Text overlay - display frame rate/ Megs of data written as text on
 Context sensative help file.
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
-hook callbacks might not be on the same thread?
 
+TEST- hook callbacks might not be on the same thread?
 Comment tag inside AVI file. TAKSI vX date + user comments?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??
@@ -50,4 +47,4 @@ Hook Audio stream from output?
  Without a loopback input the output must be hooked at a very low (kernel) level.
  Hook audio output (Wave,DirectSound) device at kernel level
 
-Does windows media encoder record audio? How do others do it?
+Does Windows Media Encoder record audio? How do others do it? hooked WaveOut ?

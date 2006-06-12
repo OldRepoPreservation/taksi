@@ -376,20 +376,28 @@ void CGui::OnInitMenuPopup( HMENU hMenu )
 		uCommand |=	(( iState < 0 ) ? (MF_GRAYED|MF_DISABLED) : MF_ENABLED );
 		int id = IDB_ConfigOpen_1+i;
 		UINT uRet;
-		if ( i == TAKSI_HOTKEY_HookModeToggle )
+		switch(i)
 		{
+		case TAKSI_HOTKEY_ConfigOpen:
+			continue;
+		case TAKSI_HOTKEY_HookModeToggle:
 			uCommand |= (iState==IDB_HookModeToggle_1) ? MF_UNCHECKED : MF_CHECKED;
 			uRet = CheckMenuItem( hMenu, id, uCommand );
-		}
-		else if ( i == TAKSI_HOTKEY_IndicatorToggle )
-		{
+			ASSERT( uRet != -1 );
+			continue;
+		case TAKSI_HOTKEY_IndicatorToggle:
 			uCommand |= (iState==IDB_IndicatorToggle_1) ? MF_CHECKED : MF_UNCHECKED;
 			uRet = CheckMenuItem( hMenu, id, uCommand );
+			ASSERT( uRet != -1 );
+			continue;
+		case TAKSI_HOTKEY_RecordPause:
+			uCommand |= (iState==IDB_RecordPause_2) ? MF_CHECKED : MF_UNCHECKED;
+			uRet = CheckMenuItem( hMenu, id, uCommand );
+			ASSERT( uRet != -1 );
+			break;
 		}
-		else
-		{
-			uRet = EnableMenuItem( hMenu, id, uCommand	);
-		}
+
+		uRet = EnableMenuItem( hMenu, id, uCommand );
 		ASSERT( uRet != -1 );
 	}
 }
