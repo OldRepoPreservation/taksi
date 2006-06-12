@@ -878,7 +878,8 @@ bool CTaksiDX9::HookFunctions()
 
 	m_Hook_Present.InstallHook(s_D3D9_Present,DX9_Present);
 	m_Hook_Reset.InstallHook(s_D3D9_Reset,DX9_Reset);
-	return true;
+
+	return __super::HookFunctions();
 }
 
 void CTaksiDX9::UnhookFunctions()

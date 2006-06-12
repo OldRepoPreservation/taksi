@@ -33,7 +33,7 @@ public:
 
 	virtual const TCHAR* get_DLLName() const = 0;
 
-	HRESULT AttachGraphXMode();
+	virtual HRESULT AttachGraphXMode();
 	void PresentFrameBegin( bool bChange );
 	void PresentFrameEnd();
 	void RecordAVI_Reset();
@@ -42,7 +42,7 @@ protected:
 	virtual bool HookFunctions()
 	{
 		ASSERT( IsValidDll());
-		DEBUG_MSG(( "CTaksiGraphX::HookFunctions" LOG_CR ));
+		DEBUG_MSG(( "CTaksiGraphX::HookFunctions done." LOG_CR ));
 		return true;
 	}
 	virtual void UnhookFunctions()
@@ -193,6 +193,7 @@ public:
 		return TEXT("user32.dll");
 	}
 
+	virtual HRESULT AttachGraphXMode();
 	virtual bool HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();

@@ -137,10 +137,12 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		// Set the DLL implants on whoever gets the focus!
 		// ASSUME DLL_PROCESS_ATTACH was called.
 		// TAKSI_INDICATE_Hooked
+		// wParam = NULL. can be null of losing focus.
 		if ( g_Proc.m_bIsProcessSpecial )
 			break;
-		LOG_MSG(( "HookCBTProc: nCode=%08x" LOG_CR, (DWORD)nCode ));
-		ASSERT(wParam);
+		LOG_MSG(( "HookCBTProc: nCode=%08x, wParam=0%x" LOG_CR, (DWORD)nCode, wParam ));
+		if ( wParam == NULL )	// ignore this!
+			break;
 		if ( g_Proc.AttachGraphXMode( (HWND) wParam ) == S_OK )
 		{
 			g_Proc.CheckProcessCustom();	// determine frame capturing algorithm 
@@ -583,6 +585,11 @@ bool CTaksiProcess::OnDllProcessAttach()
 		}
 	}
 
+#ifdef _DEBUG
+	CTaksiDll* pDll = &sg_Dll;
+	CTaksiConfigData* pConfig = &sg_Config;
+#endif
+
 	sg_Dll.m_iProcessCount ++;
 	LOG_MSG(( "DLL_PROCESS_ATTACH '%s' v" TAKSI_VERSION_S " (num=%d)" LOG_CR, pszTitle, sg_Dll.m_iProcessCount ));
 
@@ -632,10 +639,10 @@ bool CTaksiProcess::OnDllProcessAttach()
 
 	if ( ! bProcMaster )	// not read INI yet.
 	{
-		DEBUG_TRACE(( "m_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
-		DEBUG_TRACE(( "m_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
+		DEBUG_TRACE(( "sg_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
+		DEBUG_TRACE(( "sg_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
+		DEBUG_TRACE(( "sg_Config.m_bGDIUse=%d" LOG_CR, sg_Config.m_bGDIUse));
 		DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
-		DEBUG_TRACE(( "sg_Dll.m_bMasterExiting=%d" LOG_CR, sg_Dll.m_bMasterExiting));
 	}
 
 	// ASSUME HookCBTProc will call AttachGraphXMode later

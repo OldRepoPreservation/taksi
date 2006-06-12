@@ -255,6 +255,15 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	return ::CallWindowProc( g_GDI.m_WndProcOld, hWnd, uMsg, wParam, lParam );
 }
 
+HRESULT CTaksiGDI::AttachGraphXMode()
+{
+	if ( ! sg_Config.m_bGDIUse )	// not allowed.
+	{
+		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
+	}
+	return __super::AttachGraphXMode();
+}
+
 bool CTaksiGDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
@@ -288,7 +297,7 @@ bool CTaksiGDI::HookFunctions()
 	{
 		return false;
 	}
-	return true;
+	return __super::HookFunctions();
 }
 
 void CTaksiGDI::UnhookFunctions()
