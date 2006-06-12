@@ -83,8 +83,8 @@ struct LIBSPEC CTaksiConfigData
 public:
 	// CAN be set from CGuiConfig
 	TCHAR  m_szCaptureDir[_MAX_PATH];	// files go here!
-	TCHAR  m_szFileNamePostfix[64];
 	bool   m_bDebugLog;					// keep log files or not?
+	TCHAR  m_szFileNamePostfix[64];
 
 	float  m_fFrameRateTarget;			// What do we want our movies frame rate to be? (f/sec)
 	CVideoCodec m_VideoCodec;			// Video Compression scheme selected

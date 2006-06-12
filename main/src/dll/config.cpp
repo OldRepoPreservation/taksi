@@ -121,12 +121,12 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_RecordStop]=0x7b;
 	m_wHotKey[TAKSI_HOTKEY_Screenshot]=0x77;
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
+	m_bUseDirectInput = true;
 
-	m_bGDIUse = true;
+	m_bGDIUse = false;
 	m_bGDIFrame = true;
 
 	m_bShowIndicator = true;
-	m_bUseDirectInput = true;
 	m_ptMasterWindow.x = 0;
 	m_ptMasterWindow.y = 0;
 
@@ -136,15 +136,25 @@ void CTaksiConfigData::InitConfig()
 void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 {
 	strncpy( m_szCaptureDir, config.m_szCaptureDir, sizeof(m_szCaptureDir)-1);
+	m_bDebugLog = config.m_bDebugLog;
 	strncpy( m_szFileNamePostfix, config.m_szFileNamePostfix, sizeof(m_szFileNamePostfix));
+
 	m_fFrameRateTarget = config.m_fFrameRateTarget;
-	m_bVideoHalfSize = config.m_bVideoHalfSize;
 	m_VideoCodec.CopyCodec( config.m_VideoCodec );
+	m_bVideoHalfSize = config.m_bVideoHalfSize;
+
+	m_iAudioDevice = config.m_iAudioDevice;	// audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
+	m_AudioCodec.SetFormat( config.m_AudioCodec );
 
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
-
 	m_bUseDirectInput = config.m_bUseDirectInput;
-	m_bDebugLog = config.m_bDebugLog;
+
+	m_bGDIUse = config.m_bGDIUse;		// hook GDI mode at all?
+	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
+
+	// CAN NOT be set from CGuiConfig directly
+	m_bShowIndicator = config.m_bShowIndicator;
+	m_ptMasterWindow = config.m_ptMasterWindow;	// previous position of the master EXE window.
 
 	// CANT COPY m_pCustomList for interproces access ??
 	DEBUG_MSG(("CTaksiConfig::CopyConfig '%s'" LOG_CR, m_szCaptureDir ));

@@ -326,7 +326,6 @@ bool CTaksiOGL::HookFunctions()
 		return false;
 	}
 
-	DEBUG_MSG(( "CTaksiOGL::HookFunctions: done." LOG_CR ));
 	return __super::HookFunctions();
 }
 
