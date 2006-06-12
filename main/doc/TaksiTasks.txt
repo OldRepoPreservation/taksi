@@ -18,6 +18,7 @@ Should prefer graphics hook over GDI hook.
 Very unpredictable crash after record in gdi with firefox ?
 
 TODO:
+check menu for paused mode.
 crc diff uncompressed frames with last. empty frame.
 stats should show capture mode.
 Need message explaining focus changing/hooking.

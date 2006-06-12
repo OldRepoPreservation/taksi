@@ -43,7 +43,7 @@ private:
 	void OnInitMenuPopup( HMENU hMenu );
 	BOOL TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip );
 	void TrayIcon_OnEvent( LPARAM lParam );
-	void TrayIcon_Create();
+	bool TrayIcon_Create();
 #endif
 
 	int GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const;
