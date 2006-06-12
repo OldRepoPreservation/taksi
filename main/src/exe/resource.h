@@ -3,6 +3,7 @@
 // Used by Taksi.rc
 //
 #define ID_APP                          100
+#define IDS_STRING101                   101
 #define IDD_GuiConfig                   110
 #define IDD_GuiConfigTab1               111
 #define IDD_GuiConfigTab2               112
@@ -12,7 +13,7 @@
 #define IDD_GuiConfigTab6               116
 #define IDD_About                       143
 #define IDM_TRAYICON                    150
-#define IDC_SHOW_NORMAL						151
+#define IDC_SHOW_NORMAL                 151
 #define IDB_ConfigOpen_1                200
 #define IDB_HookModeToggle_1            201
 #define IDB_IndicatorToggle_1           202
