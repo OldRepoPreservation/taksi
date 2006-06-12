@@ -354,8 +354,8 @@ BEGIN
         MENUITEM "Begin Record",                IDB_RecordBegin_1
         MENUITEM "Pause Record",                IDB_RecordPause_1
         MENUITEM "Stop Record",                 IDB_RecordStop_1
-        MENUITEM "Screenshot",                  IDB_Screenshot_1
-        MENUITEM "Small Screenshot",            IDB_SmallScreenshot_1
+        MENUITEM "Screenshot!",                 IDB_Screenshot_1
+        MENUITEM "Small Screenshot!",           IDB_SmallScreenshot_1
         MENUITEM SEPARATOR
         MENUITEM "Help URL...",                 IDM_SC_HELP_URL
         MENUITEM "Help About...",               IDM_SC_HELP_ABOUT
