@@ -349,10 +349,14 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		ShowWindow(m_hWnd, SW_NORMAL);
 		return true;
 	case SC_CLOSE:
+		if ( m_hTrayIconMenu == NULL ) // tray didnt work.
+			return false;
 		DestroyWindow();
 		return true;
 	case SC_MINIMIZE:
 		// hide the window.
+		if ( m_hTrayIconMenu == NULL )	// tray didnt work.
+			return false;
 		ShowWindow( m_hWnd, SW_HIDE );
 		return true;
 #endif
@@ -439,15 +443,19 @@ void CGui::TrayIcon_OnEvent( LPARAM lParam )
 	}
 }
 
-void CGui::TrayIcon_Create()
+bool CGui::TrayIcon_Create()
 {
 	// everyone expects this feature these days. 
 	// so give the people what they want.
 	// Set up my tray menu.
+
+	if ( ! TrayIcon_Command(NIM_ADD, NULL, NULL))
+		return false;
+
 	m_hTrayIconMenuDummy = LoadMenu(g_hInst, MAKEINTRESOURCE(IDM_TRAYICON));
 	m_hTrayIconMenu = GetSubMenu(m_hTrayIconMenuDummy, 0);
-
-	TrayIcon_Command(NIM_ADD, NULL, NULL);
+	if ( m_hTrayIconMenu == NULL )
+		return false;
 
 	TCHAR szBuff[ _MAX_PATH ];
     LoadString( g_hInst, IDS_APP_DESC, szBuff, sizeof(szBuff));
@@ -455,6 +463,7 @@ void CGui::TrayIcon_Create()
 	HICON hIcon = (HICON) LoadImage(g_hInst,MAKEINTRESOURCE(ID_APP), IMAGE_ICON, 16, 16, 0);
 	TrayIcon_Command( NIM_MODIFY, hIcon, szBuff);
 	DestroyIcon(hIcon);
+	return true;
 }
 #endif
 
