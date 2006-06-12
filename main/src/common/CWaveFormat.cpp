@@ -28,6 +28,7 @@ int CWaveFormat::FormatCalcSize( const WAVEFORMATEX FAR* pForm ) // static
 
 int CWaveFormat::get_CalcSize( void ) const
 {
+	// What size should it be? not what size it actually is. m_iAllocSize
 	if ( ! CHeapBlock_IsValid(m_pWF))
 		return( 0 );
 	return( FormatCalcSize( get_WF()));
@@ -101,6 +102,35 @@ bool CWaveFormat::ReAllocFormatSize( int iSize )
 	return true;
 }
 
+bool CWaveFormat::SetFormatBytes( const BYTE* pFormData, int iSize )
+{
+	// Copy the format data as just a blob of bytes.
+	ASSERT(pFormData);
+	if ( iSize < sizeof(PCMWAVEFORMAT))
+		return false;
+	const WAVEFORMATEX* pForm = (const WAVEFORMATEX*) pFormData;
+	int iSizeMin = ( pForm->wFormatTag == WAVE_FORMAT_PCM ) ? PCMWAVEFORMAT_SIZE : sizeof(WAVEFORMATEX);
+	if ( iSize < iSizeMin )
+		return false;
+	if ( ! ReAllocFormatSize(iSize))
+	{
+		return false;
+	}
+
+	memcpy( get_WF(), pFormData, iSize );
+
+	if ( get_WF()->wFormatTag != WAVE_FORMAT_PCM )
+	{
+		if ( get_WF()->cbSize > iSize - sizeof(WAVEFORMATEX))
+		{
+			DEBUG_ERR(( "Audio format %d has bad bSize! %d" LOG_CR, 
+				get_WF()->wFormatTag, get_WF()->cbSize ));
+			get_WF()->cbSize = iSize - sizeof(WAVEFORMATEX);
+		}
+	}
+	return true;
+}
+
 bool CWaveFormat::SetFormat( const WAVEFORMATEX FAR* pForm )
 {
 	// Copy the format info.
@@ -116,6 +146,7 @@ bool CWaveFormat::SetFormat( const WAVEFORMATEX FAR* pForm )
 		return false;
 	if ( ! ReAllocFormatSize(iSize))
 	{
+		ASSERT(0);
 		return false;
 	}
 	memcpy( m_pWF, pForm, iSize );

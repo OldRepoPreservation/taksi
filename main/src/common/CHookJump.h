@@ -26,6 +26,7 @@ public:
 	void SwapOld( LPVOID pFunc )
 	{
 		// put back saved code fragment
+		ASSERT(pFunc);
 		memcpy(pFunc, m_OldCode, sizeof(m_OldCode));
 	}
 	void SwapReset( LPVOID pFunc )
@@ -33,6 +34,7 @@ public:
 		// put back JMP instruction again
 		if ( ! IsHookInstalled())	// hook has since been destroyed!
 			return;
+		ASSERT(pFunc);
 		memcpy(pFunc, m_Jump, sizeof(m_Jump));
 	}
 public:

@@ -52,6 +52,7 @@ public:
 		return( m_iAllocSize );
 	}
 
+	bool SetFormatBytes( const BYTE* pFormData, int iSize );
 	bool SetFormat( const WAVEFORMATEX FAR* pForm );
 
 	bool IsValid() const;

@@ -603,6 +603,7 @@ CAVIFile::CAVIFile()
 	, m_dwTotalFrames(0)
 {
 	m_VideoCodec.InitCodec();
+	m_AudioCodec.InitFormatEmpty();
 }
 
 CAVIFile::~CAVIFile() 

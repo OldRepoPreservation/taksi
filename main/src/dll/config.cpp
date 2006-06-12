@@ -409,11 +409,17 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		{
 		BYTE bTmp[1024];
 		ZeroMemory( &bTmp, sizeof(bTmp));
-		int iSize = Mem_ReadFromString( bTmp, sizeof(bTmp), pszValue );
+		int iSize = Mem_ReadFromString( bTmp, sizeof(bTmp)-1, pszValue );
 		if ( iSize <= sizeof(PCMWAVEFORMAT))
+		{
+			ASSERT(0);
 			return false;
-		m_AudioCodec.ReAllocFormatSize(iSize);
-		memcpy( m_AudioCodec.get_WF(), bTmp, iSize );
+		}
+		if ( ! m_AudioCodec.SetFormatBytes( bTmp, iSize ))
+		{
+			//ASSERT(0);
+			return false;
+		}
 		}
 		break;
 	case TAKSI_CFGPROP_AudioDevice:

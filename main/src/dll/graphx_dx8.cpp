@@ -72,6 +72,11 @@ static HRESULT CreateVB( IDirect3DDevice8* pDevice, IRefPtr<IDirect3DVertexBuffe
 		DEBUG_ERR(( "s_pVB->Lock() FAILED. 0%x" LOG_CR, hRes ));
 		return hRes;
 	}
+	if ( pVertices == NULL )
+	{
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
+	}
 	memcpy(pVertices, pVertSrc, iSizeSrc);
 	pVB->Unlock();
 	return S_OK;

@@ -106,6 +106,7 @@ public:
 	void CopyProcStats( const CTaksiProcStats& stats );
 	void UpdateProcStat( TAKSI_PROCSTAT_TYPE eProp )
 	{
+		ASSERT( eProp >= 0 && eProp < TAKSI_PROCSTAT_QTY );
 		m_dwPropChangedMask |= (1<<eProp);
 	}
 	void CopyProcStat( const CTaksiProcStats& stats, TAKSI_PROCSTAT_TYPE eProp )
@@ -113,7 +114,12 @@ public:
 		// Move just a single property.
 		ASSERT( eProp >= 0 && eProp < TAKSI_PROCSTAT_QTY );
 		const WORD wOffset = sm_Props[eProp][0];
-		memcpy(((BYTE*)this) + wOffset, ((const BYTE*)&stats) + wOffset, sm_Props[eProp][1] );
+		ASSERT( wOffset >= 0 && wOffset < sizeof(CTaksiProcStats));
+		const WORD wSize = sm_Props[eProp][1];
+		ASSERT( wSize > 0 && wSize < sizeof(CTaksiProcStats));
+		const WORD wEnd = wSize+wOffset;
+		ASSERT( wEnd > 0 && wEnd <= sizeof(CTaksiProcStats));
+		memcpy(((BYTE*)this) + wOffset, ((const BYTE*)&stats) + wOffset, wSize );
 		UpdateProcStat(eProp);
 	}
 
