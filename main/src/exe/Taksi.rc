@@ -9,8 +9,8 @@
 //
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
-#include "TaksiVer.rc2"
 #undef APSTUDIO_HIDDEN_SYMBOLS
+#include "TaksiVer.rch"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -39,8 +39,8 @@ END
 BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
-    "#include ""TaksiVer.rc2""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""TaksiVer.rch""\r\n"
     "\0"
 END
 
@@ -346,7 +346,7 @@ IDM_TRAYICON MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Show Tools",			        IDC_SHOW_NORMAL
+        MENUITEM "Show Tools...",               IDC_SHOW_NORMAL
         MENUITEM "Open Config Dialog...",       IDB_ConfigOpen_1
         MENUITEM "Toggle App Hook",             IDB_HookModeToggle_1
         MENUITEM "Toggle Indicator",            IDB_IndicatorToggle_1
@@ -359,9 +359,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Help URL...",                 IDM_SC_HELP_URL
         MENUITEM "Help About...",               IDM_SC_HELP_ABOUT
-		MENUITEM "Close",						SC_CLOSE
+        MENUITEM "Close",                       61536
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -452,6 +453,11 @@ END
 STRINGTABLE 
 BEGIN
     IDC_C_StatsClear        "Clear the stats values"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_C_VideoCodecButton  "Video Codecs - Select a video codec to compress the video stream as it is recorded."
 END
 
 #endif    // English (U.S.) resources
