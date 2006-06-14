@@ -200,6 +200,7 @@ public:
 	WNDPROC m_WndProcOld;	// the old handler before i hooked it.
 	int m_iReentrant;
 	DWORD m_dwTimeLastDrawIndicator;	// GetTickCount() of last.
+	UINT_PTR m_uTimerId;	// did we set up the timer ?
 };
 extern CTaksiGDI g_GDI;
 

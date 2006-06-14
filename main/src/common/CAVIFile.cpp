@@ -469,10 +469,11 @@ void CVideoCodec::CompEnd()
 	::ICSeqCompressFrameEnd(&m_v);
 }
 
-bool CVideoCodec::CompFrame( CVideoFrame& frame, void*& rpCompRet, LONG& nSize, BOOL& bIsKey )
+bool CVideoCodec::CompFrame( const CVideoFrame& frame, const void*& rpCompRet, LONG& nSize, BOOL& bIsKey )
 {
 	// Compress the frame in the stream.
 	// ASSUME: CompStart() was called.
+	// ASSUME: frame.m_pPixels is not altered.
 	// ASSUME frame == m_FrameForm
 	// RETURN:
 	//  bIsKey = this was used as the key frame?
@@ -484,7 +485,7 @@ bool CVideoCodec::CompFrame( CVideoFrame& frame, void*& rpCompRet, LONG& nSize, 
 		nSize = frame.get_SizeBytes();
 		return false;
 	}
-	void* pCompRet = ::ICSeqCompressFrame( &m_v, 0, frame.m_pPixels, &bIsKey, &nSize );
+	void* pCompRet = ::ICSeqCompressFrame( &m_v, 0, (LPVOID) frame.m_pPixels, &bIsKey, &nSize );
 	if (pCompRet == NULL)
 	{
 		// Just use the raw frame.
@@ -493,7 +494,7 @@ bool CVideoCodec::CompFrame( CVideoFrame& frame, void*& rpCompRet, LONG& nSize, 
 		nSize = frame.get_SizeBytes();
 		return false;
 	}
-	rpCompRet = pCompRet;
+	rpCompRet = pCompRet; // ASSUME m_v owns this buffer and it will get cleaned up on CompEnd()
 	return true;
 }
 
@@ -638,7 +639,7 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 {
 	// build the AVI file header structure
 	ASSERT(m_VideoCodec.m_v.lpbiOut);
-	LOG_MSG(("CAVIFile:InitFileHeader framerate=%u" LOG_CR, (DWORD)m_fFrameRate ));
+	LOG_MSG(("CAVIFile:InitFileHeader framerate=%g" LOG_CR, (float)m_fFrameRate ));
 	ZeroMemory( &afh, sizeof(afh));
 
 	afh.fccRiff = FOURCC_RIFF; // "RIFF"
@@ -701,7 +702,7 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh )
 	afh.m_StreamHeader.fccHandler = m_VideoCodec.m_v.fccHandler;
 
 	afh.m_StreamHeader.dwScale = 1;
-	afh.m_StreamHeader.dwRate = (DWORD) m_fFrameRate;
+	afh.m_StreamHeader.dwRate = ( m_fFrameRate < 1 ) ? 1 : ((DWORD)m_fFrameRate);	// Float to DWORD ??? <1 is a problem!
 	afh.m_StreamHeader.dwLength = m_dwTotalFrames;
 	afh.m_StreamHeader.dwQuality = m_VideoCodec.m_v.lQ;
 	afh.m_StreamHeader.dwSuggestedBufferSize = afh.m_AviHeader.dwSuggestedBufferSize;
@@ -949,13 +950,13 @@ void CAVIFile::CloseAVI()
 HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 {
 	// ARGS:
-	//  nTimes = FrameDups = duplicate this frame a few times.
+	//  nTimes = FrameDups = duplicate this frame a few times. to make up for missed frames.
 	// RETURN:
 	//  bytes written
 	// ASSUME: 
 	//  This frame is at the correct frame rate.
 	// NOTE: 
-	//  This can be pretty slow. we may want to put this on another thread??
+	//  This can be pretty slow. May be on background thread.
 
 	if ( ! m_File.IsValidHandle()) 
 		return 0;
@@ -966,7 +967,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 	DEBUG_TRACE(("CAVIFile:WriteVideoFrame: called. writing frame %d time(s)" LOG_CR, nTimes ));
 
 	bool bCompressed;
-	void* pCompBuf;
+	const void* pCompBuf;
 	LONG nSizeComp;
 	BOOL bIsKey = false;
 
@@ -981,7 +982,8 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 		}
 		else
 		{
-			// no change.
+			// no change. so dont bother compessing it yet again.
+			// ??? since we know this is not changed, can i just write a blank frame?
 		}
 
 		DEBUG_TRACE(("CAVIFile:WriteVideoFrame: size=%d, bIsKey=%d" LOG_CR, nSizeComp, bIsKey ));
