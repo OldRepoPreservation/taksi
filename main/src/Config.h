@@ -102,6 +102,7 @@ public:
 	// CAN NOT be set from CGuiConfig directly
 	bool   m_bShowIndicator;
 	POINT m_ptMasterWindow;	// previous position of the master EXE window.
+	// DWORD m_dwHelpShown;	// What help messages have been shown so far. throttle help.
 };
 extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set via CGuiConfig
 

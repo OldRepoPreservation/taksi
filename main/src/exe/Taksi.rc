@@ -205,14 +205,16 @@ BEGIN
     LTEXT           "Frame Rate",IDC_STATIC,7,68,45,8
     EDITTEXT        IDC_C_StatFrameRate,90,65,40,14,ES_AUTOHSCROLL | 
                     ES_READONLY
-    LTEXT           "FPS",IDC_STATIC,141,68,35,8
-    EDITTEXT        IDC_C_StatFormat,177,65,85,14,ES_AUTOHSCROLL | 
+    LTEXT           "FPS",IDC_STATIC,136,68,16,8
+    EDITTEXT        IDC_C_StatFormat,158,65,56,14,ES_AUTOHSCROLL | 
                     ES_READONLY
     LTEXT           "Recorded Data Size",IDC_STATIC,7,84,83,8
     EDITTEXT        IDC_C_StatDataRecorded,90,81,66,14,ES_AUTOHSCROLL | 
                     ES_READONLY
     LTEXT           "MB",IDC_STATIC,167,84,35,8
     PUSHBUTTON      "C",IDC_C_StatsClear,250,83,12,12
+    EDITTEXT        IDC_C_StatGraphXMode,217,65,45,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
 END
 
 IDD_About DIALOGEX 0, 0, 214, 97

@@ -87,7 +87,7 @@ HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
 	return m_hWnd;
 }
 
-void CTaksiGDI::DrawMouse( HDC hMemDC )
+void CTaksiGDI::DrawMouse( HDC hMemDC, bool bHalfSize )
 {
 	// Draw the cursor on the sampled bitmap.
 	POINT xPoint; 
@@ -112,7 +112,12 @@ void CTaksiGDI::DrawMouse( HDC hMemDC )
 			::DeleteObject(iconinfo.hbmColor);
 	}		
 		
-	::DrawIcon(hMemDC,  xPoint.x,  xPoint.y, hCursor);
+	if (bHalfSize)
+	{
+		xPoint.x /= 2;
+		xPoint.y /= 2;
+	}
+	::DrawIcon(hMemDC, xPoint.x, xPoint.y, hCursor);
 }
 
 HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
@@ -127,7 +132,7 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	if ( ! MemDC.CreateCompatibleDC( ScreenDC ))
 		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
 
-	CWndGDI Bitmap( ScreenDC.CreateCompatibleBitmap( g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy ));
+	CWndGDI Bitmap( ScreenDC.CreateCompatibleBitmap( frame.m_Size.cx, frame.m_Size.cy ));
 	if ( Bitmap.m_hObject == NULL )
 	{
 		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
@@ -137,13 +142,34 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	// Put the pixels i want into Bitmap.
 	{
 	CWndGDISelect BitmapOld( MemDC, Bitmap );	 
-	BOOL bBltRet = BitBlt( MemDC, 0, 0, g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy, ScreenDC, 
-		m_WndRect.left, m_WndRect.top, SRCCOPY );
+	BOOL bBltRet;
+	if ( bHalfSize )
+	{
+		bBltRet = ::StretchBlt( 
+			MemDC,	// dest dc
+			0, 0,
+			frame.m_Size.cx, frame.m_Size.cy,
+			ScreenDC,  // handle to source DC
+			m_WndRect.left, m_WndRect.top, 
+			m_WndRect.right - m_WndRect.left,	// width of source rectangle
+			m_WndRect.bottom - m_WndRect.top,		// height of source rectangle
+			SRCCOPY );	// raster operation code
+	}
+	else
+	{
+		bBltRet = ::BitBlt( 
+			MemDC,	// dest dc
+			0, 0, 
+			frame.m_Size.cx, frame.m_Size.cy, 
+			ScreenDC, 
+			m_WndRect.left, m_WndRect.top, 
+			SRCCOPY );	// raster operation code
+	}
 	if ( ! bBltRet)
 	{
 		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
-	DrawMouse(MemDC);	// Draw Mouse cursor if they want that.
+	DrawMouse(MemDC,bHalfSize);	// Draw Mouse cursor if they want that.
 	}
 #ifdef _DEBUG
 	BITMAP BitmapInfo;
@@ -173,8 +199,6 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		DEBUG_ERR(( "GetDIBits FAILED (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
-
-	// ??? bHalfSize not used !!
 
 	return S_OK;
 }

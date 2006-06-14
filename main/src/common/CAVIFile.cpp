@@ -224,6 +224,7 @@ int CVideoCodec::GetStr( char* pszValue, int iSizeMax) const
 	if ( m_v.cbSize <= 0 || iSizeMax <= 0 )
 		return 0;
 	CVideoCodec codec;
+	codec.InitCodec();
 	codec.CopyCodec( *this );
 	return Mem_ConvertToString( pszValue, iSizeMax, (BYTE*) &codec.m_v, sizeof(codec.m_v));
 }
@@ -244,6 +245,7 @@ void CVideoCodec::CopyCodec( const CVideoCodec& codec )
 {
 	// cant copy the m_v.hic, etc.
 	// DONT allow pointers to get copied! this will leak CloseCodec()!
+	m_bCompressing = false;
 	memcpy( &m_v, &codec.m_v, sizeof(m_v));
 	m_v.hic = NULL;
 	m_v.lpbiIn = NULL;
@@ -294,6 +296,9 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 		CloseCodec();	
 	}
 
+	ASSERT( !m_bCompressing );
+	ASSERT( m_v.hic  == NULL );
+
 	if ( m_v.fccHandler == MAKEFOURCC('D','I','B',' '))
 	{
 		// this just means NOT compressed! m_v.hic would be NULL anyhow.
@@ -318,6 +323,7 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 void CVideoCodec::CloseCodec()
 {
 	CompEnd();
+	ASSERT( !m_bCompressing );
 	if ( m_v.hic != NULL )
 	{
 		::ICClose(m_v.hic);
@@ -347,6 +353,7 @@ bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 	{
 		// open a temporary version of this.
 		CVideoCodec codec;
+		codec.InitCodec();
 		codec.CopyCodec( *this );
 		HRESULT hRes = codec.OpenCodec(ICMODE_QUERY);
 		if ( IS_ERROR(hRes) || codec.m_v.hic == NULL )
@@ -424,6 +431,7 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 	ASSERT(lpbiIn);
 	if ( m_bCompressing )	// already started?!
 	{
+		ASSERT(m_v.lpbiOut);
 		return S_FALSE;
 	}
 	if ( m_v.hic == NULL )
@@ -453,8 +461,9 @@ void CVideoCodec::CompEnd()
 {
 	// End the compression stream.
 	// ASSUME: CompStart() was called.
-	if ( ! m_bCompressing || m_v.hic == NULL )
+	if ( ! m_bCompressing )
 		return;
+	//ASSERT(m_v.lpbiOut);
 	DEBUG_MSG(( "CVideoCodec:CompEnd" LOG_CR ));
 	m_bCompressing = false;
 	::ICSeqCompressFrameEnd(&m_v);

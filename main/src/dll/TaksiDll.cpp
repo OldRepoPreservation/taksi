@@ -98,6 +98,7 @@ void CTaksiProcStats::InitProcStats()
 	m_szProcessFile[0] = '\0';
 	m_szLastError[0] = '\0';
 	m_hWnd = NULL;
+	m_eGraphXMode = TAKSI_GRAPHX_QTY;
 	m_eState = TAKSI_INDICATE_QTY;	
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
 }
@@ -509,7 +510,11 @@ HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 	{
 		hRes = s_GraphxModes[i]->AttachGraphXMode();
 		if ( SUCCEEDED(hRes))
+		{
+			m_Stats.m_eGraphXMode = (TAKSI_GRAPHX_TYPE) i;
+			UpdateStat( TAKSI_PROCSTAT_GraphXMode );
 			break;
+		}
 	}
 	return hRes;
 }
@@ -533,6 +538,9 @@ void CTaksiProcess::DetachGraphXMode()
 	{
 		s_GraphxModes[i]->FreeDll();
 	}
+
+	m_Stats.m_eGraphXMode = TAKSI_GRAPHX_QTY;
+	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
 }
 
 bool CTaksiProcess::OnDllProcessAttach()

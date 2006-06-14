@@ -9,18 +9,6 @@
 #define INDICATOR_Width 16
 #define INDICATOR_Height 16
 
-enum TAKSI_GRAPHX_TYPE
-{
-	// enumerate the avilable modes we support.
-	TAKSI_GRAPHX_OGL = 0,
-#ifdef USE_DX
-	TAKSI_GRAPHX_DX8,
-	TAKSI_GRAPHX_DX9,
-#endif
-	TAKSI_GRAPHX_GDI,	// put this last. prefer other modes over this.
-	TAKSI_GRAPHX_QTY,
-};
-
 struct CTaksiGraphX : public CDllFile
 {
 	// a generic graphics mode base class.
@@ -203,7 +191,7 @@ public:
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 private:
-	void DrawMouse( HDC hMemDC );
+	void DrawMouse( HDC hMemDC, bool bHalfSize );
 	static LRESULT CALLBACK WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 public:
