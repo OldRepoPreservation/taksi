@@ -71,23 +71,17 @@ bool CGui::UpdateWindowTitle()
 	switch (sg_ProcStats.m_eState)
 	{
 	case TAKSI_INDICATE_Hooked:
+		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen,
+			_T(" (Hook)") );
+		break;
 	case TAKSI_INDICATE_Recording:
+		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
+			_T(" (Rec %.2gM)"), sg_ProcStats.get_DataRecMeg());
+		break;
 	case TAKSI_INDICATE_RecordPaused:
-		{
-			TCHAR szState[ _MAX_PATH ];
-			int iLenStr = LoadString( g_hInst, IDS_STATE_Ready + sg_ProcStats.m_eState - TAKSI_INDICATE_Ready,
-				szState, COUNTOF(szState)-1 );
-			if ( iLenStr > 0 )
-			{
-				iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, _T(" (%s)"), szState );
-			}
-		}
-		if ( sg_ProcStats.m_eState != TAKSI_INDICATE_Hooked )
-		{
-			// size of the recording.
-			iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
-				_TEXT("(%gM)"), sg_ProcStats.get_DataRecMeg());
-		}
+		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
+			_T(" (Pause %.2gM)"), sg_ProcStats.get_DataRecMeg());
+		break;
 	}
 
 	SetWindowText( m_hWnd, szTitle );
