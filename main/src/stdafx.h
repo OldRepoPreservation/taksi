@@ -123,6 +123,11 @@ public:
 		UpdateProcStat(eProp);
 	}
 
+	float get_DataRecMeg() const
+	{
+		return ((float) m_dwDataRecorded ) / (1024*1024);
+	}
+
 public:
 	DWORD m_dwProcessId;		// What process is this?
 	TCHAR m_szProcessFile[ _MAX_PATH ];	// What is the file name/path for the current process.

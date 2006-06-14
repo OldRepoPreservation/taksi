@@ -22,9 +22,12 @@ static BOOL AppendMenuStr( HMENU hMenu, int id )
 		id, szTmp );
 }
 
+//**************************************************************
+
 CGui::CGui()
+	: m_uTimerStat(0)
 #ifdef USE_TRAYICON
-	: m_hTrayIconMenuDummy(NULL)
+	, m_hTrayIconMenuDummy(NULL)
 	, m_hTrayIconMenu(NULL)
 #endif
 {
@@ -78,6 +81,12 @@ bool CGui::UpdateWindowTitle()
 			{
 				iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, _T(" (%s)"), szState );
 			}
+		}
+		if ( sg_ProcStats.m_eState != TAKSI_INDICATE_Hooked )
+		{
+			// size of the recording.
+			iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
+				_TEXT("(%gM)"), sg_ProcStats.get_DataRecMeg());
 		}
 	}
 
@@ -162,7 +171,24 @@ void CGui::UpdateButtonStates()
 	{
 		UpdateButton( (TAKSI_HOTKEY_TYPE) i );
 	}
+
 	UpdateWindowTitle();
+
+	if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording )
+	{
+		if ( m_uTimerStat == 0 )
+		{
+			m_uTimerStat = ::SetTimer( m_hWnd, IDT_UpdateStats, 1000, NULL );
+		}
+	}
+	else
+	{
+		if ( m_uTimerStat )
+		{
+			::KillTimer( m_hWnd, IDT_UpdateStats );
+			m_uTimerStat = 0;
+		}
+	}
 }
 
 int CGui::GetVirtKeyName( TCHAR* pszName, int iLen, BYTE bVirtKey ) // static
@@ -266,103 +292,6 @@ BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
     } 
     return false; 
 } 
-
-int CGui::OnCommandHelpAbout( HWND hWndParent )
-{
-	// IDM_SC_HELP_ABOUT
-	return DialogBox( g_hInst, MAKEINTRESOURCE(IDD_About), hWndParent, AboutDlgProc );
-}
-
-bool CGui::OnCommandKey( TAKSI_HOTKEY_TYPE eKey )
-{
-	if ( GetButtonState(eKey) <= 0 )
-		return false;
-	sg_Dll.m_dwHotKeyMask |= (1<<eKey);
-	UpdateButtonStates();
-	return true;
-}
-
-bool CGui::OnCommand( int id, int iNotify, HWND hControl )
-{
-	switch (id)
-	{
-	case TAKSI_HOTKEY_ConfigOpen:
-	case IDB_ConfigOpen_1:
-		if ( g_GUIConfig.m_hWnd == NULL )
-		{
-			g_GUIConfig.m_hWnd = CreateDialog( g_hInst, 
-				MAKEINTRESOURCE(IDD_GuiConfig),
-				NULL, CGuiConfig::DialogProc );
-			if (g_GUIConfig.m_hWnd == NULL) 
-			{
-				return false;
-			}
-		}
-		else
-		{
-			::ShowWindow(g_GUIConfig.m_hWnd,SW_SHOWNORMAL);
-			::SetFocus(g_GUIConfig.m_hWnd);
-		}
-		return true;
-	case TAKSI_HOTKEY_HookModeToggle:
-	case IDB_HookModeToggle_1:
-		if ( sg_Dll.IsHookCBT())
-		{
-			sg_Dll.HookCBT_Uninstall();
-		}
-		else
-		{
-			sg_Dll.HookCBT_Install();
-		}
-		UpdateButtonStates();
-		return true;
-	case TAKSI_HOTKEY_IndicatorToggle:
-	case IDB_IndicatorToggle_1:
-		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
-		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
-		UpdateButtonStates();
-		return true;
-
-	case TAKSI_HOTKEY_RecordBegin:
-	case TAKSI_HOTKEY_RecordPause:
-	case TAKSI_HOTKEY_RecordStop:
-	case TAKSI_HOTKEY_Screenshot:
-	case TAKSI_HOTKEY_SmallScreenshot:
-		return OnCommandKey( (TAKSI_HOTKEY_TYPE) id );
-
-	case IDB_RecordBegin_1:
-	case IDB_RecordPause_1:
-	case IDB_RecordStop_1:
-	case IDB_Screenshot_1:
-	case IDB_SmallScreenshot_1:
-		return OnCommandKey( (TAKSI_HOTKEY_TYPE)( TAKSI_HOTKEY_ConfigOpen + (id - IDB_ConfigOpen_1)));
-
-	case IDM_SC_HELP_URL:
-		OnCommandHelpURL();
-		return true;
-	case IDM_SC_HELP_ABOUT:
-		OnCommandHelpAbout(m_hWnd);
-		return true;
-
-#ifdef USE_TRAYICON
-	case IDC_SHOW_NORMAL:	// SC_RESTORE
-		ShowWindow(m_hWnd, SW_NORMAL);
-		return true;
-	case SC_CLOSE:
-		if ( m_hTrayIconMenu == NULL ) // tray didnt work.
-			return false;
-		DestroyWindow();
-		return true;
-	case SC_MINIMIZE:
-		// hide the window.
-		if ( m_hTrayIconMenu == NULL )	// tray didnt work.
-			return false;
-		ShowWindow( m_hWnd, SW_HIDE );
-		return true;
-#endif
-	}
-	return false;
-}
 
 #ifdef USE_TRAYICON
 
@@ -475,6 +404,119 @@ bool CGui::TrayIcon_Create()
 }
 #endif
 
+//***************************************************************
+
+bool CGui::OnTimer( UINT idTimer )
+{
+	// IDT_UpdateStats
+	if ( idTimer != IDT_UpdateStats )
+	{
+		return false;
+	}
+	if ( sg_ProcStats.m_eState == TAKSI_INDICATE_Recording )
+	{
+		UpdateWindowTitle();
+	}
+	return true;
+}
+
+int CGui::OnCommandHelpAbout( HWND hWndParent )
+{
+	// IDM_SC_HELP_ABOUT
+	return DialogBox( g_hInst, MAKEINTRESOURCE(IDD_About), hWndParent, AboutDlgProc );
+}
+
+bool CGui::OnCommandKey( TAKSI_HOTKEY_TYPE eKey )
+{
+	if ( GetButtonState(eKey) <= 0 )
+		return false;
+	sg_Dll.m_dwHotKeyMask |= (1<<eKey);
+	UpdateButtonStates();
+	return true;
+}
+
+bool CGui::OnCommand( int id, int iNotify, HWND hControl )
+{
+	switch (id)
+	{
+	case TAKSI_HOTKEY_ConfigOpen:
+	case IDB_ConfigOpen_1:
+		if ( g_GUIConfig.m_hWnd == NULL )
+		{
+			g_GUIConfig.m_hWnd = CreateDialog( g_hInst, 
+				MAKEINTRESOURCE(IDD_GuiConfig),
+				NULL, CGuiConfig::DialogProc );
+			if (g_GUIConfig.m_hWnd == NULL) 
+			{
+				return false;
+			}
+		}
+		else
+		{
+			::ShowWindow(g_GUIConfig.m_hWnd,SW_SHOWNORMAL);
+			::SetFocus(g_GUIConfig.m_hWnd);
+		}
+		return true;
+	case TAKSI_HOTKEY_HookModeToggle:
+	case IDB_HookModeToggle_1:
+		if ( sg_Dll.IsHookCBT())
+		{
+			sg_Dll.HookCBT_Uninstall();
+		}
+		else
+		{
+			sg_Dll.HookCBT_Install();
+		}
+		UpdateButtonStates();
+		return true;
+	case TAKSI_HOTKEY_IndicatorToggle:
+	case IDB_IndicatorToggle_1:
+		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
+		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
+		UpdateButtonStates();
+		return true;
+
+	case TAKSI_HOTKEY_RecordBegin:
+	case TAKSI_HOTKEY_RecordPause:
+	case TAKSI_HOTKEY_RecordStop:
+	case TAKSI_HOTKEY_Screenshot:
+	case TAKSI_HOTKEY_SmallScreenshot:
+		return OnCommandKey( (TAKSI_HOTKEY_TYPE) id );
+
+	case IDB_RecordBegin_1:
+	case IDB_RecordPause_1:
+	case IDB_RecordStop_1:
+	case IDB_Screenshot_1:
+	case IDB_SmallScreenshot_1:
+		return OnCommandKey( (TAKSI_HOTKEY_TYPE)( TAKSI_HOTKEY_ConfigOpen + (id - IDB_ConfigOpen_1)));
+
+	case IDM_SC_HELP_URL:
+		OnCommandHelpURL();
+		return true;
+	case IDM_SC_HELP_ABOUT:
+		OnCommandHelpAbout(m_hWnd);
+		return true;
+
+#ifdef USE_TRAYICON
+	case IDC_SHOW_NORMAL:	// SC_RESTORE
+		ShowWindow(m_hWnd, SW_NORMAL);
+		return true;
+	case SC_CLOSE:
+		if ( m_hTrayIconMenu == NULL ) // tray didnt work.
+			return false;
+		DestroyWindow();
+		return true;
+	case SC_MINIMIZE:
+		// hide the window.
+		if ( m_hTrayIconMenu == NULL )	// tray didnt work.
+			return false;
+		ShowWindow( m_hWnd, SW_HIDE );
+		return true;
+#endif
+	}
+	return false;
+}
+
 bool CGui::OnCreate( HWND hWnd, CREATESTRUCT* pCreate )
 {
 	// WM_CREATE 
@@ -529,6 +571,8 @@ bool CGui::OnCreate( HWND hWnd, CREATESTRUCT* pCreate )
 	return true;
 }
 
+//******************************************************************************
+
 LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) // static
 {
 	switch (uMsg)
@@ -568,6 +612,8 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if ( g_GUI.OnCommand( LOWORD(wParam), HIWORD(wParam), (HWND)lParam ))
 			return 0;
 		break;
+	case WM_TIMER:
+		return g_GUI.OnTimer((UINT) wParam );
 	case WM_APP_UPDATE:
 		// Use m_iMasterUpdateCount to throttle these ?
 		g_GUI.UpdateButtonToolTips();

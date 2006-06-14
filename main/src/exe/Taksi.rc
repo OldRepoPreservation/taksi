@@ -434,9 +434,9 @@ END
 STRINGTABLE 
 BEGIN
     IDS_STATE_Ready         "Ready"
-    IDS_STATE_Hooked        "Hooked"
-    IDS_STATE_Recording     "Recording"
-    IDS_STATE_RecordPause   "Paused"
+    IDS_STATE_Hooked        "Hook"
+    IDS_STATE_Recording     "Record"
+    IDS_STATE_RecordPause   "Pause"
     IDS_STATE_QTY           "UNK"
 END
 
