@@ -14,6 +14,7 @@
 #include "resource.h"
 
 struct CTaksiConfigCustom;
+#define IDT_UpdateStats 100	// timer id for updating the stats in real time.
 
 struct CGui : public CWindowChild
 {
@@ -26,11 +27,13 @@ public:
 	static int OnCommandHelpAbout( HWND hWnd );
 
 	static int MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp );
+	bool UpdateWindowTitle();
 
 private:
 	void UpdateButtonStates();
 	void UpdateButtonToolTips();
 
+	bool OnTimer( UINT idTimer );
 	bool OnCreate( HWND hWnd, CREATESTRUCT* pCreate );
 	bool OnCommandKey( TAKSI_HOTKEY_TYPE eKey );
 	bool OnCommand( int id, int iNotify, HWND hControl );
@@ -38,7 +41,6 @@ private:
 	static ATOM RegisterClass();
 	static LRESULT CALLBACK WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-	bool UpdateWindowTitle();
 #ifdef USE_TRAYICON
 	void OnInitMenuPopup( HMENU hMenu );
 	BOOL TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip );
@@ -56,6 +58,7 @@ public:
 #define BTN_QTY TAKSI_HOTKEY_QTY
 	CWndGDI m_Bitmap[ ( IDB_RecordPause_2 - IDB_ConfigOpen_1 ) + 1 ];
 	CWndToolTip m_ToolTips;
+	UINT_PTR m_uTimerStat;
 
 #ifdef USE_TRAYICON
 	HMENU m_hTrayIconMenuDummy;

@@ -10,7 +10,6 @@
 #include "../common/CFileDirDlg.h"
 #include "../common/CWaveDevice.h"
 
-#define IDT_UpdateStats 100
 #define UPDATE_EDIT_LIMIT(c,i,p)	SendMessage(m_hControl##i, CB_LIMITTEXT, sizeof(((c*)0)->p)-1, 0)
 #define UPDATE_CHECK(i,v)			SendMessage(m_hControl##i, BM_SETCHECK, (v)? BST_CHECKED : BST_UNCHECKED, 0 )
 
@@ -160,8 +159,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_DataRecorded))
 	{
-		float fMeg = ((float) stats.m_dwDataRecorded ) / (1024*1024);
-		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%g"), fMeg );
+		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%g"), stats.get_DataRecMeg());
 		SetWindowText( m_hControlStatDataRecorded, szTmp );
 	}
 }
@@ -513,6 +511,7 @@ bool CGuiConfig::OnTimer( UINT idTimer )
 	{
 		return false;
 	}
+
 	// Check for stats update. only if this tab is set.
 	if ( m_iTabCur != 5 )
 		return false;

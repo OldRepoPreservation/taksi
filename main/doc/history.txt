@@ -335,7 +335,13 @@ Attempt to fix hooking GDI mode with multiple main windows or instances.
 Ver 0.752
 Unique error codes for VFW errors.
 
-Ver 0.753
+Ver 0.753 - SourceForge RELEASED
 Tray Icon and tray menu support for all functions. USE_TRAYICON conditional compile
 Supports uncompressed video. Why would anyone want that ?
 check menu for paused mode.
+FIX - overflow when storing bad wave format.
+
+June 13,2006 
+==============
+Ver 0.754
+Display the M of data recorded in the main GUI window title.
