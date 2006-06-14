@@ -33,12 +33,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4B38F493D27042B1B6CAEB3C65D0F439"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4F1297FD3B08473FB6C6EFA2EF179DA4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -58,6 +52,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6DE31EF302AF42DEB6235AB1568C345A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -191,26 +191,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_4B38F493D27042B1B6CAEB3C65D0F439"
-            {
-            "SourcePath" = "8:..\\taksi.ini"
-            "TargetName" = "8:taksi.ini"
-            "Tag" = "8:"
-            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4F1297FD3B08473FB6C6EFA2EF179DA4"
             {
             "SourcePath" = "8:..\\exe\\res\\Taksi.ico"
@@ -255,6 +235,26 @@
             {
             "SourcePath" = "8:..\\..\\doc\\history.txt"
             "TargetName" = "8:history.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
+            {
+            "SourcePath" = "8:..\\taksi.ini"
+            "TargetName" = "8:taksi.ini"
             "Tag" = "8:"
             "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
             "Condition" = "8:"
@@ -347,7 +347,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Taksi Desktop Video Recorder"
         "ProductCode" = "8:{EBB05CE8-52DF-4B7C-BDF4-ECC6BB0C3BB1}"
-        "PackageCode" = "8:{7C32078B-22B2-4E3C-B148-D320086C82D5}"
+        "PackageCode" = "8:{B8D94F4D-74FB-47C8-9F11-A022BF2CD466}"
         "UpgradeCode" = "8:{24F27168-C6D5-4236-B614-30CC5E2D0044}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
