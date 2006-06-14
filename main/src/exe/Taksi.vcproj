@@ -300,9 +300,6 @@
 		<File
 			RelativePath=".\taksi.ini">
 		</File>
-		<File
-			RelativePath=".\taksi2.ini">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

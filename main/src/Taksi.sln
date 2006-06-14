@@ -36,6 +36,7 @@ Global
 		..\license.txt = ..\license.txt
 		Makefile = Makefile
 		..\doc\manual.txt = ..\doc\manual.txt
+		taksi.ini = taksi.ini
 		..\doc\TaksiPic.jpg = ..\doc\TaksiPic.jpg
 		..\doc\TaksiTasks.txt = ..\doc\TaksiTasks.txt
 	EndGlobalSection
