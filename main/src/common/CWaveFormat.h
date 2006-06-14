@@ -55,7 +55,7 @@ public:
 	bool SetFormatBytes( const BYTE* pFormData, int iSize );
 	bool SetFormat( const WAVEFORMATEX FAR* pForm );
 
-	bool IsValid() const;
+	bool IsValidFormat() const;
 	bool IsValidBasic() const
 	{
 		if ( ! CHeapBlock_IsValid(m_pWF)) 
@@ -156,7 +156,7 @@ protected:
 	int get_CalcSize( void ) const;
 
 protected:
-	int m_iAllocSize;
+	int m_iAllocSize;		// sizeof(WAVEFORMATEX) + cbSize;
 	WAVEFORMATEX* m_pWF;    // variable size structure. CHeapBlock_ReAlloc()
 };
 
