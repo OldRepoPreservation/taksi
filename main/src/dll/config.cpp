@@ -106,7 +106,7 @@ void CTaksiConfigData::InitConfig()
 	m_szFileNamePostfix[0] = '\0';
 
 	// Video Format
-	m_fFrameRateTarget=20;
+	m_fFrameRateTarget=10;
 	m_VideoCodec.InitCodec();
 	m_bVideoHalfSize = true;
 
@@ -362,7 +362,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	switch (eProp)
 	{
 	case TAKSI_CFGPROP_DebugLog:
-		m_bDebugLog = atoi(pszValue);
+		m_bDebugLog = atoi(pszValue) ? true : false;
 		break;
 	case TAKSI_CFGPROP_FileNamePostfix:
 		if (! Str_GetQuoted( m_szFileNamePostfix, pszValue, sizeof(m_szFileNamePostfix)))

@@ -350,9 +350,9 @@ void CGuiConfig::OnCommandSave()
 	if (g_Config.WriteIniFile())
 	{
 		// Apply new settings globally
+		SetSaveState( false );
 		sg_Dll.UpdateConfigCustom();	// make global change.
 		SetStatusText( MAKEINTRESOURCE(IDS_STATUS_SAVED));
-		SetSaveState( false );
 	}
 	else
 	{

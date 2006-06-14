@@ -262,18 +262,19 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		break;
 #endif
 	case WM_TIMER: 
-		if ( wParam != IDT_TIMER )	// the app owns this timer.
+		if ( wParam != IDT_TIMER )	// the app owns this timer. pass it along.
 			break;
 		if (g_GDI.m_iReentrant)
 		{
 			DEBUG_ERR(( "CTaksiGDI::WM_TIMER reentrant!" LOG_CR ));
 			break;
 		}
+		// NOTE: The frame is the same as last. re-use the previous frame???!
 		g_GDI.m_iReentrant++;
-		g_GDI.PresentFrameBegin( GetTickCount() - g_GDI.m_dwTimeLastDrawIndicator > 1000 );
+		g_GDI.PresentFrameBegin( ( GetTickCount() - g_GDI.m_dwTimeLastDrawIndicator ) > 1000 );
 		g_GDI.PresentFrameEnd();
 		g_GDI.m_iReentrant--;
-		return 0;	// this is my timer. don't pass to the app!
+		return 0;	// this is my timer. don't pass to the app! eat it.
 	}
 	
 	return ::CallWindowProc( g_GDI.m_WndProcOld, hWnd, uMsg, wParam, lParam );
@@ -312,12 +313,9 @@ bool CTaksiGDI::HookFunctions()
 		return false;
 	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) WndProcHook );
 
-	// Set up a timer to give me a frame rate.
-	DWORD dwMSec = (DWORD)( 1000.0 / sg_Config.m_fFrameRateTarget );
-	if ( dwMSec <= 0 )
-		dwMSec = 1;
-	UINT_PTR idTimer = ::SetTimer( m_hWnd, IDT_TIMER, dwMSec, NULL );
-	if ( idTimer == 0 )
+	// Set up a timer to give me a frame rate / basic update time.
+	m_uTimerId = ::SetTimer( m_hWnd, IDT_TIMER, 1000, NULL );
+	if ( m_uTimerId == 0 )
 	{
 		return false;
 	}
@@ -330,7 +328,11 @@ void CTaksiGDI::UnhookFunctions()
 		return;
 	ASSERT(m_hWnd);
 	// Release the timer.
-	::KillTimer( m_hWnd, IDT_TIMER );
+	if ( m_uTimerId )
+	{
+		::KillTimer( m_hWnd, IDT_TIMER );
+		m_uTimerId = 0;
+	}
 	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) m_WndProcOld );
 	m_WndProcOld = NULL;
 
