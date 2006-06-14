@@ -88,6 +88,18 @@ enum TAKSI_INDICATE_TYPE
 	TAKSI_INDICATE_QTY,
 };
 
+enum TAKSI_GRAPHX_TYPE
+{
+	// enumerate the avilable modes we support.
+	TAKSI_GRAPHX_OGL = 0,
+#ifdef USE_DX
+	TAKSI_GRAPHX_DX8,
+	TAKSI_GRAPHX_DX9,
+#endif
+	TAKSI_GRAPHX_GDI,	// put this last. prefer other modes over this.
+	TAKSI_GRAPHX_QTY,
+};
+
 enum TAKSI_PROCSTAT_TYPE
 {
 #define ProcStatProp(a,b,c,d) TAKSI_PROCSTAT_##a,
@@ -137,6 +149,7 @@ public:
 
 	HWND m_hWnd;	// the window the graphics is in
 	SIZE m_SizeWnd;	// the window/backbuffer size. (pixels)
+	TAKSI_GRAPHX_TYPE m_eGraphXMode;
 
 	TAKSI_INDICATE_TYPE m_eState;	// What are we doing with the process?
 	float m_fFrameRate;			// measured frame rate. recording or not.

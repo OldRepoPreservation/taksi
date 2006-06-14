@@ -143,6 +143,23 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%d x %d"), stats.m_SizeWnd.cx, stats.m_SizeWnd.cy  );
 		SetWindowText( m_hControlStatFormat, szTmp );
 	}
+	if ( dwMask & (1<<TAKSI_PROCSTAT_GraphXMode))
+	{
+		const TCHAR* sm_szNames[TAKSI_GRAPHX_QTY+1] = 
+		{
+		_T("OpenGL"),	// TAKSI_GRAPHX_OGL
+#ifdef USE_DX
+		_T("DirectX8"), // TAKSI_GRAPHX_DX8
+		_T("DirectX9"), // TAKSI_GRAPHX_DX9
+#endif
+		_T("GDI"),		// TAKSI_GRAPHX_GDI
+		_T(""),
+		};
+		int i = stats.m_eGraphXMode;
+		if ( i < 0 || i >= COUNTOF(sm_szNames))
+			i = COUNTOF(sm_szNames)-1;
+		SetWindowText( m_hControlStatGraphXMode, sm_szNames[i] );
+	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_State))
 	{
 		//TAKSI_INDICATE_TYPE
@@ -382,10 +399,12 @@ void CGuiConfig::OnCommandCustomDeleteButton()
 void CGuiConfig::OnCommandVideoCodecButton()
 {
 	CVideoCodec VideoPrev;
+	VideoPrev.InitCodec();
 	VideoPrev.CopyCodec( g_Config.m_VideoCodec );
 	g_Config.m_VideoCodec.CompChooseDlg( m_hWnd,
 		_TEXT("Choose video compressor"));
 	CVideoCodec VideoCur;
+	VideoCur.InitCodec();
 	VideoCur.CopyCodec( g_Config.m_VideoCodec );
 	if ( memcmp( &VideoCur, &VideoPrev, sizeof(VideoCur)))
 	{

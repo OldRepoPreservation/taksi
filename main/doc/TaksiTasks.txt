@@ -6,18 +6,17 @@ why use HeapAlloc instead of new for allocs ? seems the same to me.
 dummy keyboard to keep dll loaded ?
 
 KNOWN BUGS:
-Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
-Support auto switch to alternate codec if codec fails ?
-Half sized GDI not work.
 Non Frame GDI not working properly.
+Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
 switching hook not always working correctly. 2 instances of the same app?
 GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
-Should prefer graphics hook over GDI hook. 
 
 TODO:
-crc diff uncompressed frames with last. empty frame.
-stats should show capture mode.
+Prompt for selection of codec first time starting app.
+Support auto switch to alternate codec if codec fails ?
+Should auto prefer graphics hook over GDI hook. 
+crc diff uncompressed frames with last. compress to empty frame.
 Need message explaining focus changing/hooking.
 Allow adjust of the size of the background thread Q
 makefile, Manual.txt completely out of date!

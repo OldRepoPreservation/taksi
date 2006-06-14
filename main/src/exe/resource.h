@@ -69,11 +69,12 @@
 #define IDC_C_StatFrameRate             1063
 #define IDC_C_StatDataRecorded          1064
 #define IDC_C_StatFormat                1065
+#define IDC_C_StatGraphXMode            1066
+#define IDC_C_StatsClear                1067
 #define IDC_C_OverlayVerbose            1072
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
-#define IDC_C_StatsClear                1086
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
