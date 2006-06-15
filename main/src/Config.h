@@ -96,7 +96,8 @@ public:
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
 
-	bool   m_bGDIUse;				// hook GDI mode at all?
+	bool   m_bOpenGLUse;
+	bool   m_bGDIUse;		// hook GDI mode at all?
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
 
 	// CAN NOT be set from CGuiConfig directly

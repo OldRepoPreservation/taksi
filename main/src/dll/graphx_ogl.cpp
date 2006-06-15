@@ -308,6 +308,11 @@ bool CTaksiOGL::HookFunctions()
 	// the JMP instruction back into the beginning of wglSwapBuffers, and
 	// returns.
 	
+	if ( ! sg_Config.m_bOpenGLUse )	// not allowed.
+	{
+		return false;
+	}
+
 	ASSERT( IsValidDll());
   	
 	// initialize function pointers
@@ -349,4 +354,13 @@ void CTaksiOGL::FreeDll()
 
 	DEBUG_MSG(( "CTaksiOGL::FreeDll: done." LOG_CR));
 	__super::FreeDll();
+}
+
+HRESULT CTaksiOGL::AttachGraphXMode()
+{
+	if ( ! sg_Config.m_bOpenGLUse )	// not allowed.
+	{
+		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
+	}
+	return __super::AttachGraphXMode();
 }

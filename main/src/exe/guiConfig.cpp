@@ -281,6 +281,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	// Display options
 	UPDATE_CHECK(GDIUse,config.m_bGDIUse);
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
+	UPDATE_CHECK(OpenGLUse,config.m_bOpenGLUse);
 
 	m_bDataUpdating = false;
 }
@@ -581,6 +582,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 
 	case IDC_C_DebugLog:
 		sg_Config.m_bDebugLog = g_Config.m_bDebugLog = OnCommandCheck( m_hControlDebugLog );
+		return true;
+	case IDC_C_OpenGLUse:
+		sg_Config.m_bOpenGLUse = g_Config.m_bOpenGLUse = OnCommandCheck( m_hControlGDIUse );
 		return true;
 	case IDC_C_GDIUse:
 		sg_Config.m_bGDIUse = g_Config.m_bGDIUse = OnCommandCheck( m_hControlGDIUse );
