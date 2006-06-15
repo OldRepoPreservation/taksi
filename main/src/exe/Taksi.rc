@@ -177,13 +177,15 @@ BEGIN
     ICON            ID_APP,ID_APP,247,7,20,20
     CONTROL         "Verbose Overlay Information (FPS,Record Size)",
                     IDC_C_OverlayVerbose,"Button",BS_AUTOCHECKBOX | 
-                    WS_DISABLED | WS_TABSTOP,7,38,196,10
+                    WS_DISABLED | WS_TABSTOP,7,37,196,10
     CONTROL         "Hook GDI",IDC_C_GDIUse,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,7,63,196,10
     CONTROL         "Allow capture of full desktop",IDC_C_GDIFull,"Button",
                     BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,76,196,10
     CONTROL         "Record GDI Frame",IDC_C_GDIFrame,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,89,196,10
+    CONTROL         "Hook OpenGL",IDC_C_OpenGLUse,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,50,196,10
 END
 
 IDD_GuiConfigTab6 DIALOGEX 4, 14, 274, 113
