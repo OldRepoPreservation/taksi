@@ -75,6 +75,7 @@
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
+#define IDC_C_OpenGLUse                 1076
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
