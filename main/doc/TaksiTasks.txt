@@ -28,6 +28,7 @@ Graphics Mode Text overlay - display frame rate/ Megs of data written as text on
 Context sensative help file.
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
+Support DirectShow plugin codec to get Theora support
 
 TEST- hook callbacks might not be on the same thread?
 Comment tag inside AVI file. TAKSI vX date + user comments?
