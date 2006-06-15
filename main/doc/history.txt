@@ -347,3 +347,8 @@ Ver 0.754
 Display the M of data recorded in the main GUI window title.
 stats show graphics mode hooked.
 Half sized GDI record
+
+June 14,2006 
+==============
+Ver 0.755
+test switch to turn off opengl hook. OpenGLUse

@@ -123,6 +123,7 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 	m_bUseDirectInput = true;
 
+	m_bOpenGLUse = false;
 	m_bGDIUse = false;
 	m_bGDIFrame = true;
 
@@ -149,6 +150,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
 	m_bUseDirectInput = config.m_bUseDirectInput;
 
+	m_bOpenGLUse = config.m_bOpenGLUse;
 	m_bGDIUse = config.m_bGDIUse;		// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
 
@@ -349,6 +351,8 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, m_bGDIFrame? "1" : "0" );
 	case TAKSI_CFGPROP_GDIUse:
 		return _snprintf(pszValue, iSizeMax, m_bGDIUse? "1" : "0" );
+	case TAKSI_CFGPROP_OpenGLUse:
+		return _snprintf(pszValue, iSizeMax, m_bOpenGLUse? "1" : "0" );
 	default:
 		ASSERT(0);
 		break;
@@ -433,6 +437,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		break;
 	case TAKSI_CFGPROP_GDIUse:
 		m_bGDIUse = atoi(pszValue) ? true : false;
+		break;
+	case TAKSI_CFGPROP_OpenGLUse:
+		m_bOpenGLUse = atoi(pszValue) ? true : false;
 		break;
 	default:
 		ASSERT(0);

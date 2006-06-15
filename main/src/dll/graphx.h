@@ -146,6 +146,8 @@ public:
 		return TEXT("opengl32.dll");
 	}
 
+	virtual HRESULT AttachGraphXMode();
+
 	virtual bool HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();

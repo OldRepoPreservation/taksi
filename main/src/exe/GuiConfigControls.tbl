@@ -36,6 +36,7 @@ GuiConfigControl(CustomFrameRate,      4, "displays current custom frame rate")
 GuiConfigControl(CustomFrameWeight,    4, "displays current custom frame weight")
 
 GuiConfigControl(OverlayVerbose,        5, "Indicator has verbose text")
+GuiConfigControl(OpenGLUse,				5, "Use GDI mode hooking?")
 GuiConfigControl(GDIUse,				5, "Use GDI mode hooking?")
 GuiConfigControl(GDIFull,               5, "")
 GuiConfigControl(GDIFrame,              5, "")
