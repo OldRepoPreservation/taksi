@@ -47,7 +47,7 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		GENERIC_WRITE,                // open for writing 
 		0,                            // do not share 
 		NULL,                         // default security 
-		OPEN_ALWAYS,                  // overwrite existing 
+		OPEN_ALWAYS,                  // append existing else create
 		FILE_ATTRIBUTE_NORMAL,        // normal file 
 		NULL ));                        // no attr. template 
 	if ( ! m_File.IsValidHandle())
@@ -480,6 +480,17 @@ void CTaksiProcess::CheckProcessCustom()
 	LOG_MSG(( "CheckProcessCustom: No custom config match." LOG_CR ));
 }
 
+bool CTaksiProcess::StartGraphXMode( TAKSI_GRAPHX_TYPE eMode )
+{
+	// TODO PresentFrameBegin() was called for this mode.
+	// Does this mode bump all others?
+
+	m_Stats.m_eGraphXMode = (TAKSI_GRAPHX_TYPE) eMode;
+	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
+
+	return true;
+}
+
 HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 {
 	// see if any of supported graphics API DLLs are already loaded. (and can be hooked)
@@ -511,8 +522,7 @@ HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 		hRes = s_GraphxModes[i]->AttachGraphXMode();
 		if ( SUCCEEDED(hRes))
 		{
-			m_Stats.m_eGraphXMode = (TAKSI_GRAPHX_TYPE) i;
-			UpdateStat( TAKSI_PROCSTAT_GraphXMode );
+			StartGraphXMode( (TAKSI_GRAPHX_TYPE) i );
 			break;
 		}
 	}
