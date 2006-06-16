@@ -41,7 +41,7 @@ protected:
 
 	virtual HWND GetFrameInfo( SIZE& rSize ) = 0;
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize ) = 0;
-	virtual bool DrawIndicator( TAKSI_INDICATE_TYPE eIndicate ) = 0;
+	virtual HRESULT DrawIndicator( TAKSI_INDICATE_TYPE eIndicate ) = 0;
 
 private:
 	HRESULT RecordAVI_Start();
@@ -76,7 +76,7 @@ public:
 	virtual void FreeDll();
 
 	virtual HWND GetFrameInfo( SIZE& rSize );
-	virtual bool DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
+	virtual HRESULT DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 	HRESULT RestoreDeviceObjects();
@@ -112,7 +112,7 @@ public:
 	virtual void FreeDll();
 
 	virtual HWND GetFrameInfo( SIZE& rSize );
-	virtual bool DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
+	virtual HRESULT DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 	HRESULT RestoreDeviceObjects();
@@ -153,7 +153,7 @@ public:
 	virtual void FreeDll();
 
 	virtual HWND GetFrameInfo( SIZE& rSize );
-	virtual bool DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
+	virtual HRESULT DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 private:
@@ -189,7 +189,7 @@ public:
 	virtual void FreeDll();
 
 	virtual HWND GetFrameInfo( SIZE& rSize );
-	virtual bool DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
+	virtual HRESULT DrawIndicator( TAKSI_INDICATE_TYPE eIndicate );
 	virtual HRESULT GetFrame( CVideoFrame& frame, bool bHalfSize );
 
 private:

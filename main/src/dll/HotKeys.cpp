@@ -86,7 +86,7 @@ void CTaksiDI::ProcessDirectInput()
 		if (FAILED(hRes))
 		{
 			// DirectInput not available; take appropriate action 
-			LOG_MSG(( "DirectInput8Create failed. %d" LOG_CR, hRes ));
+			LOG_MSG(( "DirectInput8Create failed. 0x%x" LOG_CR, hRes ));
 			return;
 		}
 		if (!s_lpDI.IsValidRefObj())
@@ -97,7 +97,7 @@ void CTaksiDI::ProcessDirectInput()
 			IREF_GETPPTR(s_lpDIDevice,IDirectInputDevice8), NULL);
 		if (FAILED(hRes))
 		{
-			LOG_MSG(( "TaksiPresent: s_lpDI->CreateDevice() failed. %d" LOG_CR, hRes ));
+			LOG_MSG(( "TaksiPresent: s_lpDI->CreateDevice() FAILED. 0x%x" LOG_CR, hRes ));
 		}
 		if (!s_lpDIDevice.IsValidRefObj())
 		{
@@ -106,7 +106,7 @@ void CTaksiDI::ProcessDirectInput()
 		hRes = s_lpDIDevice->SetDataFormat(&c_dfDIKeyboard);
 		if (FAILED(hRes))
 		{
-			LOG_MSG(( "TaksiPresent: s_lpDIDevice->SetDataFormat() failed. %d" LOG_CR, hRes ));
+			LOG_MSG(( "TaksiPresent: s_lpDIDevice->SetDataFormat() failed. 0x%x" LOG_CR, hRes ));
 			return;
 		} 
 		// Acquire device
@@ -186,7 +186,7 @@ void CTaksiKeyboard::UninstallHookKeys(void)
 	if (m_hHookKeys == NULL)
 		return;
 	::UnhookWindowsHookEx( m_hHookKeys );
-	LOG_MSG(( "CTaksiKeyboard::UninstallHookKeys %08x" LOG_CR, (UINT_PTR)m_hHookKeys ));
+	LOG_MSG(( "CTaksiKeyboard::UninstallHookKeys 0x%x" LOG_CR, (UINT_PTR)m_hHookKeys ));
 	m_hHookKeys = NULL;
 }
 

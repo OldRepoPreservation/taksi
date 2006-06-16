@@ -24,7 +24,7 @@ void CTaksiFrameRate::InitFreqUnits()
 	}
 	else
 	{
-		DEBUG_ERR(( "QueryPerformanceFrequency FAILED!" LOG_CR ));
+		LOG_WARN(( "QueryPerformanceFrequency FAILED!" LOG_CR ));
 	}
 	m_dwFreqUnits = freq.LowPart;
 	m_tLastCount = 0;
@@ -325,7 +325,7 @@ HRESULT CAVIThread::StartAVIThread()
 		m_nThreadId = 0;
 do_erroret:
 		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
-		DEBUG_ERR(( "CAVIThread:Unable to create new thread 0x%x" LOG_CR, hRes ));
+		LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	return S_OK;

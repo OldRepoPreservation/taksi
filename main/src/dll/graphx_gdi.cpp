@@ -12,7 +12,7 @@ CTaksiGDI g_GDI;
 
 //*****************************************
 
-bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
+HRESULT CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	// Draw my indicator on the window. Hooked WM_PAINT, or WM_NCPAINT
 	// ??? Figire out the best way to draw indicator and prevent bleed through
@@ -20,20 +20,22 @@ bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	m_dwTimeLastDrawIndicator = GetTickCount();
 
 	if ( m_hWnd == NULL )
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 	if ( eIndicate < 0 || eIndicate >= TAKSI_INDICATE_QTY )
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_UNKNOWN_FEATURE);
+
 	CWndDC dc;
 	// NOTE: I cant tell if the window is being overlapped?
 	if ( ! dc.GetDCEx( m_hWnd, DCX_WINDOW|DCX_PARENTCLIP )) // DCX_CLIPSIBLINGS
-		return false;
+		return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_DC_NOT_FOUND));
+
 	// eIndicate = color.
 	const BYTE* pColorDX = (const BYTE*) &sm_IndColors[eIndicate];
 	COLORREF color = RGB( pColorDX[2], pColorDX[1], pColorDX[0] );
 	CWndGDI brush;
 	if ( brush.CreateSolidBrush(color) == NULL )
 	{
-		return false;
+		return Check_GetLastError(VIEW_E_DRAW);
 	}
 
 	RECT rect = { INDICATOR_X, INDICATOR_Y, INDICATOR_X+INDICATOR_Width, INDICATOR_Y+INDICATOR_Height };
@@ -48,12 +50,12 @@ bool CTaksiGDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	if ( ! ::FillRect( dc, &rect, brush.get_HBrush()))
 	{
-		return false;
+		return Check_GetLastError(VIEW_E_DRAW);
 	}
 #if 0
 	::ValidateRect( NULL, &rectW );
 #endif
-	return true;
+	return S_OK;
 }
 
 HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
@@ -196,7 +198,7 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	if ( iRet<=0 )
 	{
 		HRESULT hRes = Check_GetLastError( CONVERT10_E_OLESTREAM_BITMAP_TO_DIB );
-		DEBUG_ERR(( "GetDIBits FAILED (0x%x)" LOG_CR, hRes ));
+		LOG_WARN(( "GetDIBits FAILED (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
 

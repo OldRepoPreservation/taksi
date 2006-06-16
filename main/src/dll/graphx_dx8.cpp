@@ -60,7 +60,7 @@ static HRESULT CreateVB( IDirect3DDevice8* pDevice, IRefPtr<IDirect3DVertexBuffe
 		IREF_GETPPTR(pVB,IDirect3DVertexBuffer8));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "CreateVertexBuffer() FAILED. 0%x" LOG_CR, hRes ));
+		LOG_WARN(( "CreateVertexBuffer() FAILED. 0%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	g_DX8.m_iRefCountMe++;
@@ -69,7 +69,7 @@ static HRESULT CreateVB( IDirect3DDevice8* pDevice, IRefPtr<IDirect3DVertexBuffe
 	hRes = pVB->Lock(0, iSizeSrc, &pVertices, 0);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "s_pVB->Lock() FAILED. 0%x" LOG_CR, hRes ));
+		LOG_WARN(( "s_pVB->Lock() FAILED. 0%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	if ( pVertices == NULL )
@@ -98,7 +98,7 @@ HRESULT CTaksiDX8::RestoreDeviceObjects()
 	HRESULT hRes = CreateVB(m_pDevice,s_pVBborder,s_VertBorder,sizeof(s_VertBorder));
     if (FAILED(hRes))
     {
-		DEBUG_ERR(( "InitVB() failed. %d" LOG_CR, hRes ));
+		LOG_WARN(( "InitVB() FAILED. 0x%x" LOG_CR, hRes ));
         return hRes;
     }
 
@@ -117,6 +117,11 @@ HRESULT CTaksiDX8::RestoreDeviceObjects()
 			s_Vert[j].color = sm_IndColors[i];
 		}
 		hRes = CreateVB(m_pDevice,s_pVB[i],s_Vert,sizeof(s_Vert));
+		if ( FAILED(hRes))
+		{
+			LOG_WARN(( "CreateVB(%d) FAILED. (0x%x)" LOG_CR, i, hRes ));
+		    return hRes;
+		}
 	}
 
 	D3DVIEWPORT8 vp;
@@ -209,7 +214,10 @@ HWND CTaksiDX8::GetFrameInfo( SIZE& rSize ) // virtual
 	HRESULT hRes = m_pDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, 
 		IREF_GETPPTR(pBackBuffer,IDirect3DSurface8));
 	if (FAILED(hRes))
+	{
+		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x", hRes ));
 		return NULL;
+	}
 
 	D3DSURFACE_DESC desc;
 	hRes = pBackBuffer->GetDesc(&desc);
@@ -243,6 +251,7 @@ HWND CTaksiDX8::GetFrameInfo( SIZE& rSize ) // virtual
 	hRes = m_pDevice->GetCreationParameters(&params);
 	if (FAILED(hRes))
 	{
+		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x", hRes ));
 		return NULL;
 	}
 
@@ -442,6 +451,9 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 			}
 		}
 		break;
+	default:
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
 	}
 
 	return S_OK;
@@ -556,6 +568,9 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 			}
 		}
 		break;
+	default:
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
 	}
 
 	return S_OK;
@@ -573,7 +588,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	case D3DFMT_X1R5G5B5:
 		break;
 	default:
-		DEBUG_ERR(( "GetFrame: surface s_bbFormat not supported." LOG_CR));
+		LOG_WARN(( "GetFrame: surface s_bbFormat=0x%x not supported." LOG_CR, s_bbFormat ));
 		return HRESULT_FROM_WIN32(ERROR_CTX_BAD_VIDEO_MODE);
 	}
 
@@ -582,7 +597,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		IREF_GETPPTR(pBackBuffer,IDirect3DSurface8));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "GetFrame: failed to get back-pBackBuffer %d" LOG_CR, hRes ));
+		LOG_WARN(( "GetFrame: FAILED to get back-pBackBuffer 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 
@@ -596,7 +611,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 			IREF_GETPPTR(s_pSurfTemp,IDirect3DSurface8));
 		if (FAILED(hRes))
 		{
-			DEBUG_ERR(( "GetFrame: Unable to create image surface. %d" LOG_CR, hRes ));
+			LOG_WARN(( "GetFrame: FAILED to create image surface. 0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
 		m_iRefCountMe++;
@@ -609,7 +624,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = m_pDevice->CopyRects(pBackBuffer, &Rect, 1, s_pSurfTemp, points);
 	if (FAILED(hRes))
 	{
-		LOG_WARN(( "GetFrame: CopyRects() failed for image surface 0x%x." LOG_CR, hRes ));
+		LOG_WARN(( "GetFrame: CopyRects() FAILED for image surface 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 	CLOCK_STOP(a,"CTaksiDX8:CopyRects: clock=%10d");
@@ -621,7 +636,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = s_pSurfTemp->LockRect(&lockedSrcRect, &newRect, 0);
 	if (FAILED(hRes))
 	{
-		LOG_MSG(( "GetFrame: Unable to lock source rect. 0x%x" LOG_CR, hRes ));
+		LOG_WARN(( "GetFrame: FAILED to lock source rect. 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	CLOCK_STOP(b,"CTaksiDX8::LockRect: clock=%10d");
@@ -643,7 +658,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 
 //*********************************************************************************
 
-bool CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
+HRESULT CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	ASSERT(m_pDevice);
 	ASSERT( eIndicate >= 0 && eIndicate < COUNTOF(s_pVB));
@@ -652,8 +667,8 @@ bool CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		HRESULT hRes = RestoreDeviceObjects();
 		if (FAILED(hRes))
 		{
-			DEBUG_ERR(( "RestoreDeviceObjects() failed=%d" LOG_CR, hRes ));
-			return false;
+			LOG_WARN(( "RestoreDeviceObjects() FAILED 0x%x" LOG_CR, hRes ));
+			return hRes;
 		}
 		DEBUG_TRACE(( "RestoreDeviceObjects() done." LOG_CR));
 	}
@@ -662,7 +677,7 @@ bool CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	HRESULT hRes = m_pDevice->CaptureStateBlock(s_dwSaveState_Them);
 	if (FAILED(hRes))
 	{
-		return false;
+		return hRes;
 	}
 	hRes = m_pDevice->ApplyStateBlock(s_dwSaveState_Me);
 
@@ -681,7 +696,7 @@ bool CTaksiDX8::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	// restore the modified renderstates
 	m_pDevice->ApplyStateBlock(s_dwSaveState_Them);
-	return true;
+	return hRes;
 }
 
 //************************************************************************
@@ -825,7 +840,7 @@ bool CTaksiDX8::HookFunctions()
 	ASSERT( IsValidDll());
 	if (!sg_Dll.m_nDX8_Present || !sg_Dll.m_nDX8_Reset)
 	{
-		LOG_MSG(( "CTaksiDX8::HookFunctions: No info on Present and/or Reset." LOG_CR ));
+		LOG_WARN(( "CTaksiDX8::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR ));
 		return false;
 	}
 

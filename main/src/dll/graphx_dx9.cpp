@@ -61,7 +61,7 @@ static HRESULT CreateVB( IDirect3DDevice9* pDevice, IRefPtr<IDirect3DVertexBuffe
 		IREF_GETPPTR(pVB,IDirect3DVertexBuffer9), NULL );
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "CreateVertexBuffer() FAILED. %d" LOG_CR, hRes ));
+		LOG_WARN(( "CreateVertexBuffer() FAILED. 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	g_DX9.m_iRefCountMe++;
@@ -70,7 +70,7 @@ static HRESULT CreateVB( IDirect3DDevice9* pDevice, IRefPtr<IDirect3DVertexBuffe
 	hRes = pVB->Lock(0, iSizeSrc, &pVertices, 0);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "s_pVB->Lock() FAILED. %d" LOG_CR, hRes ));
+		LOG_WARN(( "s_pVB->Lock() FAILED. 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	if ( pVertices == NULL )
@@ -99,10 +99,10 @@ HRESULT CTaksiDX9::RestoreDeviceObjects()
 	HRESULT hRes = CreateVB(m_pDevice,s_pVBborder,s_VertBorder,sizeof(s_VertBorder));
     if (FAILED(hRes))
     {
-		LOG_MSG(( "InitVB() failed." LOG_CR));
+		LOG_WARN(( "CreateVB() FAILED. (0x%x)" LOG_CR, hRes ));
         return hRes;
     }
-	LOG_MSG(( "InitVB() done." LOG_CR));
+	LOG_MSG(( "CreateVB() done." LOG_CR));
 
 	// create vertex buffer for TAKSI_INDICATE_QTY
 	for ( int i=0; i<COUNTOF(s_pVB); i++ )
@@ -119,6 +119,11 @@ HRESULT CTaksiDX9::RestoreDeviceObjects()
 			s_Vert[j].color = sm_IndColors[i];
 		}
 		hRes = CreateVB(m_pDevice,s_pVB[i],s_Vert,sizeof(s_Vert));
+		if ( FAILED(hRes))
+		{
+			LOG_WARN(( "CreateVB(%d) FAILED. (0x%x)" LOG_CR, i, hRes ));
+		    return hRes;
+		}
 	}
 
 	D3DVIEWPORT9 vp;
@@ -132,7 +137,7 @@ HRESULT CTaksiDX9::RestoreDeviceObjects()
 	// Create the state blocks for rendering text
 	for( UINT which=0; which<2; which++ )
 	{
-		m_pDevice->BeginStateBlock();
+		hRes = m_pDevice->BeginStateBlock();
 
 		m_pDevice->SetViewport( &vp );
 		m_pDevice->SetRenderState( D3DRS_ZENABLE, D3DZB_FALSE );
@@ -214,7 +219,9 @@ HWND CTaksiDX9::GetFrameInfo( SIZE& rSize ) // virtual
 	// Determine format of back buffer and its dimensions.
 	//
 	if ( m_pDevice == NULL )
+	{
 		return NULL;
+	}
 
 	// get the 0th backbuffer.
 	IRefPtr<IDirect3DSurface9> backBuffer;
@@ -222,6 +229,7 @@ HWND CTaksiDX9::GetFrameInfo( SIZE& rSize ) // virtual
 		IREF_GETPPTR(backBuffer,IDirect3DSurface9));
 	if (FAILED(hRes))
 	{
+		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x", hRes ));
 		return NULL;
 	}
 
@@ -257,6 +265,7 @@ HWND CTaksiDX9::GetFrameInfo( SIZE& rSize ) // virtual
 	hRes = m_pDevice->GetCreationParameters(&params);
 	if (FAILED(hRes))
 	{
+		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x", hRes ));
 		return NULL;
 	}
 
@@ -373,6 +382,9 @@ static HRESULT GetFrameFullSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 			}
 		}
 		break;
+	default:
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
 	}
 
 	return S_OK;
@@ -571,6 +583,10 @@ static HRESULT GetFrameHalfSize( D3DLOCKED_RECT& lockedSrcRect, CVideoFrame& fra
 			}
 		}
 		break;
+
+	default:
+		ASSERT(0);
+		return HRESULT_FROM_WIN32(ERROR_INTERNAL_ERROR);
 	}
 
 	return S_OK;
@@ -588,7 +604,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	case D3DFMT_X1R5G5B5:
 		break;
 	default:
-		DEBUG_ERR(( "GetFrameFullSize: surface format not supported." LOG_CR));
+		LOG_WARN(( "GetFrameFullSize: surface format=0x%x not supported." LOG_CR, s_bbFormat ));
 		return HRESULT_FROM_WIN32(ERROR_CTX_BAD_VIDEO_MODE);
 	}
 
@@ -597,7 +613,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		IREF_GETPPTR(pBackBuffer,IDirect3DSurface9));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "GetFramePrep: failed to get back-buffer %d" LOG_CR, hRes ));
+		LOG_WARN(( "GetFramePrep: FAILED to get back-buffer 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 
@@ -611,7 +627,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		IREF_GETPPTR(pSurfTemp,IDirect3DSurface9), NULL );
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "GetFramePrep: Unable to create image surface." LOG_CR));
+		LOG_WARN(( "GetFramePrep: FAILED to create image surface. 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 
@@ -624,7 +640,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = m_pDevice->GetRenderTargetData(pBackBuffer, pSurfTemp);
 	if (FAILED(hRes))
 	{
-		LOG_WARN(( "GetFramePrep: GetRenderTargetData() failed for image surface.(0x%x)" LOG_CR, hRes));
+		LOG_WARN(( "GetFramePrep: GetRenderTargetData() FAILED for image surface.(0x%x)" LOG_CR, hRes));
 		return hRes;
 	}
 	
@@ -635,7 +651,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = pSurfTemp->LockRect( &lockedSrcRect, &newRect, 0);
 	if (FAILED(hRes))
 	{
-		LOG_WARN(( "GetFramePrep: Unable to lock source rect. (0x%x)" LOG_CR, hRes ));
+		LOG_WARN(( "GetFramePrep: FAILED to lock source rect. (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
 
@@ -657,7 +673,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 
 //*********************************************************************************
 
-bool CTaksiDX9::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
+HRESULT CTaksiDX9::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	ASSERT(m_pDevice);
 	ASSERT( eIndicate >= 0 && eIndicate < COUNTOF(s_pVB) );
@@ -666,8 +682,8 @@ bool CTaksiDX9::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		HRESULT hRes = RestoreDeviceObjects();
 		if (FAILED(hRes))
 		{
-			DEBUG_ERR(( "RestoreDeviceObjects() failed %d." LOG_CR, hRes ));
-			return false;
+			LOG_WARN(( "RestoreDeviceObjects() FAILED 0x%x." LOG_CR, hRes ));
+			return hRes;
 		}
 		DEBUG_TRACE(( "RestoreDeviceObjects() done." LOG_CR));
 	}
@@ -676,7 +692,7 @@ bool CTaksiDX9::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	HRESULT hRes = s_pSavedState_Them->Capture();
 	if ( FAILED(hRes))
 	{
-		return false;
+		return hRes;
 	}
 
 	hRes = s_pSavedState_Me->Apply();
@@ -696,7 +712,7 @@ bool CTaksiDX9::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	// restore the modified renderstates
 	s_pSavedState_Them->Apply();
-	return true;
+	return hRes;
 }
 
 //****************************************************
@@ -877,7 +893,7 @@ bool CTaksiDX9::HookFunctions()
 	ASSERT( IsValidDll());
 	if (!sg_Dll.m_nDX9_Present || !sg_Dll.m_nDX9_Reset)
 	{
-		LOG_MSG(( "CTaksiDX9::HookFunctions: No info on Present and/or Reset." LOG_CR));
+		LOG_WARN(( "CTaksiDX9::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR));
 		return false;
 	}
 	
