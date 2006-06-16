@@ -136,7 +136,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 			"Cant open AVI codec. Error=0x%x. Try a different video codec?", hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
-		DEBUG_ERR(("g_AVIFile.OpenAVIFile FAIL %d." LOG_CR, hRes ));
+		LOG_WARN(("g_AVIFile.OpenAVIFile FAIL 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 	
@@ -147,7 +147,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 			"Cant open AVI file. Error=0x%x.", hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
-		DEBUG_ERR(("g_AVIFile.OpenAVIFile FAIL %d." LOG_CR, hRes ));
+		LOG_WARN(("g_AVIFile.OpenAVIFile FAIL 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 

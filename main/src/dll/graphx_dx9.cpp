@@ -624,7 +624,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = m_pDevice->GetRenderTargetData(pBackBuffer, pSurfTemp);
 	if (FAILED(hRes))
 	{
-		LOG_MSG(( "GetFramePrep: GetRenderTargetData() failed for image surface." LOG_CR));
+		LOG_WARN(( "GetFramePrep: GetRenderTargetData() failed for image surface.(0x%x)" LOG_CR, hRes));
 		return hRes;
 	}
 	
@@ -635,7 +635,7 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = pSurfTemp->LockRect( &lockedSrcRect, &newRect, 0);
 	if (FAILED(hRes))
 	{
-		LOG_MSG(( "GetFramePrep: Unable to lock source rect." LOG_CR));
+		LOG_WARN(( "GetFramePrep: Unable to lock source rect. (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
 
