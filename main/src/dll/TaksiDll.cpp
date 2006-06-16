@@ -141,7 +141,7 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		// wParam = NULL. can be null of losing focus.
 		if ( g_Proc.m_bIsProcessSpecial )
 			break;
-		LOG_MSG(( "HookCBTProc: nCode=%08x, wParam=0%x" LOG_CR, (DWORD)nCode, wParam ));
+		LOG_MSG(( "HookCBTProc: nCode=0x%x, wParam=0x%x" LOG_CR, (DWORD)nCode, wParam ));
 		if ( wParam == NULL )	// ignore this!
 			break;
 		if ( g_Proc.AttachGraphXMode( (HWND) wParam ) == S_OK )
@@ -161,13 +161,13 @@ bool CTaksiDll::HookCBT_Install(void)
 	// This causes my dll to be loaded into another process space.
 	if ( IsHookCBT())
 	{
-		LOG_MSG(( "HookCBT_Install: already installed. (0%x)" LOG_CR, m_hHookCBT ));
+		LOG_MSG(( "HookCBT_Install: already installed. (0x%x)" LOG_CR, m_hHookCBT ));
 		return false;
 	}
 
 	m_hHookCBT = ::SetWindowsHookEx( WH_CBT, HookCBTProc, g_hInst, 0);
 
-	LOG_MSG(( "HookCBT_Install: hHookCBT=0%x,ProcID=%d" LOG_CR,
+	LOG_MSG(( "HookCBT_Install: hHookCBT=0x%x,ProcID=%d" LOG_CR,
 		m_hHookCBT, ::GetCurrentProcessId()));
 
 	UpdateMaster();
@@ -409,10 +409,10 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	if (!lstrcmpi( m_Stats.m_szProcessFile, szExplorer))
 		return true;
 
-	if ( ! ::IsWindow( sg_Dll.m_hMasterWnd ))
+	if ( ! ::IsWindow( sg_Dll.m_hMasterWnd ) && ! sg_Dll.m_bMasterExiting )
 	{
 		// The master app is gone! this is bad! This shouldnt really happen
-		DEBUG_ERR(( "Taksi.EXE App is NOT Loaded! (%d)" LOG_CR, sg_Dll.m_hMasterWnd ));
+		LOG_MSG(( "Taksi.EXE App is NOT Loaded! unload dll (0x%x)" LOG_CR, sg_Dll.m_hMasterWnd ));
 		sg_Dll.m_hMasterWnd = NULL;
 		sg_Dll.m_bMasterExiting = true;
 		return true;
@@ -468,7 +468,7 @@ void CTaksiProcess::CheckProcessCustom()
 			m_pCustomConfig = config.CustomConfig_Alloc();
 			if (!m_pCustomConfig)
 			{
-				LOG_MSG(( "FindCustomConfig: Unable to allocate new custom config" LOG_CR));
+				LOG_WARN(( "FindCustomConfig: FAILED to allocate new custom config" LOG_CR));
 				return;
 			}
 			*m_pCustomConfig = *pCfgMatch; // copy contents.

@@ -136,7 +136,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 			"Cant open AVI codec. Error=0x%x. Try a different video codec?", hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
-		LOG_WARN(("g_AVIFile.OpenAVIFile FAIL 0x%x." LOG_CR, hRes ));
+		LOG_WARN(("g_AVIFile.OpenAVIFile FAILED 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 	
@@ -147,7 +147,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
 			"Cant open AVI file. Error=0x%x.", hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
-		LOG_WARN(("g_AVIFile.OpenAVIFile FAIL 0x%x." LOG_CR, hRes ));
+		LOG_WARN(("g_AVIFile.OpenAVIFile FAILED 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 
@@ -202,7 +202,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 	CAVIFrame* pFrame = g_AVIThread.WaitForNextFrame();	// dont get new frame til i finish the last one.
 	if (pFrame==NULL)
 	{
-		DEBUG_ERR(("CTaksiGraphX::RecordAVI_Frame() FAILED" LOG_CR ));
+		LOG_WARN(("CTaksiGraphX::RecordAVI_Frame() FAILED" LOG_CR ));
 		return false;
 	}
 
@@ -265,7 +265,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		if ( ! g_Proc.m_Stats.m_hWnd )	
 		{
 			// This is fatal i can not proceed!
-			DEBUG_ERR(( "PresentFrameBegin.GetFrameInfo FAIL!" LOG_CR));
+			LOG_WARN(( "PresentFrameBegin.GetFrameInfo FAILED!" LOG_CR));
 			return;	// i can do nothing else here!
 		}
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_Wnd);
@@ -352,9 +352,10 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 			g_Proc.UpdateStat(TAKSI_PROCSTAT_State);
 			sg_Dll.UpdateMaster();
 		}
-		if ( ! DrawIndicator( eIndicate ))	//virtual
+		HRESULT hRes = DrawIndicator( eIndicate );
+		if ( IS_ERROR(hRes))	//virtual
 		{
-			DEBUG_ERR(( "DrawIndicator FAIL!" LOG_CR )); 
+			LOG_WARN(( "DrawIndicator FAILED 0x%x!" LOG_CR, hRes )); 
 			sg_Config.m_bShowIndicator = false;
 		}
 	}

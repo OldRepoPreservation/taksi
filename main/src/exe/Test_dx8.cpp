@@ -17,7 +17,7 @@ bool Test_DirectX8( HWND hWnd )
 	HRESULT hRes = _DX8.LoadDll( TEXT("d3d8"));
 	if (IS_ERROR(hRes))
 	{
-		LOG_MSG(("Test_DirectX8 Failed to load d3d8.dll (%d)" LOG_CR, hRes ));
+		LOG_MSG(("Test_DirectX8 Failed to load d3d8.dll (0x%x)" LOG_CR, hRes ));
 		return false;
 	}
 
@@ -41,7 +41,7 @@ bool Test_DirectX8( HWND hWnd )
 	hRes = pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm );
     if (FAILED(hRes))
 	{
-		LOG_MSG(("Test_DirectX8 GetAdapterDisplayMode failed. %d" LOG_CR, hRes ));
+		LOG_MSG(("Test_DirectX8 GetAdapterDisplayMode failed. 0x%x" LOG_CR, hRes ));
         return false;
 	}
 
@@ -57,7 +57,7 @@ bool Test_DirectX8( HWND hWnd )
 		&d3dpp, IREF_GETPPTR(pD3DDevice,IDirect3DDevice8));
     if (FAILED(hRes))
     {
-		LOG_MSG(("Test_DirectX8 CreateDevice failed. %d" LOG_CR, hRes ));
+		LOG_MSG(("Test_DirectX8 CreateDevice failed. 0x%x" LOG_CR, hRes ));
         return false;
     }
 

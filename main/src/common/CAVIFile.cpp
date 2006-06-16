@@ -130,7 +130,7 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 	if ( ! File.IsValidHandle()) 
 	{
 		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
-		LOG_MSG(("CVideoFrame::SaveAsBMP: failed save to file. 0x%x" LOG_CR, hRes ));
+		DEBUG_ERR(("CVideoFrame::SaveAsBMP: FAILED save to file. 0x%x" LOG_CR, hRes ));
 		return hRes;	// 
 	}
 

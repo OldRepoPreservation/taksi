@@ -39,7 +39,7 @@ static const GLenum s_TextureUnitNums[32] =
 
 //*****************************************************
 
-bool CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
+HRESULT CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
 	// Draws indicator in the top-left corner. 
 	//DEBUG_TRACE(( "Drawing indicator..." LOG_CR));
@@ -53,7 +53,7 @@ bool CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		if (pszVer == NULL)
 		{
 			ASSERT(0);
-			return false;
+			return HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY);
 		}
 		DEBUG_TRACE(("OpenGL Version: %s" LOG_CR, pszVer));
 
@@ -61,19 +61,21 @@ bool CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		if (pszExt == NULL )
 		{
 			ASSERT(0);
-			return false;
+			return HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY);
 		}
 		DEBUG_TRACE(("OpenGL Extensions: %s" LOG_CR, pszExt));
+
 		if ( strstr(pszExt, "GL_ARB_multitexture"))
 		{
 			s_glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)s_wglGetProcAddress("glActiveTextureARB");
 			DEBUG_TRACE(( "s_glActiveTextureARB = %08x" LOG_CR, (UINT_PTR)s_glActiveTextureARB ));
 
 			s_glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &s_iMaxTexUnits);
-			DEBUG_TRACE(( "Maximum texture units: %d" LOG_CR, s_iMaxTexUnits ));
+			LOG_MSG(( "OpenGL Maximum texture units: %d" LOG_CR, s_iMaxTexUnits ));
 		}
 		else
 		{
+			LOG_WARN(( "OpenGL Multi texturing not supported" LOG_CR ));
 			s_glActiveTextureARB = NULL;
 		}
 	}
@@ -145,7 +147,7 @@ bool CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	s_glPopMatrix();
 
 	s_glPopAttrib();
-	return true;
+	return S_OK;
 }
 
 HWND CTaksiOGL::GetFrameInfo( SIZE& rSize ) // virtual

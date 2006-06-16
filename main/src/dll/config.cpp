@@ -510,7 +510,7 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 			else
 			{
 				pObj = NULL;
-				DEBUG_ERR(("INI Bad Section %s" LOG_CR, pszName ));
+				LOG_MSG(("INI Bad Section %s" LOG_CR, pszName ));
 			}
 			continue;
 		}
@@ -527,7 +527,7 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 
 		if ( ! pObj->PropSetName( pszName, pszValue ))
 		{
-			DEBUG_ERR(("INI Bad Prop %s" LOG_CR, pszName ));
+			LOG_MSG(("INI Bad Prop %s" LOG_CR, pszName ));
 		}
 	}
 

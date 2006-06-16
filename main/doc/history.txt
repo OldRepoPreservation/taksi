@@ -352,3 +352,4 @@ June 14,2006
 ==============
 Ver 0.755
 test switch to turn off opengl hook. OpenGLUse
+better error codes loggged. testing feedback from boards.

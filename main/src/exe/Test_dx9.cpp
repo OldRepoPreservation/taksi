@@ -17,7 +17,7 @@ bool Test_DirectX9( HWND hWnd )
 	HRESULT hRes = _DX9.LoadDll( TEXT("d3d9"));
 	if (IS_ERROR(hRes))
 	{
-		LOG_MSG(("Test_DirectX9 Failed to load d3d9.dll (%d)" LOG_CR, hRes ));
+		LOG_MSG(("Test_DirectX9 Failed to load d3d9.dll (0x%x)" LOG_CR, hRes ));
 		return false;
 	}
 
@@ -40,7 +40,7 @@ bool Test_DirectX9( HWND hWnd )
 	hRes = pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm );
     if (FAILED(hRes))
 	{
-		LOG_MSG(("Test_DirectX9 GetAdapterDisplayMode failed. %d" LOG_CR, hRes));
+		LOG_MSG(("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x" LOG_CR, hRes));
         return false;
 	}
 
@@ -56,7 +56,7 @@ bool Test_DirectX9( HWND hWnd )
 		&d3dpp, IREF_GETPPTR(pD3DDevice,IDirect3DDevice9));
     if (FAILED(hRes))
     {
-		LOG_MSG(("Test_DirectX9 CreateDevice failed. %d" LOG_CR, hRes ));
+		LOG_MSG(("Test_DirectX9 CreateDevice failed. 0x%x" LOG_CR, hRes ));
         return false;
     }
 
