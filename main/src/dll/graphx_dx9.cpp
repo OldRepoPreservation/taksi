@@ -215,9 +215,8 @@ HRESULT CTaksiDX9::InvalidateDeviceObjects()
 
 HWND CTaksiDX9::GetFrameInfo( SIZE& rSize ) // virtual
 {
-	//
 	// Determine format of back buffer and its dimensions.
-	//
+	// will set m_bGotFrameInfo
 	if ( m_pDevice == NULL )
 	{
 		return NULL;
@@ -623,7 +622,8 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	// is faster if done directly.
 	IRefPtr<IDirect3DSurface9> pSurfTemp;
 	hRes = m_pDevice->CreateOffscreenPlainSurface(
-		g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy, s_bbFormat, D3DPOOL_SYSTEMMEM, 
+		g_Proc.m_Stats.m_SizeWnd.cx, g_Proc.m_Stats.m_SizeWnd.cy, 
+		s_bbFormat, D3DPOOL_SYSTEMMEM, 
 		IREF_GETPPTR(pSurfTemp,IDirect3DSurface9), NULL );
 	if (FAILED(hRes))
 	{
@@ -640,6 +640,10 @@ HRESULT CTaksiDX9::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = m_pDevice->GetRenderTargetData(pBackBuffer, pSurfTemp);
 	if (FAILED(hRes))
 	{
+		// This method will fail if:
+		// The render target is multisampled.
+		// The source render target is a different size than the destination surface.
+		// The source render target and destination surface formats do not match.
 		LOG_WARN(( "GetFramePrep: GetRenderTargetData() FAILED for image surface.(0x%x)" LOG_CR, hRes));
 		return hRes;
 	}

@@ -246,9 +246,8 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindAppId( const char* pszAppId )
 	return NULL;
 }
 
-CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId)
+CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId )
 {
-	//
 	// Looks up a custom config in a list. If not found, creates one
 	// and inserts at the beginning of the list.
 	//

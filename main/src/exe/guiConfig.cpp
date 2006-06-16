@@ -361,14 +361,30 @@ void CGuiConfig::OnCommandSave()
 	}
 }
 
-void CGuiConfig::OnCommandCustomAddButton()
+void CGuiConfig::OnCommandCustomNewButton()
 {
+	// IDC_C_CustomNewButton
 	// update current custom config
 	Custom_Read();
 	m_pCustomCur = NULL;
 
+	// Use the current hooked app as the default if there is one.
+	if ( sg_ProcStats.m_szProcessFile[0] )
+	{
+		TCHAR szTitle[ _MAX_PATH ];
+		int iLen = GetWindowText( sg_ProcStats.m_hWnd, szTitle, COUNTOF(szTitle));
+		if ( iLen > 0 )
+		{
+			m_pCustomCur = g_Config.CustomConfig_Lookup(szTitle);
+			ASSERT(m_pCustomCur);
+			lstrcpyn( m_pCustomCur->m_szPattern, GetFileTitlePtr(sg_ProcStats.m_szProcessFile),
+				COUNTOF(m_pCustomCur->m_szPattern));
+			m_pCustomCur->m_fFrameRate = sg_ProcStats.m_fFrameRate ? sg_ProcStats.m_fFrameRate : sg_Config.m_fFrameRateTarget;
+		}
+	}
+
 	// clear out controls
-	SetWindowText( m_hControlCustomSettingsList,"");
+	SetWindowText( m_hControlCustomSettingsList, m_pCustomCur ? (m_pCustomCur->m_szAppId) : "" );
 	Custom_Update();
 
 	// set focus on appId comboBox
@@ -395,6 +411,51 @@ void CGuiConfig::OnCommandCustomDeleteButton()
 	m_pCustomCur = Custom_FindSelect(0);
 
 	Custom_Update();
+}
+
+void CGuiConfig::OnCommandCustomKillFocus()
+{
+	// IDC_C_CustomSettingsList
+	// CBN_KILLFOCUS
+
+	char szTmp[_MAX_PATH];
+	szTmp[0] = '\0';
+	int iLen = GetWindowText(m_hControlCustomSettingsList, szTmp, sizeof(szTmp));
+	if ( iLen <= 0 )
+	{
+		// cannot use empty string. Restore the old one, if known.
+		if (m_pCustomCur == NULL)
+			return;
+		// restore previous text
+		SetWindowText( m_hControlCustomSettingsList, m_pCustomCur->m_szAppId );
+		return;
+	}
+	if (m_pCustomCur != NULL)
+	{
+		if ( !lstrcmp(szTmp, m_pCustomCur->m_szAppId)) // no change
+			return;
+		// find list item with old appId
+		LRESULT idx = SendMessage(m_hControlCustomSettingsList, CB_FINDSTRING,
+			(WPARAM) sizeof(m_pCustomCur->m_szAppId),
+			(LPARAM)(UINT_PTR) m_pCustomCur->m_szAppId );
+		// delete this item, if found
+		if (idx >= 0)
+		{
+			SendMessage(m_hControlCustomSettingsList, CB_DELETESTRING, idx, 0);
+		}
+		// change appId
+		strncpy(m_pCustomCur->m_szAppId, szTmp, sizeof(szTmp)-1);
+		// add a new list item
+		SendMessage(m_hControlCustomSettingsList, CB_ADDSTRING, 0, (LPARAM)m_pCustomCur->m_szAppId);
+		OnChanges();
+	}
+	else
+	{
+		// we have a new custom config
+		m_pCustomCur = g_Config.CustomConfig_Lookup(szTmp);
+		// add a new list item
+		SendMessage(m_hControlCustomSettingsList, CB_ADDSTRING, 0, (LPARAM)m_pCustomCur->m_szAppId);
+	}
 }
 
 void CGuiConfig::OnCommandVideoCodecButton()
@@ -426,49 +487,6 @@ void CGuiConfig::OnCommandAudioCodecButton()
 	// Really changed??
 	UpdateAudioCodec( g_Config.m_AudioCodec );
 	OnChanges();
-}
-
-void CGuiConfig::OnCommandCustomKillFocus()
-{
-	// CBN_KILLFOCUS
-	char szTmp[_MAX_PATH];
-	szTmp[0] = '\0';
-	int iLen = GetWindowText(m_hControlCustomSettingsList, szTmp, sizeof(szTmp));
-	if ( iLen <= 0 )
-	{
-		// cannot use empty string. Restore the old one, if known.
-		if (m_pCustomCur == NULL)
-			return;
-		// restore previous text
-		SetWindowText( m_hControlCustomSettingsList, m_pCustomCur->m_szAppId );
-		return;
-	}
-	if ( !lstrcmp(szTmp, m_pCustomCur->m_szAppId)) // no change
-		return;
-	if (m_pCustomCur != NULL)
-	{
-		// find list item with old appId
-		LRESULT idx = SendMessage(m_hControlCustomSettingsList, CB_FINDSTRING,
-			(WPARAM) sizeof(m_pCustomCur->m_szAppId),
-			(LPARAM)(UINT_PTR) m_pCustomCur->m_szAppId );
-		// delete this item, if found
-		if (idx >= 0)
-		{
-			SendMessage(m_hControlCustomSettingsList, CB_DELETESTRING, idx, 0);
-		}
-		// change appId
-		strncpy(m_pCustomCur->m_szAppId, szTmp, sizeof(szTmp)-1);
-		// add a new list item
-		SendMessage(m_hControlCustomSettingsList, CB_ADDSTRING, 0, (LPARAM)m_pCustomCur->m_szAppId);
-		OnChanges();
-	}
-	else
-	{
-		// we have a new custom config
-		m_pCustomCur = g_Config.CustomConfig_Lookup(szTmp);
-		// add a new list item
-		SendMessage(m_hControlCustomSettingsList, CB_ADDSTRING, 0, (LPARAM)m_pCustomCur->m_szAppId);
-	}
 }
 
 void CGuiConfig::OnCommandKeyChange( HWND hControl )
@@ -723,9 +741,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		}
 		break;
 
-	case IDC_C_CustomAddButton:
+	case IDC_C_CustomNewButton:
 		// update current custom config
-		OnCommandCustomAddButton();
+		OnCommandCustomNewButton();
 		return true;
 	case IDC_C_CustomDeleteButton:
 		// remove current custom config

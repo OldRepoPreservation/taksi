@@ -61,7 +61,7 @@
 #define IDC_C_CustomPattern             1051
 #define IDC_C_CustomFrameRate           1052
 #define IDC_C_CustomFrameWeight         1053
-#define IDC_C_CustomAddButton           1054
+#define IDC_C_CustomNewButton           1054
 #define IDC_C_CustomDeleteButton        1055
 #define IDC_C_StatProcessName           1060
 #define IDC_C_StatLastError             1061

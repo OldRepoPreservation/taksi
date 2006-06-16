@@ -96,7 +96,7 @@ protected:
 	void OnCommandVideoCodecButton();
 	void OnCommandAudioCodecButton();
 	void OnCommandKeyChange( HWND hControl );
-	void OnCommandCustomAddButton();
+	void OnCommandCustomNewButton();
 	void OnCommandCustomDeleteButton();
 	void OnCommandCustomKillFocus();
 
