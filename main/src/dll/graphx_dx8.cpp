@@ -609,7 +609,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = m_pDevice->CopyRects(pBackBuffer, &Rect, 1, s_pSurfTemp, points);
 	if (FAILED(hRes))
 	{
-		LOG_MSG(( "GetFrame: CopyRects() failed for image surface %d." LOG_CR, hRes ));
+		LOG_WARN(( "GetFrame: CopyRects() failed for image surface 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
 	CLOCK_STOP(a,"CTaksiDX8:CopyRects: clock=%10d");
@@ -621,7 +621,7 @@ HRESULT CTaksiDX8::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	hRes = s_pSurfTemp->LockRect(&lockedSrcRect, &newRect, 0);
 	if (FAILED(hRes))
 	{
-		LOG_MSG(( "GetFrame: Unable to lock source rect. %d" LOG_CR, hRes ));
+		LOG_MSG(( "GetFrame: Unable to lock source rect. 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 	CLOCK_STOP(b,"CTaksiDX8::LockRect: clock=%10d");
