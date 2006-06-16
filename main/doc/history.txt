@@ -353,3 +353,7 @@ June 14,2006
 Ver 0.755
 test switch to turn off opengl hook. OpenGLUse
 better error codes loggged. testing feedback from boards.
+
+Ver 0.756
+FIX bug creating new custom config.
+re-try getting info on the surface if the GetFrame() call fails.

@@ -29,7 +29,7 @@ GuiConfigControl(KeySmallScreenshot,   3, "displays key binding for small screen
 GuiConfigControl(UseDirectInput,		3, "Use direct input or not")
 
 GuiConfigControl(CustomSettingsList,   4, "drop-down list of custom settings")
-GuiConfigControl(CustomAddButton,      4, "'Add' button for custom settings")
+GuiConfigControl(CustomNewButton,      4, "'New' button for custom settings")
 GuiConfigControl(CustomDeleteButton,   4, "'Delete' button for custom settings")
 GuiConfigControl(CustomPattern,        4, "displays current custom pattern string")
 GuiConfigControl(CustomFrameRate,      4, "displays current custom frame rate")

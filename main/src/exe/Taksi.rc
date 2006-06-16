@@ -157,7 +157,7 @@ BEGIN
     ICON            ID_APP,ID_APP,247,7,20,20
     COMBOBOX        IDC_C_CustomSettingsList,7,29,178,87,CBS_DROPDOWN | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "New",IDC_C_CustomAddButton,190,29,38,12
+    PUSHBUTTON      "New",IDC_C_CustomNewButton,190,29,38,12
     PUSHBUTTON      "Delete",IDC_C_CustomDeleteButton,231,29,38,12
     LTEXT           "Process Pattern:",IDC_STATIC,7,51,54,8
     EDITTEXT        IDC_C_CustomPattern,69,48,200,14,ES_AUTOHSCROLL
@@ -432,7 +432,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDC_C_CustomAddButton   "New - Create a new custom config for some application not yet listed"
+    IDC_C_CustomNewButton   "New - Create a new custom config for some application not yet listed"
 END
 
 STRINGTABLE 

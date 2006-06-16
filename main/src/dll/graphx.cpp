@@ -31,6 +31,7 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 	HRESULT hRes = GetFrame( frame, bHalfSize );	// virtual
 	if (FAILED(hRes))
 	{
+		m_bGotFrameInfo = false;	// must get it again.
 		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError),
 			_T("MakeScreenShot: unable to get RGB-data. 0%x"), hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
@@ -212,6 +213,10 @@ bool CTaksiGraphX::RecordAVI_Frame()
 	CLOCK_START(b);
 	// get pixels from the backbuffer into the new buffer
 	HRESULT hRes = GetFrame( *pFrame, bVideoHalfSize );	// virtual
+	if ( IS_ERROR(hRes))
+	{
+		m_bGotFrameInfo = false;	// must get it again.
+	}
 	CLOCK_STOP(b,"Clock GetFrame=%d");
 
 	// Move compression work to another thread
