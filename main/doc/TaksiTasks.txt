@@ -14,6 +14,8 @@ GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 
 TODO:
+hotKeys indicated in the shell icon
+check the save dir existis at start up.
 AVI doesnt understand < 1 FPS ??
 Prompt for selection of codec first time starting app.
 Support auto switch to alternate codec if codec fails ?
