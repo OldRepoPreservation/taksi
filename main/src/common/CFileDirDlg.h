@@ -15,8 +15,6 @@ public:
 	CFileDirDlg( HWND hWndOwner, const TCHAR* pszDir );
 	~CFileDirDlg();
 	HRESULT DoModal( const TCHAR* pszPrompt );
-	static bool __stdcall RemoveFileX( const TCHAR* pszPath, DWORD dwFlags ); // allow recursive delete.
-	static HRESULT __stdcall CreateDirectoryX( const TCHAR* pszDir, HWND hWnd );
 protected:
 	static int CALLBACK BrowseCallbackProc( HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData );
 public:

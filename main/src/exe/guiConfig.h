@@ -43,6 +43,7 @@ private:
 
 #ifdef USE_TRAYICON
 	void OnInitMenuPopup( HMENU hMenu );
+	void UpdateMenuPopupHotKey( HMENU hMenu, TAKSI_HOTKEY_TYPE eKey );
 	BOOL TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip );
 	void TrayIcon_OnEvent( LPARAM lParam );
 	bool TrayIcon_Create();

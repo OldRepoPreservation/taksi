@@ -14,8 +14,6 @@ GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.
 
 TODO:
-hotKeys indicated in the shell icon
-check the save dir existis at start up.
 AVI doesnt understand < 1 FPS ??
 Prompt for selection of codec first time starting app.
 Support auto switch to alternate codec if codec fails ?
@@ -32,6 +30,7 @@ put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
 Support DirectShow plugin codec to get Theora support
 
+put command menu in the sysmenu of the hooked app ?
 TEST- hook callbacks might not be on the same thread?
 Comment tag inside AVI file. TAKSI vX date + user comments?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.

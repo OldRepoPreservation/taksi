@@ -21,11 +21,57 @@ TCHAR* GetFileTitlePtr( TCHAR* pszPath )
 {
 	// Given a full file path, get a pointer to its title.
 	TCHAR* p = pszPath + lstrlen(pszPath); 
-	while ((p > pszPath) && (*p != '\\')) 
+	while ((p > pszPath) && ! FILE_IsDirSep(*p)) 
 		p--;
-	if (*p == '\\')
+	if ( FILE_IsDirSep(*p))
 		p++; 
 	return p;
+}
+
+HRESULT CreateDirectoryX( const TCHAR* pszDir )
+{
+	// This is like CreateDirectory() except.
+	// This will create intermediate directories if needed.
+	// NOTE: like SHCreateDirectoryExA() but we cant use since thats only for Win2K+
+
+	ASSERT(pszDir);
+	TCHAR szTmp[ _MAX_PATH ];
+	int iLen = 0;
+	for (;;)
+	{	
+		int iStart = iLen;
+		TCHAR ch;
+		for (;;)
+		{
+			if ( iLen >= COUNTOF(szTmp)-1 )
+				return HRESULT_FROM_WIN32(ERROR_BUFFER_OVERFLOW);
+			ch = pszDir[iLen];
+			szTmp[iLen] = ch;
+			if ( ch == '\0' )
+				break;
+			iLen++;
+			if ( FILE_IsDirSep( ch ))
+				break;
+		}
+		if ( iStart >= iLen )
+		{
+			if ( ch == '\0' )
+				break;
+			return HRESULT_FROM_WIN32(ERROR_BAD_PATHNAME);	// bad name!
+		}
+		szTmp[iLen] = '\0';
+		if ( ! CreateDirectory( szTmp, NULL ))
+		{
+			DWORD dwLastError = ::GetLastError();
+			if ( dwLastError == ERROR_ALREADY_EXISTS )
+				continue;
+			if ( dwLastError == ERROR_ACCESS_DENIED && iStart==0 ) // create a drive? 'c:\' type thing.
+				continue;
+			return HRESULT_FROM_WIN32(dwLastError);
+		}
+	}
+
+	return S_OK;
 }
 
 bool Str_IsSpace( char ch )

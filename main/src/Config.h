@@ -78,7 +78,8 @@ struct LIBSPEC CTaksiConfigData
 	bool SetHotKey(TAKSI_HOTKEY_TYPE eHotKey, WORD vKey);
 	WORD GetHotKey(TAKSI_HOTKEY_TYPE eHotKey) const;
 
-	bool FixCaptureDir();
+	HRESULT FixCaptureDir();
+	HRESULT FixVideoCodec();
 
 public:
 	// CAN be set from CGuiConfig

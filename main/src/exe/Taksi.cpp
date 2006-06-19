@@ -49,13 +49,35 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 		return -1;
 	}
 
-	g_Config.ReadIniFileFromDir(NULL);
+	if ( ! g_Config.ReadIniFileFromDir(NULL))
+	{
+		// this is ok since we can just take all defaults.
+	}
+
+	// Test my Save Dir
+	HRESULT hRes = g_Config.FixCaptureDir();
+	if ( FAILED(hRes))
+	{
+		MessageBox( NULL, 
+			_T("Cant create save file directory. Please check the configuration dialog"),
+			_T("Taksi"), MB_OK );
+	}
+
+	// Test my codec.
+	hRes = g_Config.FixVideoCodec();
+	if ( FAILED(hRes))
+	{
+		MessageBox( NULL, 
+			_T("The selected video codec doesnt work on this system. Please check the configuration dialog"),
+			_T("Taksi"), MB_OK );
+	}
+
 	sg_Config.CopyConfig( g_Config );
 
 	LoadString( g_hInst, IDS_SELECT_APP_HOOK, 
 		sg_ProcStats.m_szLastError, COUNTOF(sg_ProcStats.m_szLastError));
-	InitCommonControls();
 
+	InitCommonControls();
 #ifdef _DEBUG
 	CTaksiDll* pDll = &sg_Dll;
 #endif

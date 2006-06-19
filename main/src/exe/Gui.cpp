@@ -224,19 +224,20 @@ int CGui::GetHotKeyName( TCHAR* pszName, int iLen, TAKSI_HOTKEY_TYPE eHotKey ) /
 
 void CGui::UpdateButtonToolTips()
 {
-	// reflect state in tooltip ???
+	// reflect GetButtonState() in tooltip ???
 	for ( int i=0; i<BTN_QTY; i++ )
 	{
 		TCHAR szHelp[ _MAX_PATH ];
 		int iLen = LoadString( g_hInst, i + IDB_ConfigOpen_1, szHelp, sizeof(szHelp)-1 );
 		ASSERT( iLen > 0 );
 
-		TCHAR* pszText;
 		TCHAR szHotKey[ _MAX_PATH ];
 		iLen = GetHotKeyName( szHotKey, COUNTOF(szHotKey), (TAKSI_HOTKEY_TYPE) i ); 
+
+		TCHAR* pszText;
+		TCHAR szText[ _MAX_PATH ];
 		if ( iLen > 0 )
 		{
-			TCHAR szText[ _MAX_PATH ];
 			_sntprintf( szText, COUNTOF(szText), _T("(%s) %s"), szHotKey, szHelp );
 			pszText = szText;
 		}
@@ -289,39 +290,73 @@ BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
 #ifdef USE_TRAYICON
 
+void CGui::UpdateMenuPopupHotKey( HMENU hMenu, TAKSI_HOTKEY_TYPE eKey )
+{
+	// update the menu item for its hotkey.
+
+	int iState = GetButtonState( eKey );
+
+	UINT uMenuFlags = MF_BYCOMMAND;
+	uMenuFlags |=	(( iState < 0 ) ? (MF_GRAYED|MF_DISABLED) : MF_ENABLED );
+
+	switch( eKey)
+	{
+	case TAKSI_HOTKEY_ConfigOpen:
+		break;
+	case TAKSI_HOTKEY_HookModeToggle:
+		uMenuFlags |= (iState==IDB_HookModeToggle_1) ? MF_UNCHECKED : MF_CHECKED;
+		break;
+	case TAKSI_HOTKEY_IndicatorToggle:
+		uMenuFlags |= (iState==IDB_IndicatorToggle_1) ? MF_CHECKED : MF_UNCHECKED;
+		break;
+	case TAKSI_HOTKEY_RecordPause:
+		uMenuFlags |= (iState==IDB_RecordPause_2) ? MF_CHECKED : MF_UNCHECKED;
+		break;
+	}
+
+	int id = IDB_ConfigOpen_1+eKey;
+
+	TCHAR szMenuText[ _MAX_PATH ];
+	int iLenMenuText = GetMenuString( hMenu, id,
+		szMenuText, COUNTOF(szMenuText)-1, uMenuFlags );
+	ASSERT(iLenMenuText>0);
+
+	TCHAR szHotKey[ _MAX_PATH ];
+	int iLenHotKey = GetHotKeyName( szHotKey, COUNTOF(szHotKey), eKey ); 
+
+	TCHAR* pszParen = strchr( szMenuText, '(' );
+	if ( iLenHotKey > 0 )
+	{
+		if ( pszParen )
+		{
+			_sntprintf( pszParen, COUNTOF(szMenuText) - (pszParen-szMenuText),
+				_T("(%s)"), szHotKey );
+		}
+		else
+		{
+			_sntprintf( szMenuText+iLenMenuText, COUNTOF(szMenuText) - iLenMenuText,
+				_T(" (%s)"), szHotKey );
+		}
+	}
+	else
+	{
+		if ( pszParen )
+		{
+			ASSERT(pszParen[-1] == ' ');
+			pszParen[-1] = '\0';	// get rid of the key and space.
+		}
+	}
+
+	UINT uRet = ModifyMenu( hMenu, id, uMenuFlags, id, szMenuText );
+}
+
 void CGui::OnInitMenuPopup( HMENU hMenu )
 {
 	// WM_INITMENUPOPUP
+	// update the check marks, enabled states and hotkeys for the menu.
 	for ( int i=0; i<TAKSI_HOTKEY_QTY; i++ )
 	{
-		int iState = GetButtonState( (TAKSI_HOTKEY_TYPE) i );
-		UINT uCommand = MF_BYCOMMAND;
-		uCommand |=	(( iState < 0 ) ? (MF_GRAYED|MF_DISABLED) : MF_ENABLED );
-		int id = IDB_ConfigOpen_1+i;
-		UINT uRet;
-		switch(i)
-		{
-		case TAKSI_HOTKEY_ConfigOpen:
-			continue;
-		case TAKSI_HOTKEY_HookModeToggle:
-			uCommand |= (iState==IDB_HookModeToggle_1) ? MF_UNCHECKED : MF_CHECKED;
-			uRet = CheckMenuItem( hMenu, id, uCommand );
-			ASSERT( uRet != -1 );
-			continue;
-		case TAKSI_HOTKEY_IndicatorToggle:
-			uCommand |= (iState==IDB_IndicatorToggle_1) ? MF_CHECKED : MF_UNCHECKED;
-			uRet = CheckMenuItem( hMenu, id, uCommand );
-			ASSERT( uRet != -1 );
-			continue;
-		case TAKSI_HOTKEY_RecordPause:
-			uCommand |= (iState==IDB_RecordPause_2) ? MF_CHECKED : MF_UNCHECKED;
-			uRet = CheckMenuItem( hMenu, id, uCommand );
-			ASSERT( uRet != -1 );
-			break;
-		}
-
-		uRet = EnableMenuItem( hMenu, id, uCommand );
-		ASSERT( uRet != -1 );
+		UpdateMenuPopupHotKey( hMenu, (TAKSI_HOTKEY_TYPE)i );
 	}
 }
 
