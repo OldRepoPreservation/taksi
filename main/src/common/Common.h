@@ -17,7 +17,12 @@
 
 typedef LONGLONG TIMEFAST_t;
 extern LIBSPEC TIMEFAST_t GetPerformanceCounter();
+
+inline bool FILE_IsDirSep( TCHAR ch ) { return(( ch == '/')||( ch == '\\')); }
+
 extern LIBSPEC TCHAR* GetFileTitlePtr( TCHAR* pszPath );
+extern LIBSPEC HRESULT CreateDirectoryX( const TCHAR* pszDir );
+
 extern LIBSPEC char* Str_SkipSpace( const char* pszNon );
 extern LIBSPEC bool Str_IsSpace( char ch );
 

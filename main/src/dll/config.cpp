@@ -182,28 +182,50 @@ WORD CTaksiConfigData::GetHotKey( TAKSI_HOTKEY_TYPE eHotKey ) const
 	return m_wHotKey[eHotKey];
 }
 
-bool CTaksiConfigData::FixCaptureDir()
+HRESULT CTaksiConfigData::FixCaptureDir()
 {
+	// RETURN: 
+	//  <0 = bad name.
+	//  S_FALSE = no change.
+	//  S_OK = changed!
+
 	int iLen = lstrlen(m_szCaptureDir);
-	if (iLen==0)
+	if (iLen<=0)
 	{
 		// If capture directory is still unknown at this point
 		// set it to the current APP directory then.
-		::GetModuleFileName(NULL,m_szCaptureDir, sizeof(m_szCaptureDir)-1 );
+		if ( ::GetModuleFileName(NULL,m_szCaptureDir, sizeof(m_szCaptureDir)-1 ) <= 0 )
+		{
+			return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND));
+		}
 		// strip off file name
 		TCHAR* pTitle = GetFileTitlePtr(m_szCaptureDir);
-		if(pTitle)
-			*pTitle = '\0';
-		return true;
+		if(pTitle==NULL)
+			return HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND);
+		*pTitle = '\0';
+		return S_OK; // changed
 	}
 
 	// make sure it ends with backslash.
-	if ( iLen <= 0 || m_szCaptureDir[iLen-1] != '\\') 
+	if ( ! FILE_IsDirSep( m_szCaptureDir[iLen-1] )) 
 	{
 		lstrcat(m_szCaptureDir, "\\");
-		return true;
+		return S_OK;	// changed
 	}
-	return false;
+
+	// make sure it actually exists! try to create it if not.
+	HRESULT hRes = CreateDirectoryX( m_szCaptureDir );
+	if ( FAILED(hRes))
+	{
+		return hRes;
+	}
+	return S_FALSE;	// no change.
+}
+
+HRESULT CTaksiConfigData::FixVideoCodec()
+{
+	// is this video codec any good? loaded on this system ?
+	return S_FALSE;
 }
 
 //************************************************************
@@ -471,7 +493,10 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 
 	FILE* pFile = fopen(szConfigFileName, "rt");
 	if (pFile == NULL) 
+	{
+		// ASSUME constructor has already set this to all defaults.
 		return false;
+	}
 
 	CIniObject* pObj = NULL;
 	while (true)

@@ -306,7 +306,8 @@ void CGuiConfig::OnCommandRestore(void)
 	// read optional configuration file
 	if ( ! g_Config.ReadIniFileFromDir(NULL))
 	{
-		return;
+		// this is ok since we can just take all defaults.
+		g_Config.InitConfig();
 	}
 	
 	UpdateSettings(g_Config);	// push out to the dialog.
@@ -326,7 +327,8 @@ void CGuiConfig::OnCommandSave()
 	int iLen = GetWindowText( m_hControlCaptureDirectory,
 		g_Config.m_szCaptureDir, sizeof(g_Config.m_szCaptureDir));
 
-	if ( g_Config.FixCaptureDir())	// changed?
+	HRESULT hRes = g_Config.FixCaptureDir();
+	if ( hRes != S_FALSE )	// changed?
 	{
 		m_bDataUpdating = true;
 		SetWindowText( m_hControlCaptureDirectory, g_Config.m_szCaptureDir); 
@@ -513,7 +515,11 @@ bool CGuiConfig::OnCommandCaptureBrowse()
 	if ( ! lstrcmpi( g_Config.m_szCaptureDir, dlg.m_szDir ))
 		return false;
 	lstrcpy( g_Config.m_szCaptureDir, dlg.m_szDir );
-	g_Config.FixCaptureDir();
+	hRes = g_Config.FixCaptureDir();
+	if ( FAILED(hRes))
+	{
+		// Error message!
+	}
 	OnChanges();
 	m_bDataUpdating = true;
 	SetWindowText( m_hControlCaptureDirectory, g_Config.m_szCaptureDir); 
