@@ -483,8 +483,9 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		else
 		{
 			::ShowWindow(g_GUIConfig.m_hWnd,SW_SHOWNORMAL);
-			::SetFocus(g_GUIConfig.m_hWnd);
 		}
+		::SetForegroundWindow(g_GUIConfig.m_hWnd);	// moves window to the foreground
+		::SetFocus(g_GUIConfig.m_hWnd);
 		return true;
 	case TAKSI_HOTKEY_HookModeToggle:
 	case IDB_HookModeToggle_1:

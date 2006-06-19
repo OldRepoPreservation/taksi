@@ -361,3 +361,7 @@ re-try getting info on the surface if the GetFrame() call fails.
 Ver 0.757
 check the save dir exists (Create if not) at start up.
 hotKeys indicated in the shell icon
+
+Ver 0.758
+Move config dialog window to the foreground if opened via hotkey
+
