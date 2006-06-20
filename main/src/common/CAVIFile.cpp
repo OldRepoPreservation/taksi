@@ -169,7 +169,7 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 
 HRESULT CVideoCodec::GetHError( LRESULT lRes ) // static
 {
-	// convert the return code into a standard error code.
+	// convert the return code into a standard error code. or something reasonably close.
 	switch(lRes)
 	{
 	case ICERR_OK:	return S_OK;
@@ -197,9 +197,9 @@ void CVideoCodec::InitCodec()
 	// Use a default codec
 	m_v.cbSize = sizeof(m_v); // 0x40;
 	m_v.dwFlags = ICMF_COMPVARS_VALID;
-	m_v.fccType = mmioFOURCC('v','i','d','c');	
-	m_v.fccHandler = mmioFOURCC('D','I','B',' '); // no compress.
-	// mmioFOURCC('iyuv') = intel yuv format works.
+	m_v.fccType = MAKEFOURCC('v','i','d','c');	
+	m_v.fccHandler = MAKEFOURCC('D','I','B',' '); // no compress.
+	// MAKEFOURCC('iyuv') = intel yuv format works.
 	m_v.lKey = 0x01;
 	m_v.lDataRate = 0x12c;
 	//m_v.lpState = 0xsdfsdf;
@@ -570,7 +570,7 @@ void CAVIIndex::FlushIndexChunk( HANDLE hFile )
 	{
 		// write index
 		DWORD dwTags[2];
-		dwTags[0] = ckidAVINEWINDEX;	// mmioFOURCC('i', 'd', 'x', '1')
+		dwTags[0] = ckidAVINEWINDEX;	// MAKEFOURCC('i', 'd', 'x', '1')
 		dwTags[1] = get_ChunkSize();
 		::WriteFile(hFile, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	}
@@ -754,14 +754,13 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 	}
 
 	// prepare BITMAPINFO for compressor
-	static BITMAPINFO biIn; // This need to be 'static' ???
-	InitBitmapIn(biIn);
+	InitBitmapIn(m_biIn);
 
 #if 0 //def _DEBUG
 	// print compressor settings
 	// m_VideoCodec.DumpSettings();
 
-	LRESULT lFormatSize = m_VideoCodec.GetCompFormat(&biIn,NULL);
+	LRESULT lFormatSize = m_VideoCodec.GetCompFormat(&m_biIn,NULL);
 	if ( lFormatSize <= 0 )
 	{
 		// dwFormatSize = -2 = ICERR_BADFORMAT 
@@ -774,28 +773,28 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 
 	BITMAPINFO biOut;
 	ZeroMemory(&biOut, sizeof(biOut));
-	LRESULT lRes = m_VideoCodec.GetCompFormat(&biIn,&biOut);
+	LRESULT lRes = m_VideoCodec.GetCompFormat(&m_biIn,&biOut);
 	if ( lRes != 0 )
 	{	
-		// lRes = -2 = ICERR_BADFORMAT, should be 0x28 = sizeof(biIn.bmiHeader)
+		// lRes = -2 = ICERR_BADFORMAT, should be 0x28 = sizeof(m_biIn.bmiHeader)
 		DEBUG_ERR(( "CAVIFile:GetCompFormat FAILED %d" LOG_CR, lRes ));
 		//ASSERT(0);
 		return m_VideoCodec.GetHError(lRes);
 	}
 
 	// The codec doesnt like odd sizes !!
-	if ( biIn.bmiHeader.biHeight != biOut.bmiHeader.biHeight 
-		|| biIn.bmiHeader.biWidth != biOut.bmiHeader.biWidth )
+	if ( m_biIn.bmiHeader.biHeight != biOut.bmiHeader.biHeight 
+		|| m_biIn.bmiHeader.biWidth != biOut.bmiHeader.biWidth )
 	{
 		DEBUG_MSG(( "Codec changes the size! from (%d x %d) to (%d x %d)" LOG_CR,
-			biIn.bmiHeader.biHeight, biIn.bmiHeader.biWidth,
+			m_biIn.bmiHeader.biHeight, m_biIn.bmiHeader.biWidth,
 			biOut.bmiHeader.biWidth, biOut.bmiHeader.biHeight ));
 	}
 #endif
 
 	// initialize compressor
 do_retry:
-	hRes = m_VideoCodec.CompStart(&biIn);
+	hRes = m_VideoCodec.CompStart(&m_biIn);
 	if ( IS_ERROR(hRes))
 	{
 		// re-try the aligned size.
@@ -804,8 +803,8 @@ do_retry:
 			DEBUG_WARN(( "CAVIFile:CompStart retry at (%d x %d)" LOG_CR, FrameForm.m_Size.cx, FrameForm.m_Size.cy ));
 			FrameForm.m_Size.cx &= ~3;
 			FrameForm.m_Size.cy &= ~3;
-			biIn.bmiHeader.biWidth = FrameForm.m_Size.cx;
-			biIn.bmiHeader.biHeight = FrameForm.m_Size.cy;
+			m_biIn.bmiHeader.biWidth = FrameForm.m_Size.cx;
+			m_biIn.bmiHeader.biHeight = FrameForm.m_Size.cy;
 			m_FrameForm = FrameForm;
 			goto do_retry;
 		}
@@ -990,7 +989,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 		DEBUG_TRACE(("CAVIFile:WriteVideoFrame: size=%d, bIsKey=%d" LOG_CR, nSizeComp, bIsKey ));
 
 		DWORD dwTags[2];
-		dwTags[0] = bCompressed ? mmioFOURCC('0', '0', 'd', 'c') : mmioFOURCC('0', '0', 'd', 'b');
+		dwTags[0] = bCompressed ? MAKEFOURCC('0', '0', 'd', 'c') : MAKEFOURCC('0', '0', 'd', 'b');
 		dwTags[1] = nSizeComp;
 
 		// NOTE: do we really need to index each frame ?

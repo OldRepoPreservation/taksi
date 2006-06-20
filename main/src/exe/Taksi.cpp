@@ -8,6 +8,7 @@
 
 // Program Configuration
 HINSTANCE g_hInst = NULL;
+const TCHAR g_szAppTitle[] = _T("Taksi");
 CTaksiConfig g_Config;
 
 const TCHAR* CheckIntResource( const TCHAR* pszText, TCHAR* pszTmp )
@@ -26,7 +27,34 @@ void DlgTODO( HWND hWnd, const TCHAR* pszMsg )
 	// Explain to the user why this doesnt work yet.
 	if ( pszMsg == NULL )
 		pszMsg = _T("TODO");
-	MessageBox( hWnd, pszMsg, _T("Taksi"), MB_OK );
+	MessageBox( hWnd, pszMsg, g_szAppTitle, MB_OK );
+}
+
+void CheckVideoCodec( HWND hWnd )
+{
+	if ( g_Config.m_bVideoCodecMsg )
+		return;
+	g_Config.m_bVideoCodecMsg = true;
+	switch ( g_Config.m_VideoCodec.m_v.fccHandler )
+	{
+	case MAKEFOURCC('D','I','B',' '): // no compress.
+	case MAKEFOURCC('d','i','b',' '): // no compress.
+		MessageBox( hWnd, 
+			_T("The selected video codec uses a VERY large amount of disk space.")
+			_T("You may want to check the configuration dialog and pick a better codec."),
+			g_szAppTitle, MB_OK );
+		break;
+	case MAKEFOURCC('m','s','v','c'): // Video1 = CRAM
+	case MAKEFOURCC('M','S','V','C'): // Video1 = CRAM
+		// just warn that the codec isnt very good.
+		MessageBox( hWnd, 
+			_T("The selected video codec (MS-CRAM) is popular")
+			_T("and has low CPU usage but doesnt have very good compression.")
+			_T("You may want to check the configuration dialog and pick a different codec."),
+			g_szAppTitle, MB_OK );
+		break;
+		// MPEG4 may slow frames per sec.
+	}
 }
 
 int APIENTRY WinMain( HINSTANCE hInstance,
@@ -60,7 +88,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	{
 		MessageBox( NULL, 
 			_T("Cant create save file directory. Please check the configuration dialog"),
-			_T("Taksi"), MB_OK );
+			g_szAppTitle, MB_OK );
 	}
 
 	// Test my codec.
@@ -69,11 +97,12 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	{
 		MessageBox( NULL, 
 			_T("The selected video codec doesnt work on this system. Please check the configuration dialog"),
-			_T("Taksi"), MB_OK );
+			g_szAppTitle, MB_OK );
 	}
-	if (hRes)
+	else 
 	{
-		// just warn that the codec isnt very good. CRAM or no compression.
+		// may want to select a better codec?
+		CheckVideoCodec( NULL );
 	}
 
 	sg_Config.CopyConfig( g_Config );

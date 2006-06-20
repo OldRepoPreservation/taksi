@@ -9,6 +9,7 @@ i dont understand the point of frameweight ? how is it different from FrameRate 
 KNOWN BUGS:
 Non Frame GDI not working properly.
 Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
+Some codecs use profiles requiring precise size/format to work.
 switching hook not always working correctly. 2 instances of the same app?
 GDI indicator drawn over overlapped windows. bleeds through.
 Data recorded stat number not including overhead! too small.

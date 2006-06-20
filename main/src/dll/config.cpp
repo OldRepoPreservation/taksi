@@ -108,6 +108,7 @@ void CTaksiConfigData::InitConfig()
 	// Video Format
 	m_fFrameRateTarget=10;
 	m_VideoCodec.InitCodec();
+	m_bVideoCodecMsg = false;
 	m_bVideoHalfSize = true;
 
 	m_AudioCodec.InitFormatEmpty();
@@ -143,6 +144,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	m_fFrameRateTarget = config.m_fFrameRateTarget;
 	m_VideoCodec.CopyCodec( config.m_VideoCodec );
 	m_bVideoHalfSize = config.m_bVideoHalfSize;
+	m_bVideoCodecMsg = config.m_bVideoCodecMsg;
 
 	m_iAudioDevice = config.m_iAudioDevice;	// audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
 	m_AudioCodec.SetFormat( config.m_AudioCodec );
@@ -358,6 +360,9 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, m_bUseDirectInput ? "1" : "0");
 	case TAKSI_CFGPROP_VideoHalfSize:
 		return _snprintf(pszValue, iSizeMax, m_bVideoHalfSize ? "1" : "0" );
+	case TAKSI_CFGPROP_VideoCodecMsg:
+		return _snprintf(pszValue, iSizeMax, m_bVideoCodecMsg ? "1" : "0" );
+
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		return m_VideoCodec.GetStr(pszValue, iSizeMax);
 	case TAKSI_CFGPROP_AudioCodecInfo:
@@ -425,6 +430,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		break;
 	case TAKSI_CFGPROP_VideoHalfSize:
 		m_bVideoHalfSize = atoi(pszValue) ? true : false;
+		break;
+	case TAKSI_CFGPROP_VideoCodecMsg:
+		m_bVideoCodecMsg = atoi(pszValue) ? true : false;
 		break;
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		if ( ! m_VideoCodec.put_Str(pszValue))

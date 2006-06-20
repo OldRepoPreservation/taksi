@@ -30,14 +30,3 @@ public:
 	// ASSUME get_PropQty() <= 32 
 	DWORD  m_dwWrittenMask;	// bitmask of props already written.
 };
-
-#if 0
-struct LIBSPEC CIniFile
-{
-public:
-	virtual CIniObject* OnReadSection( const TCHAR* pszSection, const TCHAR* pszArgs, bool bCreate );
-public:
-	bool ReadIniFile( const TCHAR* pszPath );
-	bool WriteIniFile( const TCHAR* pszPath );
-};
-#endif
