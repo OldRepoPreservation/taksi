@@ -971,7 +971,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 	LONG nSizeComp;
 	BOOL bIsKey = false;
 
-	DWORD dwBytesWritten = 0;
+	DWORD dwBytesWrittenTotal = 0;
 	for (int i=0; i<nTimes; i++)
 	{
 		// compress the frame, using chosen compressor.
@@ -1002,6 +1002,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 		m_Index.AddFrame( indexentry );
 
 		// write video frame
+		DWORD dwBytesWritten = 0;
 		::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(dwTags))
 		{
@@ -1009,20 +1010,24 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 			DEBUG_ERR(("CAVIFile:WriteVideoFrame:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
+		dwBytesWrittenTotal += dwBytesWritten;
+
 		::WriteFile(m_File, pCompBuf, (DWORD) nSizeComp, &dwBytesWritten, NULL);
+		dwBytesWrittenTotal += dwBytesWritten;
 
 		if ( nSizeComp & 1 ) // pad to even size.
 		{
 			BYTE bPad;
 			::WriteFile(m_File, &bPad, 1, &dwBytesWritten, NULL);
 			m_dwMoviChunkSize++;
+			dwBytesWrittenTotal ++;
 		}
 
 		m_dwTotalFrames ++;
 		m_dwMoviChunkSize += sizeof(dwTags) + nSizeComp;
 	}
 
-	return dwBytesWritten;	// ASSUME not negative -> error
+	return dwBytesWrittenTotal;	// ASSUME not negative -> error
 }
 
 HRESULT CAVIFile::WriteAudioFrame( const BYTE* pWaveData )

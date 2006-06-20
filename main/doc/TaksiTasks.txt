@@ -8,40 +8,39 @@ i dont understand the point of frameweight ? how is it different from FrameRate 
 
 KNOWN BUGS:
 Non Frame GDI not working properly.
-Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
-Some codecs use profiles requiring precise size/format to work.
 switching hook not always working correctly. 2 instances of the same app?
 GDI indicator drawn over overlapped windows. bleeds through.
-Data recorded stat number not including overhead! too small.
+Should auto prefer graphics hook over opengl over GDI hook. 
+
+Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
+Some codecs use profiles requiring precise size/format to work.
 
 TODO:
-AVI doesnt understand < 1 FPS ??
-Prompt for selection of codec first time starting app.
-Support auto switch to alternate codec if codec fails ?
-Should auto prefer graphics hook over GDI hook. 
-crc diff uncompressed frames with last. compress to empty frame.
-Need message explaining focus changing/hooking.
 Allow adjust of the size of the background thread Q
+AVI doesnt understand < 1 FPS ??
+Support auto switch to alternate codec if codec fails ?
+Need message explaining focus changing/hooking.
 makefile, Manual.txt completely out of date!
 Audio
-Better frame rate calculation ?
+Better frame rate calculation ? frame weight?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 Context sensative help file.
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
 Support DirectShow plugin codec to get Theora support
 
+crc diff uncompressed frames with last. compress to empty frame.
 put command menu in the sysmenu of the hooked app ?
-TEST- hook callbacks might not be on the same thread?
+TEST- hook callbacks might not be on the same thread? protect from multithread problems
 Comment tag inside AVI file. TAKSI vX date + user comments?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
 Can we use the DirectX JPEG/PNG compressor for screen shots ??
 AVI may not be the best format. has too much overhead. is MPG or WMV better ?
 http://guru.multimedia.cx/category/container-formats/
-smaller AVI index ? only index every nth frame or an index every 10 seconds ?
+smaller AVI index ? only index every nth frame or an index every 1 second ?
 reflect state in tooltip ?
-add a watermark or logo ?
-color reduction for GDI. reduce to a smaller number of colors ?
+add a watermark or logo ? optionally of course.
+color reduction for GDI. reduce to a smaller number of colors ? for better compression?
 
 AUDIO TASK:
 Get audio from WaveIn (assumes loopback) ? (much easier)

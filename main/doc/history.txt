@@ -364,4 +364,6 @@ hotKeys indicated in the shell icon
 
 Ver 0.758
 Move config dialog window to the foreground if opened via hotkey
+FIX Data recorded stat number not including overhead! too small.
+Warning message of possible codec that is not that great.
 
