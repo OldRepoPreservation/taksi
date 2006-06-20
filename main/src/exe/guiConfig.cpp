@@ -470,9 +470,15 @@ void CGuiConfig::OnCommandVideoCodecButton()
 	CVideoCodec VideoCur;
 	VideoCur.InitCodec();
 	VideoCur.CopyCodec( g_Config.m_VideoCodec );
+#ifdef _DEBUG
+	const char* pCodec = (const char*) &(VideoCur.m_v.fccHandler);
+	DEBUG_MSG(( "VideoCodec %c,%c,%c,%c selected" LOG_CR, pCodec[0], pCodec[1], pCodec[2], pCodec[3] ));
+#endif
 	if ( memcmp( &VideoCur, &VideoPrev, sizeof(VideoCur)))
 	{
 		// Really changed
+		g_Config.m_bVideoCodecMsg = false;
+		CheckVideoCodec( m_hWnd );
 		UpdateVideoCodec( g_Config.m_VideoCodec );
 		OnChanges();
 	}
@@ -544,7 +550,7 @@ bool CGuiConfig::OnHelp( LPHELPINFO pHelpInfo )
 		return true;
 	}
 
-	::MessageBox( m_hWnd, szTmp, _T("Taksi"), MB_OK );
+	::MessageBox( m_hWnd, szTmp, g_szAppTitle, MB_OK );
 	return true;
 }
 

@@ -16,9 +16,11 @@ extern bool Test_DirectX9(HWND hWnd );
 #endif
 extern void DlgTODO( HWND hWnd, const TCHAR* pszMsg );
 extern const TCHAR* CheckIntResource( const TCHAR* pszText, TCHAR* pszTmp );
+extern void CheckVideoCodec( HWND hWnd );
 
 extern HINSTANCE g_hInst;	// for the EXE
 extern CTaksiConfig g_Config;
+extern const TCHAR g_szAppTitle[];
 
 #endif	// _INC_TAKSI_H
 

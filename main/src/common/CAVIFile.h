@@ -199,6 +199,7 @@ private:
 	// Params set at OpenAVIFile().
 	double m_fFrameRate;		// What video framerate are we trying to use? (x/second)
 	CVideoCodec m_VideoCodec;	// What video compression params did we choose?
+	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.
 
 	CWaveFormat m_AudioCodec;
 };
