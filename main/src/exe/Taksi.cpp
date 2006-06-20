@@ -71,6 +71,10 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 			_T("The selected video codec doesnt work on this system. Please check the configuration dialog"),
 			_T("Taksi"), MB_OK );
 	}
+	if (hRes)
+	{
+		// just warn that the codec isnt very good. CRAM or no compression.
+	}
 
 	sg_Config.CopyConfig( g_Config );
 

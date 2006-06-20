@@ -1,5 +1,6 @@
 //
 // AVI.cpp
+// Background thread to perform the compression and writing.
 //
 #include "../stdafx.h"
 #include "TaksiDll.h"
@@ -242,14 +243,14 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 	return pFrame;	// ready
 }
 
-void CAVIThread::SignalFrameStart( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
+void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
 {
 	// New data is ready so wake up the thread.
 	// ASSUME: WaitForNextFrame() was just called.
 	if ( m_nThreadId == 0 )
 		return;
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
-	ASSERT(dwFrameDups);
+	ASSERT(dwFrameDups>0);
 	ASSERT(pFrame);
 	ASSERT( pFrame->m_dwFrameDups == 0 ); 
 	ASSERT( pFrame->IsValidFrame());
