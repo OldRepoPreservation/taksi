@@ -22,7 +22,7 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TAKSIDLL_EXPORTS"
 				StringPooling="TRUE"
-				MinimalRebuild="FALSE"
+				MinimalRebuild="TRUE"
 				ExceptionHandling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -31,7 +31,7 @@
 				PrecompiledHeaderThrough="../stdafx.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -254,6 +254,9 @@
 			</File>
 			<File
 				RelativePath="..\common\CThreadLockedLong.h">
+			</File>
+			<File
+				RelativePath="..\common\CVideoCodecs.tbl">
 			</File>
 			<File
 				RelativePath="..\common\CWaveACM.cpp">
