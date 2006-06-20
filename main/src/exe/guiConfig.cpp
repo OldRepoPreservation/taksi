@@ -181,17 +181,23 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 	}
 }
 
-bool CGuiConfig::UpdateVideoCodec( const CVideoCodec& codec )
+void CGuiConfig::UpdateVideoCodec( const CVideoCodec& codec, bool bMessageBox )
 {
 	ICINFO info;
 	if ( ! codec.GetCodecInfo(info))
 	{
 		SetWindowText( m_hControlVideoCodec, _T("<NONE>"));
-		return false;
 	}
-	TCHAR szTmp[_MAX_PATH];
-	_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%S - %S"), info.szName, info.szDescription );
-	return SetWindowText( m_hControlVideoCodec, szTmp ) ? true : false;
+	else
+	{
+		TCHAR szTmp[_MAX_PATH];
+		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%S - %S"), info.szName, info.szDescription );
+		SetWindowText( m_hControlVideoCodec, szTmp );
+	}
+	if ( bMessageBox )
+	{
+		CheckVideoCodec( m_hWnd, info );
+	}
 }
 
 bool CGuiConfig::UpdateAudioDevices( int iAudioDevice )
@@ -259,7 +265,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	config.PropGet( TAKSI_CFGPROP_MovieFrameRateTarget, szTmp, sizeof(szTmp));
 	SetWindowText( m_hControlFrameRate, szTmp);
 
-	UpdateVideoCodec( config.m_VideoCodec );
+	UpdateVideoCodec( config.m_VideoCodec, false );
 	UPDATE_CHECK(VideoHalfSize,config.m_bVideoHalfSize);
 
 	UpdateAudioCodec( config.m_AudioCodec );
@@ -478,8 +484,7 @@ void CGuiConfig::OnCommandVideoCodecButton()
 	{
 		// Really changed
 		g_Config.m_bVideoCodecMsg = false;
-		CheckVideoCodec( m_hWnd );
-		UpdateVideoCodec( g_Config.m_VideoCodec );
+		UpdateVideoCodec( g_Config.m_VideoCodec, true );
 		OnChanges();
 	}
 }

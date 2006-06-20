@@ -36,7 +36,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib comctl32.lib"
+				AdditionalDependencies="winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/Taksi.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"

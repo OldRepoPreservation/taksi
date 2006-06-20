@@ -85,7 +85,7 @@ protected:
 	void Custom_Read();
 
 	void UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask );
-	bool UpdateVideoCodec( const CVideoCodec& codec );
+	void UpdateVideoCodec( const CVideoCodec& codec, bool bMessageBox );
 	bool UpdateAudioDevices( int uDeviceId );
 	bool UpdateAudioCodec( const CWaveFormat& codec );
 	void UpdateSettings( const CTaksiConfig& config );

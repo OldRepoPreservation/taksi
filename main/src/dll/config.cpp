@@ -224,12 +224,6 @@ HRESULT CTaksiConfigData::FixCaptureDir()
 	return S_FALSE;	// no change.
 }
 
-HRESULT CTaksiConfigData::FixVideoCodec()
-{
-	// is this video codec any good? loaded on this system ?
-	return S_FALSE;
-}
-
 //************************************************************
 
 CTaksiConfigCustom* CTaksiConfig::CustomConfig_Alloc() // static

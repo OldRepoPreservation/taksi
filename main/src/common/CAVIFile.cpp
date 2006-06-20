@@ -290,7 +290,8 @@ void CVideoCodec::DumpSettings()
 HRESULT CVideoCodec::OpenCodec( WORD wMode )
 {
 	// Open a compressor or decompressor codec.
-	// wMode = ICMODE_FASTCOMPRESS, fccType = 
+	// wMode = ICMODE_FASTCOMPRESS, ICMODE_QUERY 
+	// fccType = 
 	if ( m_v.hic )
 	{
 		// May not be the mode i want. so close and re-open
@@ -298,7 +299,7 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 	}
 
 	ASSERT( !m_bCompressing );
-	ASSERT( m_v.hic  == NULL );
+	ASSERT( m_v.hic == NULL );
 
 	if ( m_v.fccHandler == MAKEFOURCC('D','I','B',' '))
 	{
@@ -307,17 +308,21 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 		return S_OK;
 	}
 
+	const char* pszFourCC = (const char*) &(m_v.fccHandler);
+
 	m_v.hic = ::ICOpen( m_v.fccType, m_v.fccHandler, wMode );
 	if ( m_v.hic == NULL)
 	{
 		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_DETECT_DRIVER_FAILURE));
-		DEBUG_WARN(("CVideoCodec::Open: ICOpen(0%x,0%x) RET NULL (0x%x)" LOG_CR,
-			m_v.fccType, m_v.fccHandler, hRes ));
+		DEBUG_WARN(("CVideoCodec::Open: ICOpen(%c,%c,%c,%c) RET NULL (0x%x)" LOG_CR,
+			pszFourCC[0], pszFourCC[1], pszFourCC[2], pszFourCC[3],
+			hRes ));
 		return hRes;
 	}
 
-	DEBUG_MSG(("CVideoCodec::OpenCodec:ICOpen(0%x,0%x) OK hic=%08x" LOG_CR, 
-		m_v.fccType, m_v.fccHandler, (UINT_PTR)m_v.hic ));
+	DEBUG_MSG(("CVideoCodec::OpenCodec:ICOpen(%c,%c,%c,%c) OK hic=0x%x" LOG_CR, 
+		pszFourCC[0], pszFourCC[1], pszFourCC[2], pszFourCC[3],
+		(UINT_PTR)m_v.hic ));
 	return S_OK;
 }
 
@@ -350,6 +355,8 @@ LRESULT CVideoCodec::CompConfigureDlg( HWND hWndApp )
 bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 {
 	// Get name etc info on the m_v.hic codec.
+	// RETURN:
+	//  false = (and icInfo.dwSize=0), to indicate the codec cant be loaded.
 	if ( m_v.hic == NULL )
 	{
 		// open a temporary version of this.
@@ -358,7 +365,10 @@ bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 		codec.CopyCodec( *this );
 		HRESULT hRes = codec.OpenCodec(ICMODE_QUERY);
 		if ( IS_ERROR(hRes) || codec.m_v.hic == NULL )
+		{
+			icInfo.dwSize = 0;
 			return false;
+		}
 		bool bRet = codec.GetCodecInfo(icInfo);
 		codec.DestroyCodec();
 		return bRet;
@@ -368,15 +378,17 @@ bool CVideoCodec::GetCodecInfo( ICINFO& icInfo ) const
 	icInfo.dwSize = sizeof(ICINFO);
 	if ( ! ::ICGetInfo(m_v.hic, &icInfo, sizeof(ICINFO)))
 	{
+		icInfo.dwSize = 0;
 		DEBUG_ERR(("CVideoCodec::GetCodecInfo: ICGetInfo FAILED." LOG_CR));
 		return false;
 	}
 
-	DEBUG_TRACE(("CVideoCodec::GetCodecInfo: fccType: {%08x}" LOG_CR, icInfo.fccType));
-	DEBUG_TRACE(("CVideoCodec::GetCodecInfo: fccHandler: {%08x}" LOG_CR, icInfo.fccHandler));
-	DEBUG_TRACE(("CVideoCodec::GetCodecInfo: Name: {%S}" LOG_CR, icInfo.szName));
-	DEBUG_TRACE(("CVideoCodec::GetCodecInfo: Desc: {%S}" LOG_CR, icInfo.szDescription));
-	DEBUG_TRACE(("CVideoCodec::GetCodecInfo: Driver: {%S}" LOG_CR, icInfo.szDriver));
+	DEBUG_MSG(("CVideoCodec::GetCodecInfo: fccType: {%08x}" LOG_CR, icInfo.fccType));
+	const char* pszFourcc = (const char*)&(icInfo.fccHandler);
+	DEBUG_MSG(("CVideoCodec::GetCodecInfo: fccHandler: {%c,%c,%c,%c}={%08x}" LOG_CR, pszFourcc[0], pszFourcc[1], pszFourcc[2], pszFourcc[3], icInfo.fccHandler));
+	DEBUG_MSG(("CVideoCodec::GetCodecInfo: Name: {%S}" LOG_CR, icInfo.szName));
+	DEBUG_MSG(("CVideoCodec::GetCodecInfo: Desc: {%S}" LOG_CR, icInfo.szDescription));
+	DEBUG_MSG(("CVideoCodec::GetCodecInfo: Driver: {%S}" LOG_CR, icInfo.szDriver));
 	return true;
 }
 
@@ -428,6 +440,7 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 {
 	// open the compression stream.
 	// MUST call CompEnd() and CloseCodec() after this.
+	// NOTE: it seems we keep a pointer to lpbiIn so it MUST PERSIST!
 
 	ASSERT(lpbiIn);
 	if ( m_bCompressing )	// already started?!
