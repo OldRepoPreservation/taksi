@@ -93,6 +93,7 @@ void CVideoFrame::FreeFrame()
 
 bool CVideoFrame::AllocForm( const CVideoFrameForm& FrameForm )
 {
+	// allocate space for a frame of a certain format.
 	if ( IsValidFrame())
 	{
 		if ( ! memcmp( &FrameForm, this, sizeof(FrameForm)))

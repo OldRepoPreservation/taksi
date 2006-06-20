@@ -66,7 +66,7 @@ public:
 
 	void WaitForAllFrames();
 	CAVIFrame* WaitForNextFrame();
-	void SignalFrameStart( CAVIFrame* pFrame, DWORD dwFrameDups );	// ready to compress/write a raw frame
+	void SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups );	// ready to compress/write a raw frame
 
 	int get_FrameBusyCount() const
 	{
