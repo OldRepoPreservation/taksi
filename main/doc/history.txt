@@ -367,3 +367,9 @@ Move config dialog window to the foreground if opened via hotkey
 FIX Data recorded stat number not including overhead! too small.
 Warning message of possible codec that is not that great.
 
+June 21,2006 
+==============
+Ver 0.759
+Non Frame GDI not working properly.
+Make the Frame Overhead compensation code optional. USE_FRAME_OVERHEAD
+

@@ -7,6 +7,7 @@
 #endif
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
+// #define USE_FRAME_OVERHEAD	// try to remove frame record overhead.
 
 // System includes always go first.
 #include <windows.h>
