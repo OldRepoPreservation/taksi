@@ -12,6 +12,7 @@ Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
 Some codecs use profiles requiring precise size/format to work.
 
 TODO:
+fix installer to default to install for all and ask if they want desktop icon ?
 Allow GUI adjust of the size of the background thread Q
 Support auto switch to alternate codec if codec fails ?
 Support DirectShow plugin codec to get Theora support
