@@ -63,6 +63,8 @@
 #define IDC_C_CustomFrameWeight         1053
 #define IDC_C_CustomNewButton           1054
 #define IDC_C_CustomDeleteButton        1055
+#define IDC_C_CustomUseCurrent          1056
+
 #define IDC_C_StatProcessName           1060
 #define IDC_C_StatLastError             1061
 #define IDC_C_StatState                 1062
@@ -76,6 +78,7 @@
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
 #define IDC_C_OpenGLUse                 1076
+
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
@@ -114,7 +117,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         40011
-#define _APS_NEXT_CONTROL_VALUE         1087
+#define _APS_NEXT_CONTROL_VALUE         1088
 #define _APS_NEXT_SYMED_VALUE           10005
 #endif
 #endif

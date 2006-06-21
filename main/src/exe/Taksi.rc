@@ -168,6 +168,8 @@ BEGIN
     EDITTEXT        IDC_C_CustomFrameWeight,69,69,46,14,ES_AUTOHSCROLL
     LTEXT           "(Force ratio of app refreshes : stored frames)",
                     IDC_STATIC,122,72,151,8
+    PUSHBUTTON      "Use current hook",IDC_C_CustomUseCurrent,189,98,77,12,
+                    NOT WS_VISIBLE
 END
 
 IDD_GuiConfigTab5 DIALOGEX 4, 14, 274, 113

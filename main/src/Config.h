@@ -121,7 +121,7 @@ public:
 	bool WriteIniFile();
 
 	CTaksiConfigCustom* CustomConfig_FindAppId( const TCHAR* pszAppId ) const;
-	CTaksiConfigCustom* CustomConfig_Lookup( const TCHAR* pszAppId);
+	CTaksiConfigCustom* CustomConfig_Lookup( const TCHAR* pszAppId,bool bCreate=true);
 	void CustomConfig_DeleteAppId( const TCHAR* pszAppId);
 
 	CTaksiConfigCustom* CustomConfig_FindPattern( const TCHAR* pszProcessfile ) const;
