@@ -41,6 +41,7 @@ smaller AVI index ? only index every nth frame or an index every 1 second ?
 reflect state in tooltip ?
 add a watermark or logo ? optionally of course.
 color reduction for GDI. reduce to a smaller number of colors ? for better compression?
+Covert to full unicode and allow translations ?
 
 AUDIO TASK:
 Get audio from WaveIn (assumes loopback) ? (much easier)
