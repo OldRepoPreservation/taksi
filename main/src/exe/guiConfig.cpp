@@ -766,6 +766,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		// remove current custom config
 		OnCommandCustomDeleteButton();
 		return true;
+	case IDC_C_CustomUseCurrent:
+		// ?? Fill in the data from the current hooked window.
+		return true;
 
 	case IDC_C_StatsClear:
 		sg_ProcStats.m_szLastError[0] = '\0';

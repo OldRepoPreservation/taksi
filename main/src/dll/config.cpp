@@ -264,7 +264,7 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindAppId( const char* pszAppId )
 	return NULL;
 }
 
-CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId )
+CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId, bool bCreate )
 {
 	// Looks up a custom config in a list. If not found, creates one
 	// and inserts at the beginning of the list.
@@ -272,6 +272,8 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId )
 	CTaksiConfigCustom* p = CustomConfig_FindAppId(pszAppId);
 	if (p)
 		return p;
+	if ( ! bCreate)
+		return NULL;
 
 	// not found. Therefore, insert a new one
 	p = CustomConfig_Alloc();
@@ -531,7 +533,7 @@ bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
 				char* pszEnd = strstr(szSection, "]");
 				if (pszEnd)
 					*pszEnd = '\0';
-				pObj = CustomConfig_Lookup(szSection);
+				pObj = CustomConfig_Lookup(szSection,true);
 			}
 			else
 			{
