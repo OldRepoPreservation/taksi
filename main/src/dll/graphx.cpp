@@ -222,7 +222,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 	// Move compression work to another thread
 	g_AVIThread.SignalFrameAdd(pFrame,dwFrameDups);	// ready to compress/write
 
-	g_FrameRate.MeasureOverhead();	// keep track of recording overhead
+	g_FrameRate.EndOfOverheadTime();	// keep track of recording overhead
 	return true;
 }
 

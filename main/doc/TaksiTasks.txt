@@ -1,33 +1,29 @@
 Taksi Dev Notes
-6/6/2006
+6/21/2006
 
 OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
-dummy keyboard to keep dll loaded ?
-i dont understand the point of frameweight ? how is it different from FrameRate ?
 
 KNOWN BUGS:
-Non Frame GDI not working properly.
 switching hook not always working correctly. 2 instances of the same app?
 GDI indicator drawn over overlapped windows. bleeds through.
 Should auto prefer graphics hook over opengl over GDI hook. 
-
 Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
 Some codecs use profiles requiring precise size/format to work.
 
 TODO:
-Allow adjust of the size of the background thread Q
-AVI doesnt understand < 1 FPS ??
+Allow GUI adjust of the size of the background thread Q
 Support auto switch to alternate codec if codec fails ?
+Support DirectShow plugin codec to get Theora support
 Need message explaining focus changing/hooking.
-makefile, Manual.txt completely out of date!
 Audio
-Better frame rate calculation ? frame weight?
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
+Better frame rate/weight calculation ?
+makefile, Manual.txt completely out of date!
 Context sensative help file.
+AVI doesnt understand < 1 FPS ??
 put debuglog files in the capture dir ?
 render the mouse cursor in graphics modes.
-Support DirectShow plugin codec to get Theora support
 
 crc diff uncompressed frames with last. compress to empty frame.
 put command menu in the sysmenu of the hooked app ?

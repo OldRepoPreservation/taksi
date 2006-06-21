@@ -18,29 +18,41 @@ struct CTaksiFrameRate
 	// frame rate calculator
 public:
 	CTaksiFrameRate()
-		: m_dwLastOverhead(0)
-		, m_dwFreqUnits(0)
+		: m_dwFreqUnits(0)
 		, m_tLastCount(0)
 		, m_fLeftoverWeight(0.0)
-		, m_dwPenalty(0)
+#ifdef USE_FRAME_OVERHEAD
+		, m_dwOverheadPenalty(0)
+		, m_dwLastOverhead(0)
+#endif
 	{
 	}
-	void InitFreqUnits();
+	bool InitFreqUnits();
 
 	DWORD CheckFrameRate();
 
-	void MeasureOverhead()
+	void EndOfOverheadTime()
 	{
+#ifdef USE_FRAME_OVERHEAD
 		TIMEFAST_t tNow = GetPerformanceCounter();
 		m_dwLastOverhead = (DWORD)( tNow - m_tLastCount );
+#endif
 	}
 
 private:
+	double CheckFrameWeight( __int64 iTimeDiff );
+
+private:
 	DWORD m_dwFreqUnits;		// the units/sec of the TIMEFAST_t timer.
+
 	TIMEFAST_t m_tLastCount;	// when was CheckFrameRate() called?
 	float m_fLeftoverWeight;
+
+#ifdef USE_FRAME_OVERHEAD
+	// Try to factor out the overhead we induce while recording.
 	DWORD m_dwLastOverhead;
-	DWORD m_dwPenalty;
+	DWORD m_dwOverheadPenalty;
+#endif
 };
 extern CTaksiFrameRate g_FrameRate;
 

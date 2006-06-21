@@ -161,11 +161,13 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_C_CustomDeleteButton,231,29,38,12
     LTEXT           "Process Pattern:",IDC_STATIC,7,51,54,8
     EDITTEXT        IDC_C_CustomPattern,69,48,200,14,ES_AUTOHSCROLL
-    LTEXT           "Frame Rate:",IDC_STATIC,7,73,41,8
-    EDITTEXT        IDC_C_CustomFrameRate,69,69,46,14,ES_AUTOHSCROLL
-    LTEXT           "FPS",IDC_STATIC,122,73,13,8
-    LTEXT           "Frame Weight:",IDC_STATIC,7,87,48,8
-    EDITTEXT        IDC_C_CustomFrameWeight,69,84,46,14,ES_AUTOHSCROLL
+    LTEXT           "Frame Rate:",IDC_STATIC,7,88,41,8
+    EDITTEXT        IDC_C_CustomFrameRate,69,85,46,14,ES_AUTOHSCROLL
+    LTEXT           "FPS",IDC_STATIC,122,88,13,8
+    LTEXT           "Frame Weight:",IDC_STATIC,7,72,48,8
+    EDITTEXT        IDC_C_CustomFrameWeight,69,69,46,14,ES_AUTOHSCROLL
+    LTEXT           "(Force ratio of app refreshes : stored frames)",
+                    IDC_STATIC,122,72,151,8
 END
 
 IDD_GuiConfigTab5 DIALOGEX 4, 14, 274, 113

@@ -14,7 +14,7 @@ CAVIThread g_AVIThread;			// put all compression on a back thread. Q raw data to
 
 //**************************************************************************************
 
-void CTaksiFrameRate::InitFreqUnits()
+bool CTaksiFrameRate::InitFreqUnits()
 {
 	// record the freq of the timer.
 	LARGE_INTEGER freq = {0, 0};
@@ -26,9 +26,65 @@ void CTaksiFrameRate::InitFreqUnits()
 	else
 	{
 		LOG_WARN(( "QueryPerformanceFrequency FAILED!" LOG_CR ));
+		m_dwFreqUnits = 0;
+		return false;	// this cant work!
 	}
 	m_dwFreqUnits = freq.LowPart;
 	m_tLastCount = 0;
+	return true;
+}
+
+double CTaksiFrameRate::CheckFrameWeight( __int64 iTimeDiff )
+{
+	double fTargetFrameRate;
+	if ( g_Proc.m_pCustomConfig )
+	{
+		// using a custom frame rate/weight. ignore iTimeDiff
+		double fFrameWeight = g_Proc.m_pCustomConfig->m_fFrameWeight;
+		if (fFrameWeight>0)
+		{
+			return fFrameWeight;
+		}
+		fTargetFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
+	}
+	else
+	{
+		fTargetFrameRate = sg_Config.m_fFrameRateTarget;
+	}
+
+	DEBUG_TRACE(( "iTimeDiff=%d" LOG_CR, (int) iTimeDiff ));
+
+#ifdef USE_FRAME_OVERHEAD
+	if (m_dwLastOverhead > 0) 
+	{
+		m_dwOverheadPenalty = m_dwLastOverhead / 2;
+		iTimeDiff -= (m_dwLastOverhead - m_dwOverheadPenalty);
+		m_dwLastOverhead = 0;
+	}
+	else
+	{
+		m_dwOverheadPenalty = m_dwOverheadPenalty / 2;
+		iTimeDiff += m_dwOverheadPenalty;
+	}
+	DEBUG_TRACE(( "adjusted iTimeDiff = %d, LastOverhead=%u" LOG_CR, (int) iTimeDiff, (int) m_dwLastOverhead ));
+#endif
+
+	double fFrameRateCur = (double)m_dwFreqUnits / (double)iTimeDiff;
+
+	if ( g_Proc.m_Stats.m_fFrameRate != fFrameRateCur )
+	{
+		g_Proc.m_Stats.m_fFrameRate = fFrameRateCur;
+		g_Proc.UpdateStat(TAKSI_PROCSTAT_FrameRate);
+	}
+
+	DEBUG_TRACE(( "currentFrameRate = %f" LOG_CR, fFrameRateCur ));
+
+	if (fFrameRateCur <= 0)
+	{
+		return 0;
+	}
+
+	return fTargetFrameRate / fFrameRateCur;
 }
 
 DWORD CTaksiFrameRate::CheckFrameRate()
@@ -49,65 +105,13 @@ DWORD CTaksiFrameRate::CheckFrameRate()
 	}
 
 	m_tLastCount = tNow;
-	double fTargetFrameRate;
+	double fFrameWeight = CheckFrameWeight( iTimeDiff );
 
-	if ( g_Proc.m_pCustomConfig )
-	{
-		// using a custom frame rate/weight
-		double fFrameWeight = g_Proc.m_pCustomConfig->m_fFrameWeight;
-		if (fFrameWeight>0)
-		{
-			fFrameWeight += m_fLeftoverWeight;
-			DWORD dwFrameDups = (DWORD)(fFrameWeight);
-			m_fLeftoverWeight = fFrameWeight - dwFrameDups;
-			DEBUG_TRACE(( "dwFrameDups = %d" LOG_CR, dwFrameDups ));
-			//DEBUG_TRACE(( "g_extraWeight = %f" LOG_CR, m_fLeftoverWeight ));
-			return dwFrameDups;
-		}
-		fTargetFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
-	}
-	else
-	{
-		fTargetFrameRate = sg_Config.m_fFrameRateTarget;
-	}
-
-	DEBUG_TRACE(( "tNow=%u, iTimeDiff=%d, LastOverhead=%u" LOG_CR, (int) tNow, (int) iTimeDiff, (int) m_dwLastOverhead ));
-
-	if (m_dwLastOverhead > 0) 
-	{
-		m_dwPenalty = m_dwLastOverhead / 2;
-		iTimeDiff -= (m_dwLastOverhead - m_dwPenalty);
-		m_dwLastOverhead = 0;
-	}
-	else
-	{
-		m_dwPenalty = m_dwPenalty / 2;
-		iTimeDiff += m_dwPenalty;
-	}
-
-	DEBUG_TRACE(( "adjusted iTimeDiff = %d" LOG_CR, (int) iTimeDiff ));
-
-	double fFrameRateCur = (double)m_dwFreqUnits / (double)iTimeDiff;
-
-	if ( g_Proc.m_Stats.m_fFrameRate != fFrameRateCur )
-	{
-		g_Proc.m_Stats.m_fFrameRate = fFrameRateCur;
-		g_Proc.UpdateStat(TAKSI_PROCSTAT_FrameRate);
-	}
-
-	DEBUG_TRACE(( "currentFrameRate = %f" LOG_CR, fFrameRateCur ));
-
-	if (fFrameRateCur <= 0)
-	{
-		return 0;
-	}
-
-	double fFrameWeight = fTargetFrameRate / fFrameRateCur + m_fLeftoverWeight;
+	fFrameWeight += m_fLeftoverWeight;
 	DWORD dwFrameDups = (DWORD)(fFrameWeight);
 	m_fLeftoverWeight = fFrameWeight - dwFrameDups;
 
-	DEBUG_TRACE(( "dwFrameDups = %d" LOG_CR, dwFrameDups ));
-	//DEBUG_TRACE(( "g_extraWeight = %f" LOG_CR, m_fLeftoverWeight));
+	DEBUG_TRACE(( "dwFrameDups = %d + %f" LOG_CR, dwFrameDups, m_fLeftoverWeight ));
 
 	return dwFrameDups;
 }
