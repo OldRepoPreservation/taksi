@@ -199,18 +199,23 @@ bool CTaksiDll::HookCBT_Uninstall(void)
 	return true;
 }
 
-void CTaksiDll::LogMessage( const TCHAR* pszPrefix )
+HRESULT CTaksiDll::LogMessage( const TCHAR* pszPrefix )
 {
 	// Log a common shared message for the dll, not the process.
 	// LOG_NAME_DLL
 	if ( ! sg_Config.m_bDebugLog)
-		return;
+		return S_OK;
 
 	TCHAR szMsg[ _MAX_PATH + 64 ];
 	int iLenMsg = _sntprintf( szMsg, COUNTOF(szMsg)-1, _T("%s:%s"), 
-		pszPrefix, g_Proc.m_Stats.m_szProcessFile );
+		pszPrefix, g_Proc.m_szProcessTitleNoExt ); 
 
-	CNTHandle File( ::CreateFile( m_szLogCentral,       // file to open/create 
+	// determine logfile full path
+	TCHAR szLogFile[_MAX_PATH];	// DLL common, NOT for each process. LOG_NAME_DLL
+	lstrcpy( szLogFile, m_szIniDir );
+	lstrcat( szLogFile, LOG_NAME_DLL);
+
+	CNTHandle File( ::CreateFile( szLogFile,       // file to open/create 
 		GENERIC_WRITE,                // open for writing 
 		0,                            // do not share 
 		NULL,                         // default security 
@@ -219,13 +224,14 @@ void CTaksiDll::LogMessage( const TCHAR* pszPrefix )
 		NULL ));                        // no attr. template 
 	if ( !File.IsValidHandle()) 
 	{
-		return;
+		return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TOO_MANY_OPEN_FILES));
 	}
 
 	DWORD dwBytesWritten;
 	::SetFilePointer(File, 0, NULL, FILE_END);
 	::WriteFile(File, (LPVOID)szMsg, iLenMsg, &dwBytesWritten, NULL);
 	::WriteFile(File, (LPVOID)"\r\n", 2, &dwBytesWritten, NULL);
+	return dwBytesWritten;
 }
 
 bool CTaksiDll::InitMasterWnd(HWND hWnd)
@@ -298,23 +304,24 @@ bool CTaksiDll::InitDll()
 	m_nDX9_Reset = 0;
 #endif
 
-	if ( ! ::GetModuleFileName( g_hInst, m_szDllPathName, sizeof(m_szDllPathName)-1 ))
-	{
-		ASSERT(0);
-		m_szDllPathName[0] = '\0';
-	}
-
 	// determine my directory 
-	lstrcpy( m_szDllDir, m_szDllPathName);
-	TCHAR* pszTitle = GetFileTitlePtr(m_szDllDir);
-	ASSERT(pszTitle);
-	*pszTitle = '\0';
-
-	// determine logfile full path
-	lstrcpy( m_szLogCentral, m_szDllPathName );
-	TCHAR* pszShortLogFile = GetFileTitlePtr(m_szLogCentral);
-	ASSERT(pszShortLogFile);
-	lstrcpy( pszShortLogFile, LOG_NAME_DLL);
+	m_szIniDir[0] = '\0';
+	DWORD dwLen = GetCurrentDirectory( sizeof(m_szIniDir)-1, m_szIniDir );
+	if ( dwLen <= 0 )
+	{
+		dwLen = GetModuleFileName( g_hInst, m_szIniDir, sizeof(m_szIniDir)-1 );
+		if ( dwLen > 0 )
+		{
+			TCHAR* pszTitle = GetFileTitlePtr(m_szIniDir);
+			ASSERT(pszTitle);
+			*pszTitle = '\0';
+		}
+	}
+	if ( ! FILE_IsDirSep( m_szIniDir[dwLen-1] ))
+	{
+		m_szIniDir[dwLen++] = '\\';
+		m_szIniDir[dwLen] = '\0';
+	}
 
 	// read optional configuration file. global init.
 	m_dwConfigChangeCount = 0;	// changed when the Custom stuff in m_Config changes.
@@ -388,9 +395,6 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	{
 		_T("devenv"),	// debugger!
 		_T("dwwin"),	// debugger! crash
-#ifdef _DEBUG
-		_T("gaim"),		// sorry, this was bugging me.
-#endif
 		_T("js7jit"),	// debugger!
 		_T("monitor"),	// debugger!
 		_T("taskmgr"),	// debugger!
@@ -405,7 +409,7 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	// Check if it's Windows Explorer. We don't want to hook it either.
 	TCHAR szExplorer[_MAX_PATH];
 	::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
-	lstrcat(szExplorer, _T("\\Explorer.EXE"));
+	lstrcat(szExplorer, _T("\\explorer.exe"));
 	if (!lstrcmpi( m_Stats.m_szProcessFile, szExplorer))
 		return true;
 
@@ -448,7 +452,7 @@ void CTaksiProcess::CheckProcessCustom()
 	//
 
 	CTaksiConfig config;
-	if ( config.ReadIniFileFromDir(sg_Dll.m_szDllDir)) 
+	if ( config.ReadIniFile()) 
 	{
 		CTaksiConfigCustom* pCfgMatch = config.CustomConfig_FindPattern(m_Stats.m_szProcessFile);
 		if ( pCfgMatch )
@@ -564,6 +568,10 @@ bool CTaksiProcess::OnDllProcessAttach()
 	{
 		m_Stats.m_szProcessFile[0] = '\0';
 	}
+	else
+	{
+		_tcslwr(m_Stats.m_szProcessFile);
+	}
 
 	// determine process full path 
 	const TCHAR* pszTitle = GetFileTitlePtr(m_Stats.m_szProcessFile);
@@ -642,7 +650,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		TCHAR szLogName[ _MAX_PATH ];
 		int iLen = _sntprintf( szLogName, COUNTOF(szLogName)-1, 
 			_T("%sTaksi_%s.log"), 
-			sg_Dll.m_szDllDir, m_szProcessTitleNoExt ); 
+			sg_Dll.m_szIniDir, m_szProcessTitleNoExt ); 
 		HRESULT hRes = g_Log.OpenLogFile(szLogName);
 		if ( IS_ERROR(hRes))
 		{

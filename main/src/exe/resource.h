@@ -73,7 +73,7 @@
 #define IDC_C_StatFormat                1065
 #define IDC_C_StatGraphXMode            1066
 #define IDC_C_StatsClear                1067
-#define IDC_C_OverlayVerbose            1072
+#define IDC_C_UseOverheadCompensation	1072
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
@@ -96,16 +96,6 @@
 #define IDS_STATUS_SAVED                2103
 #define IDS_STATUS_FAILSAVE             2104
 #define IDS_SELECT_APP_HOOK             2106
-#define ID__RECORD                      40001
-#define ID__STOP                        40002
-#define ID__PAUSE                       40003
-#define ID__CONFIG                      40004
-#define ID__SCREENSHOT                  40005
-#define ID__SMALLSCREENSHOT             40006
-#define ID__APPHOOK                     40007
-#define ID__INDICATORTOGGLE             40008
-#define ID__HELPABOUT                   40009
-#define ID__HELPURL                     40010
 #define IDM_SC_HELP_URL                 0xE000
 #define IDM_SC_HELP_ABOUT               0xE010
 #define IDC_STATIC                      -1

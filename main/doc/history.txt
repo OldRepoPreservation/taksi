@@ -371,5 +371,7 @@ June 21,2006
 ==============
 Ver 0.759
 Non Frame GDI not working properly.
-Make the Frame Overhead compensation code optional. USE_FRAME_OVERHEAD
-
+Make the Frame Overhead compensation code optional. 
+UseOverheadCompensation in INI file. and in GUI config dialog.
+Add button to fill in the custom app pattern automatically.
+0,0 as params for the custom app means DONT hook that app.

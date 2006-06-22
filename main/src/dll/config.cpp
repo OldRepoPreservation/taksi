@@ -81,6 +81,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CUSTOM_Pattern:
 		if (! Str_GetQuoted( m_szPattern, pszValue, sizeof(m_szPattern)))
 			return false;
+		_tcslwr( m_szPattern );
 		break;
 	default:
 		ASSERT(0);
@@ -127,6 +128,7 @@ void CTaksiConfigData::InitConfig()
 	m_bOpenGLUse = false;
 	m_bGDIUse = false;
 	m_bGDIFrame = true;
+	m_bUseOverheadCompensation = false;
 
 	m_bShowIndicator = true;
 	m_ptMasterWindow.x = 0;
@@ -155,6 +157,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	m_bOpenGLUse = config.m_bOpenGLUse;
 	m_bGDIUse = config.m_bGDIUse;		// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
+	m_bUseOverheadCompensation = config.m_bUseOverheadCompensation;
 
 	// CAN NOT be set from CGuiConfig directly
 	m_bShowIndicator = config.m_bShowIndicator;
@@ -244,10 +247,11 @@ void CTaksiConfig::CustomConfig_Delete( CTaksiConfigCustom* pConfig ) // static
 
 CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindPattern( const TCHAR* pszProcessFile ) const
 {
+	// must always be all lower case. _tcslwr
 	for (CTaksiConfigCustom* p=m_pCustomList; p!=NULL; p=p->m_pNext )
 	{
 		// try to match the pattern with processfile
-		if ( strstr(pszProcessFile, p->m_szPattern)) 
+		if ( _tcsstr(pszProcessFile, p->m_szPattern)) 
 			return p;
 	}
 	return NULL;
@@ -375,6 +379,9 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, m_bGDIUse? "1" : "0" );
 	case TAKSI_CFGPROP_OpenGLUse:
 		return _snprintf(pszValue, iSizeMax, m_bOpenGLUse? "1" : "0" );
+	case TAKSI_CFGPROP_UseOverheadCompensation:
+		return _snprintf(pszValue, iSizeMax, m_bUseOverheadCompensation? "1" : "0" );
+
 	default:
 		ASSERT(0);
 		break;
@@ -466,6 +473,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_OpenGLUse:
 		m_bOpenGLUse = atoi(pszValue) ? true : false;
 		break;
+	case TAKSI_CFGPROP_UseOverheadCompensation:
+		m_bUseOverheadCompensation = atoi(pszValue) ? true : false;
+		break;
 	default:
 		ASSERT(0);
 		return false;
@@ -483,19 +493,16 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 
 //***************************************************************************
 
-bool CTaksiConfig::ReadIniFileFromDir(const TCHAR* pszDir)
+bool CTaksiConfig::ReadIniFile()
 {
 	// Read an INI file in standard INI file format.
 	// Returns true if successful.
 
-	char szConfigFileName[_MAX_PATH];
-	if (pszDir != NULL) 
-		lstrcpy(szConfigFileName, pszDir);
-	else
-		szConfigFileName[0] = '\0';
-	lstrcat(szConfigFileName, TAKSI_INI_FILE);
+	char szIniFileName[_MAX_PATH];
+	lstrcpy(szIniFileName, sg_Dll.m_szIniDir );
+	lstrcat(szIniFileName, TAKSI_INI_FILE);
 
-	FILE* pFile = fopen(szConfigFileName, "rt");
+	FILE* pFile = fopen(szIniFileName, "rt");
 	if (pFile == NULL) 
 	{
 		// ASSUME constructor has already set this to all defaults.
@@ -572,8 +579,12 @@ bool CTaksiConfig::WriteIniFile()
 	char* pFileOld = NULL;
 	DWORD nSizeOld = 0;
 
+	char szIniFileName[_MAX_PATH];
+	lstrcpy(szIniFileName, sg_Dll.m_szIniDir );
+	lstrcat(szIniFileName, TAKSI_INI_FILE);
+
 	// first read all lines
-	CNTHandle FileOld( ::CreateFile( TAKSI_INI_FILE, 
+	CNTHandle FileOld( ::CreateFile( szIniFileName, 
 		GENERIC_READ, 0, NULL,
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL ));
 	if ( FileOld.IsValidHandle())

@@ -57,9 +57,9 @@ CTaksiConfigCustom* CGuiConfig::Custom_FindSelect( int index ) const
 	return g_Config.CustomConfig_FindAppId(szTmp);
 }
 
-void CGuiConfig::Custom_Update()
+void CGuiConfig::Custom_Update( CTaksiConfigCustom* pCfg )
 {
-	if ( m_pCustomCur == NULL )
+	if ( pCfg == NULL )
 	{
 		SetWindowText( m_hControlCustomPattern, _T(""));
 		SetWindowText( m_hControlCustomFrameRate, _T(""));
@@ -67,13 +67,13 @@ void CGuiConfig::Custom_Update()
 		return;
 	}
 
-	SetWindowText( m_hControlCustomPattern,m_pCustomCur->m_szPattern);
+	SetWindowText( m_hControlCustomPattern,pCfg->m_szPattern);
 
 	TCHAR szTmp[_MAX_PATH];
-	m_pCustomCur->PropGet( TAKSI_CUSTOM_FrameRate, szTmp, sizeof(szTmp));
+	pCfg->PropGet( TAKSI_CUSTOM_FrameRate, szTmp, sizeof(szTmp));
 	SetWindowText( m_hControlCustomFrameRate,szTmp);
 
-	m_pCustomCur->PropGet( TAKSI_CUSTOM_FrameWeight, szTmp, sizeof(szTmp));
+	pCfg->PropGet( TAKSI_CUSTOM_FrameWeight, szTmp, sizeof(szTmp));
 	SetWindowText( m_hControlCustomFrameWeight, szTmp);
 }
 
@@ -84,6 +84,7 @@ void CGuiConfig::Custom_Read()
 		return;
 	GetWindowText( m_hControlCustomPattern,
 		m_pCustomCur->m_szPattern, sizeof(m_pCustomCur->m_szPattern));
+	_tcslwr(m_pCustomCur->m_szPattern);
 
 	TCHAR szTmp[_MAX_PATH];
 	szTmp[0] = '\0';
@@ -95,6 +96,32 @@ void CGuiConfig::Custom_Read()
 	GetWindowText( m_hControlCustomFrameWeight,
 		szTmp, sizeof(szTmp));
 	m_pCustomCur->PropSet( TAKSI_CUSTOM_FrameWeight, szTmp );
+}
+
+bool CGuiConfig::Custom_ReadHook( CTaksiConfigCustom* pCfg )
+{
+	ASSERT(pCfg);
+	if ( sg_ProcStats.m_szProcessFile[0] == '\0' )
+		return false;
+	lstrcpyn( pCfg->m_szPattern, GetFileTitlePtr(sg_ProcStats.m_szProcessFile),
+		COUNTOF(pCfg->m_szPattern));
+
+	pCfg->m_fFrameWeight = 0;
+	pCfg->m_fFrameRate = sg_ProcStats.m_fFrameRate ? sg_ProcStats.m_fFrameRate : sg_Config.m_fFrameRateTarget;
+	return true;
+}
+
+bool CGuiConfig::Custom_ReadHook()
+{
+	// Use the current hooked app as the default if there is one.
+	if ( sg_ProcStats.m_szProcessFile[0] == '\0' )
+		return false;
+	TCHAR szTitle[ _MAX_PATH ];
+	int iLen = GetWindowText( sg_ProcStats.m_hWnd, szTitle, COUNTOF(szTitle));
+	if ( iLen <= 0 )
+		return false;
+	m_pCustomCur = g_Config.CustomConfig_Lookup(szTitle);
+	return Custom_ReadHook(m_pCustomCur);
 }
 
 void CGuiConfig::Custom_Init( CTaksiConfigCustom* pCustom )
@@ -118,7 +145,7 @@ void CGuiConfig::Custom_Init( CTaksiConfigCustom* pCustom )
 	}
 
 	// clear status text
-	Custom_Update();
+	Custom_Update(m_pCustomCur);
 	SetStatusText( _T(""));
 }
 
@@ -310,7 +337,7 @@ void CGuiConfig::OnCommandRestore(void)
 	m_pCustomCur = NULL;
 
 	// read optional configuration file
-	if ( ! g_Config.ReadIniFileFromDir(NULL))
+	if ( ! g_Config.ReadIniFile())
 	{
 		// this is ok since we can just take all defaults.
 		g_Config.InitConfig();
@@ -377,23 +404,11 @@ void CGuiConfig::OnCommandCustomNewButton()
 	m_pCustomCur = NULL;
 
 	// Use the current hooked app as the default if there is one.
-	if ( sg_ProcStats.m_szProcessFile[0] )
-	{
-		TCHAR szTitle[ _MAX_PATH ];
-		int iLen = GetWindowText( sg_ProcStats.m_hWnd, szTitle, COUNTOF(szTitle));
-		if ( iLen > 0 )
-		{
-			m_pCustomCur = g_Config.CustomConfig_Lookup(szTitle);
-			ASSERT(m_pCustomCur);
-			lstrcpyn( m_pCustomCur->m_szPattern, GetFileTitlePtr(sg_ProcStats.m_szProcessFile),
-				COUNTOF(m_pCustomCur->m_szPattern));
-			m_pCustomCur->m_fFrameRate = sg_ProcStats.m_fFrameRate ? sg_ProcStats.m_fFrameRate : sg_Config.m_fFrameRateTarget;
-		}
-	}
+	Custom_ReadHook();
 
 	// clear out controls
 	SetWindowText( m_hControlCustomSettingsList, m_pCustomCur ? (m_pCustomCur->m_szAppId) : "" );
-	Custom_Update();
+	Custom_Update(m_pCustomCur);
 
 	// set focus on appId comboBox
 	SetFocus(m_hControlCustomSettingsList);
@@ -418,7 +433,7 @@ void CGuiConfig::OnCommandCustomDeleteButton()
 	SendMessage(m_hControlCustomSettingsList, CB_SETCURSEL, 0, 0);
 	m_pCustomCur = Custom_FindSelect(0);
 
-	Custom_Update();
+	Custom_Update(m_pCustomCur);
 }
 
 void CGuiConfig::OnCommandCustomKillFocus()
@@ -567,17 +582,23 @@ bool CGuiConfig::OnTimer( UINT idTimer )
 		return false;
 	}
 
-	// Check for stats update. only if this tab is set.
-	if ( m_iTabCur != 5 )
-		return false;
-
-	if ( sg_ProcStats.m_dwPropChangedMask )
+	if ( m_iTabCur == 3 )
 	{
-		UpdateProcStats( sg_ProcStats, sg_ProcStats.m_dwPropChangedMask );
-		sg_ProcStats.m_dwPropChangedMask = 0;
+		EnableWindow( m_hControlCustomUseCurrent, sg_ProcStats.m_szProcessFile[0] != '\0' );
+		return true;
+	}
+	if ( m_iTabCur == 5 )
+	{
+		// Check for stats update. only if this tab is set.
+		if ( sg_ProcStats.m_dwPropChangedMask )
+		{
+			UpdateProcStats( sg_ProcStats, sg_ProcStats.m_dwPropChangedMask );
+			sg_ProcStats.m_dwPropChangedMask = 0;
+		}
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool CGuiConfig::OnNotify( int id, NMHDR* pHead )
@@ -626,6 +647,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case IDC_C_GDIFrame:
 		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
+		return true;
+	case IDC_C_UseOverheadCompensation:
+		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );
 		return true;
 
 	case IDC_C_CaptureDirectory:
@@ -752,7 +776,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 
 			// update custom controls
 			m_bDataUpdating = true;
-			Custom_Update();
+			Custom_Update(m_pCustomCur);
 			m_bDataUpdating = false;
 			return true;
 		}
@@ -767,7 +791,16 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		OnCommandCustomDeleteButton();
 		return true;
 	case IDC_C_CustomUseCurrent:
-		// ?? Fill in the data from the current hooked window.
+		// Fill in the data from the current hooked window.
+		{
+		m_bDataUpdating = true;
+		CTaksiConfigCustom custom;
+		if ( Custom_ReadHook(&custom))
+		{
+			Custom_Update(&custom);
+		}
+		m_bDataUpdating = false;
+		}
 		return true;
 
 	case IDC_C_StatsClear:

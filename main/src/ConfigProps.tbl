@@ -23,11 +23,14 @@ ConfigProp(VideoCodecInfo,			m_VideoCodec,		"Video Codec Info stored as an array
 ConfigProp(VideoCodecMsg,			m_bVideoCodecMsg,	"Did we put up the message about video code yet ?")
 ConfigProp(VideoHalfSize,			m_bVideoHalfSize,	"Capture Half vs Full size video")
 
-ConfigProp(VKey_ConfigOpen,			m_wHotKey,	"Hot key to open the config dialog")
-ConfigProp(VKey_HookModeToggle,		m_wHotKey,	"Hot key mappings HookModeToggle")
-ConfigProp(VKey_IndicatorToggle,	m_wHotKey,	"Hot key mappings IndicatorToggle")
-ConfigProp(VKey_RecordBegin,		m_wHotKey,	"Hot key mappings RecordBegin")
-ConfigProp(VKey_RecordPause,		m_wHotKey,	"Hot key mappings RecordPause")
-ConfigProp(VKey_RecordStop,			m_wHotKey,	"Hot key mappings RecordStop")
-ConfigProp(VKey_Screenshot,			m_wHotKey,	"Hot key mappings Screenshot")
-ConfigProp(VKey_SmallScreenshot,	m_wHotKey,	"Hot key mappings SmallScreenshot")
+ConfigProp(VKey_ConfigOpen,			m_wHotKey[0],	"Hot key to open the config dialog")
+ConfigProp(VKey_HookModeToggle,		m_wHotKey[1],	"Hot key mappings HookModeToggle")
+ConfigProp(VKey_IndicatorToggle,	m_wHotKey[2],	"Hot key mappings IndicatorToggle")
+ConfigProp(VKey_RecordBegin,		m_wHotKey[3],	"Hot key mappings RecordBegin")
+ConfigProp(VKey_RecordPause,		m_wHotKey[4],	"Hot key mappings RecordPause")
+ConfigProp(VKey_RecordStop,			m_wHotKey[5],	"Hot key mappings RecordStop")
+ConfigProp(VKey_Screenshot,			m_wHotKey[6],	"Hot key mappings Screenshot")
+ConfigProp(VKey_SmallScreenshot,	m_wHotKey[7],	"Hot key mappings SmallScreenshot")
+
+ConfigProp(UseOverheadCompensation, m_bUseOverheadCompensation, "Compensate for record overhead in frame rate calc")
+

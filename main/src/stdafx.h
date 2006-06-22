@@ -7,7 +7,6 @@
 #endif
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
-// #define USE_FRAME_OVERHEAD	// try to remove frame record overhead.
 
 // System includes always go first.
 #include <windows.h>
@@ -172,7 +171,7 @@ public:
 	void DestroyDll();
 
 	void OnDetachProcess();
-	void LogMessage( const TCHAR* pszPrefix );	// LOG_NAME_DLL
+	HRESULT LogMessage( const TCHAR* pszPrefix );	// LOG_NAME_DLL
 
 	bool IsHookCBT() const
 	{
@@ -204,11 +203,9 @@ public:
 #endif
 
 public:
-	TCHAR m_szDllPathName[_MAX_PATH];	// DLL file. GetModuleFileName()
-	TCHAR m_szDllDir[_MAX_PATH];
+	TCHAR m_szIniDir[_MAX_PATH];		// what dir to find the INI file and put the log files.
 
 #define LOG_NAME_DLL	_T("TaksiDll.log")	// common log shared by all processes.
-	TCHAR m_szLogCentral[_MAX_PATH];	// DLL common, NOT for each process. LOG_NAME_DLL
 
 	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
 	DWORD m_dwHotKeyMask;	// TAKSI_HOTKEY_TYPE mask from App.

@@ -88,7 +88,7 @@ void CheckVideoCodec( HWND hWnd, const ICINFO& info )
 
 static void InitApp()
 {
-	if ( ! g_Config.ReadIniFileFromDir(NULL))
+	if ( ! g_Config.ReadIniFile())
 	{
 		// this is ok since we can just take all defaults.
 	}
