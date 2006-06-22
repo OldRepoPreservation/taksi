@@ -346,21 +346,21 @@ June 13,2006
 Ver 0.754
 Display the M of data recorded in the main GUI window title.
 stats show graphics mode hooked.
-Half sized GDI record
+FIX Half sized GDI record
 
 June 14,2006 
 ==============
 Ver 0.755
-test switch to turn off opengl hook. OpenGLUse
-better error codes loggged. testing feedback from boards.
+Create a test switch to turn off opengl hooking. OpenGLUse
+Better error codes loggged. testing feedback from boards.
 
 Ver 0.756
 FIX bug creating new custom config.
-re-try getting info on the surface if the GetFrame() call fails.
+Re-try getting info on the surface if the GetFrame() call fails.
 
 Ver 0.757
-check the save dir exists (Create if not) at start up.
-hotKeys indicated in the shell icon
+Check that the save dir exists (Create if not) at start up.
+Make hotKeys indicated in the shell icon
 
 Ver 0.758
 Move config dialog window to the foreground if opened via hotkey
@@ -375,3 +375,6 @@ Make the Frame Overhead compensation code optional.
 UseOverheadCompensation in INI file. and in GUI config dialog.
 Add button to fill in the custom app pattern automatically.
 0,0 as params for the custom app means DONT hook that app.
+
+Ver 0.760 RELEASE
+
