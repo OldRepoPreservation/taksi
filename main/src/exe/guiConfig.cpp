@@ -210,6 +210,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 
 void CGuiConfig::UpdateVideoCodec( const CVideoCodec& codec, bool bMessageBox )
 {
+	// Assume the video codec has changed
 	ICINFO info;
 	if ( ! codec.GetCodecInfo(info))
 	{
@@ -499,7 +500,7 @@ void CGuiConfig::OnCommandVideoCodecButton()
 	{
 		// Really changed
 		g_Config.m_bVideoCodecMsg = false;
-		UpdateVideoCodec( g_Config.m_VideoCodec, true );
+		UpdateVideoCodec( g_Config.m_VideoCodec, VideoCur.m_v.fccHandler != VideoPrev.m_v.fccHandler );
 		OnChanges();
 	}
 }
