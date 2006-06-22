@@ -8,7 +8,7 @@
 
 CTaksiGDI g_GDI;
 
-#define IDT_TIMER 0x1234
+#define IDT_TIMER 0x1234	// HOPE - this wont conflict with an existing timer for the app!
 
 //*****************************************
 
