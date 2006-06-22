@@ -136,6 +136,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 		HWND hWnd = FindWindow( TAKSI_MASTER_CLASSNAME, NULL );
 		if ( hWnd )
 		{
+			::ShowWindow( hWnd, SW_NORMAL );
 			::SetActiveWindow( hWnd );
 		}
 		return -1;
