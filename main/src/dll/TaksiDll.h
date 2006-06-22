@@ -21,10 +21,8 @@ public:
 		: m_dwFreqUnits(0)
 		, m_tLastCount(0)
 		, m_fLeftoverWeight(0.0)
-#ifdef USE_FRAME_OVERHEAD
 		, m_dwOverheadPenalty(0)
 		, m_dwLastOverhead(0)
-#endif
 	{
 	}
 	bool InitFreqUnits();
@@ -33,10 +31,8 @@ public:
 
 	void EndOfOverheadTime()
 	{
-#ifdef USE_FRAME_OVERHEAD
 		TIMEFAST_t tNow = GetPerformanceCounter();
 		m_dwLastOverhead = (DWORD)( tNow - m_tLastCount );
-#endif
 	}
 
 private:
@@ -48,11 +44,10 @@ private:
 	TIMEFAST_t m_tLastCount;	// when was CheckFrameRate() called?
 	float m_fLeftoverWeight;
 
-#ifdef USE_FRAME_OVERHEAD
 	// Try to factor out the overhead we induce while recording.
+	// Config.m_bUseOverheadCompensation
 	DWORD m_dwLastOverhead;
 	DWORD m_dwOverheadPenalty;
-#endif
 };
 extern CTaksiFrameRate g_FrameRate;
 

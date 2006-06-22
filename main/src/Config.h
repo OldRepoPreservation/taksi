@@ -46,7 +46,7 @@ public:
 
 public:
 	TCHAR  m_szAppId[_MAX_PATH];	// [friendly name] in the INI file.
-	TCHAR  m_szPattern[_MAX_PATH];	// id for the process.	TAKSI_CUSTOM_Pattern
+	TCHAR  m_szPattern[_MAX_PATH];	// id for the process.	TAKSI_CUSTOM_Pattern (Lower case)
 	float  m_fFrameRate;	// video frame rate. TAKSI_CUSTOM_FrameRate
 	float  m_fFrameWeight;	// this assumes frames come in at a set rate and we dont have to measure them!
 
@@ -96,9 +96,10 @@ public:
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
 
-	bool   m_bOpenGLUse;
-	bool   m_bGDIUse;		// hook GDI mode at all?
+	bool   m_bUseOverheadCompensation;
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
+	bool   m_bGDIUse;		// hook GDI mode at all?
+	bool   m_bOpenGLUse;
 
 	// CAN NOT be set from CGuiConfig directly
 	bool   m_bShowIndicator;
@@ -117,7 +118,7 @@ public:
 	CTaksiConfig();
 	~CTaksiConfig();
 
-	bool ReadIniFileFromDir(const TCHAR* pszDir);
+	bool ReadIniFile();
 	bool WriteIniFile();
 
 	CTaksiConfigCustom* CustomConfig_FindAppId( const TCHAR* pszAppId ) const;

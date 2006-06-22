@@ -81,8 +81,10 @@ protected:
 
 	CTaksiConfigCustom* Custom_FindSelect( int index ) const;
 	void Custom_Init( CTaksiConfigCustom* pCfg );
-	void Custom_Update();
+	void Custom_Update( CTaksiConfigCustom* pCfg );
 	void Custom_Read();
+	bool Custom_ReadHook();
+	bool Custom_ReadHook( CTaksiConfigCustom* pCfg );
 
 	void UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask );
 	void UpdateVideoCodec( const CVideoCodec& codec, bool bMessageBox );
@@ -117,9 +119,9 @@ protected:
 public:
 	CWndToolTip m_ToolTips;
 
-	int m_iTabCur;	// persist this.
 	HWND m_hControlTab;
 	HWND m_hWndTab[6]; // N tabs
+	int m_iTabCur;	// persist this. 0 to COUNTOF(m_hWndTab)
 
 #define GuiConfigControl(a,b,c) HWND m_hControl##a;
 #include "GuiConfigControls.tbl"

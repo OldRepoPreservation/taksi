@@ -54,20 +54,21 @@ double CTaksiFrameRate::CheckFrameWeight( __int64 iTimeDiff )
 
 	DEBUG_TRACE(( "iTimeDiff=%d" LOG_CR, (int) iTimeDiff ));
 
-#ifdef USE_FRAME_OVERHEAD
-	if (m_dwLastOverhead > 0) 
+	if ( sg_Config.m_bUseOverheadCompensation )
 	{
-		m_dwOverheadPenalty = m_dwLastOverhead / 2;
-		iTimeDiff -= (m_dwLastOverhead - m_dwOverheadPenalty);
-		m_dwLastOverhead = 0;
+		if (m_dwLastOverhead > 0) 
+		{
+			m_dwOverheadPenalty = m_dwLastOverhead / 2;
+			iTimeDiff -= (m_dwLastOverhead - m_dwOverheadPenalty);
+			m_dwLastOverhead = 0;
+		}
+		else
+		{
+			m_dwOverheadPenalty = m_dwOverheadPenalty / 2;
+			iTimeDiff += m_dwOverheadPenalty;
+		}
+		DEBUG_TRACE(( "adjusted iTimeDiff = %d, LastOverhead=%u" LOG_CR, (int) iTimeDiff, (int) m_dwLastOverhead ));
 	}
-	else
-	{
-		m_dwOverheadPenalty = m_dwOverheadPenalty / 2;
-		iTimeDiff += m_dwOverheadPenalty;
-	}
-	DEBUG_TRACE(( "adjusted iTimeDiff = %d, LastOverhead=%u" LOG_CR, (int) iTimeDiff, (int) m_dwLastOverhead ));
-#endif
 
 	double fFrameRateCur = (double)m_dwFreqUnits / (double)iTimeDiff;
 
