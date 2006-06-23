@@ -81,7 +81,7 @@ Supports user-specified key mapping, allowing user to assign almost any key to a
 Custom video settings are supported (see manual.txt for more details about this). Basically, this allows a user to specify on a per-game basis the frame rate of the captured video, and the weight of each source frame. The weight determines whether a particular frame is captured or not. This allows for creation of smoother and faster videos, when generic algorithm doesn´t produce desired results.
 
 * Supported OS: Win95/98/ME, WinNT4.0/2K/XP/23.
-* 3D Graphics API: Direct3D 8, Direct3D 9, OpenGL
+* 3D Graphics API: Direct3D 8, Direct3D 9, OpenGL, GDI
 * Screenshot file format: 24-bit BMP
 * Video file format: compressed or uncompressed AVI 
 </Char_Desc_2000>
