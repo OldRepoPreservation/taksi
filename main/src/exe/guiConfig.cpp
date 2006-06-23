@@ -487,8 +487,11 @@ void CGuiConfig::OnCommandVideoCodecButton()
 	CVideoCodec VideoPrev;
 	VideoPrev.InitCodec();
 	VideoPrev.CopyCodec( g_Config.m_VideoCodec );
-	g_Config.m_VideoCodec.CompChooseDlg( m_hWnd,
-		_TEXT("Choose video compressor"));
+	if ( ! g_Config.m_VideoCodec.CompChooseDlg( m_hWnd,
+		_TEXT("Choose video compressor")))
+	{
+		return;
+	}
 	CVideoCodec VideoCur;
 	VideoCur.InitCodec();
 	VideoCur.CopyCodec( g_Config.m_VideoCodec );
