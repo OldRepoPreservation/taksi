@@ -265,7 +265,7 @@ bool CVideoCodec::CompChooseDlg( HWND hWnd, LPSTR lpszTitle )
 		NULL, NULL,
 		&m_v, (LPSTR) lpszTitle ))
 	{
-		return false;
+		return false;	// cancelled.
 	}
 	// ICMF_COMPVARS_VALID
 	return true; 
