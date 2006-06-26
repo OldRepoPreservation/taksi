@@ -15,20 +15,14 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0723204639144775B786B18144055A9D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0EF154C5E8A44FA89DB40B57F92227C0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_44F983E411D62C63605F104FAE424454"
-        "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmKey" = "8:_4BF8BEC9A8444A2AAFE9700D956125BA"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -51,12 +45,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6DE31EF302AF42DEB6235AB1568C345A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -69,7 +57,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B7D5F4F1F37D03B7B66F38BF8EA623FE"
+        "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ED02A38A2B9540B1B32359245C0496C8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F2A99BB7CDCF49D28DFB7E28C68710C2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -131,26 +137,6 @@
         }
         "File"
         {
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_0723204639144775B786B18144055A9D"
-            {
-            "SourcePath" = "8:..\\..\\doc\\manual.txt"
-            "TargetName" = "8:manual.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_0EF154C5E8A44FA89DB40B57F92227C0"
             {
             "SourcePath" = "8:..\\..\\doc\\TaksiTasks.txt"
@@ -171,10 +157,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_44F983E411D62C63605F104FAE424454"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_4BF8BEC9A8444A2AAFE9700D956125BA"
             {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
+            "SourcePath" = "8:..\\..\\doc\\TaksiHistory.txt"
+            "TargetName" = "8:TaksiHistory.txt"
             "Tag" = "8:"
             "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
             "Condition" = "8:"
@@ -187,8 +173,8 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4F1297FD3B08473FB6C6EFA2EF179DA4"
@@ -231,26 +217,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_6DE31EF302AF42DEB6235AB1568C345A"
-            {
-            "SourcePath" = "8:..\\..\\doc\\history.txt"
-            "TargetName" = "8:history.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
             {
             "SourcePath" = "8:..\\taksi.ini"
@@ -275,6 +241,66 @@
             {
             "SourcePath" = "8:TaksiLogo.jpg"
             "TargetName" = "8:TaksiLogo.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7D5F4F1F37D03B7B66F38BF8EA623FE"
+            {
+            "SourcePath" = "8:MSVFW32.dll"
+            "TargetName" = "8:MSVFW32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_ED02A38A2B9540B1B32359245C0496C8"
+            {
+            "SourcePath" = "8:..\\..\\doc\\TaksiManual.txt"
+            "TargetName" = "8:TaksiManual.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F2A99BB7CDCF49D28DFB7E28C68710C2"
+            {
+            "SourcePath" = "8:..\\..\\TaksiLicense.txt"
+            "TargetName" = "8:TaksiLicense.txt"
             "Tag" = "8:"
             "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
             "Condition" = "8:"

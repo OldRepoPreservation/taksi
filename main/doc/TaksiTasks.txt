@@ -1,4 +1,4 @@
-Taksi Dev Notes
+Taksi Dev Notes and Task TODO list.
 6/21/2006
 
 OPEN QUESTIONS:

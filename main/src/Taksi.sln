@@ -32,11 +32,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		..\BUILD.txt = ..\BUILD.txt
-		..\doc\history.txt = ..\doc\history.txt
-		..\license.txt = ..\license.txt
 		Makefile = Makefile
-		..\doc\manual.txt = ..\doc\manual.txt
 		taksi.ini = taksi.ini
+		..\doc\TaksiHistory.txt = ..\doc\TaksiHistory.txt
+		..\TaksiLicense.txt = ..\TaksiLicense.txt
+		..\doc\TaksiManual.txt = ..\doc\TaksiManual.txt
 		..\doc\TaksiPic.jpg = ..\doc\TaksiPic.jpg
 		..\doc\TaksiTasks.txt = ..\doc\TaksiTasks.txt
 	EndGlobalSection
