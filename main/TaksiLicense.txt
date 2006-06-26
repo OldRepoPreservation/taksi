@@ -1,6 +1,8 @@
-Parts Copyright (c) 1992 - 2006 Dennis Robinson (www.menasoft.com)
+Taksi Desktop Video Recorder License
 
-Copyright (c) 2004, Anton Jouline
+Parts of Taksi Copyright (c) 1992 - 2006 Dennis Robinson (www.menasoft.com)
+
+Taksi Copyright (c) 2004, Anton Jouline
 
 All rights reserved.
 
