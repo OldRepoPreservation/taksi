@@ -32,6 +32,7 @@
 #define IDB_RecordPause_2               215
 #define IDC_ABOUT_1                     1001
 #define IDC_ABOUT_4                     1004
+#define IDC_ABOUT_5                     1005
 #define IDC_C_TAB                       1009
 #define IDC_C_StatusText                1010
 #define IDC_C_RestoreButton             1011
@@ -64,7 +65,6 @@
 #define IDC_C_CustomNewButton           1054
 #define IDC_C_CustomDeleteButton        1055
 #define IDC_C_CustomUseCurrent          1056
-
 #define IDC_C_StatProcessName           1060
 #define IDC_C_StatLastError             1061
 #define IDC_C_StatState                 1062
@@ -73,12 +73,13 @@
 #define IDC_C_StatFormat                1065
 #define IDC_C_StatGraphXMode            1066
 #define IDC_C_StatsClear                1067
-#define IDC_C_UseOverheadCompensation	1072
+#define IDC_C_UseOverheadCompensation   1072
 #define IDC_C_GDIUse                    1073
 #define IDC_C_GDIFull                   1074
 #define IDC_C_GDIFrame                  1075
 #define IDC_C_OpenGLUse                 1076
-
+#define IDC_EDIT1                       1088
+#define IDC_RICHEDIT21                  1089
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
@@ -107,7 +108,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         40011
-#define _APS_NEXT_CONTROL_VALUE         1088
+#define _APS_NEXT_CONTROL_VALUE         1090
 #define _APS_NEXT_SYMED_VALUE           10005
 #endif
 #endif

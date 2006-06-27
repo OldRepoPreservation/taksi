@@ -168,8 +168,7 @@ BEGIN
     EDITTEXT        IDC_C_CustomFrameWeight,69,69,46,14,ES_AUTOHSCROLL
     LTEXT           "(Force ratio of app refreshes : stored frames)",
                     IDC_STATIC,122,72,151,8
-    PUSHBUTTON      "Use current hook",IDC_C_CustomUseCurrent,189,98,77,12,
-                    WS_VISIBLE
+    PUSHBUTTON      "Use current hook",IDC_C_CustomUseCurrent,189,98,77,12
 END
 
 IDD_GuiConfigTab5 DIALOGEX 4, 14, 274, 113
@@ -229,18 +228,14 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
 CAPTION "About Taksi Desktop Video Recorder"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Taksi",IDC_ABOUT_1,7,7,140,8
-    LTEXT           "Desktop Video Recorder",IDC_STATIC,7,15,140,8
-    LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,140,
+    LTEXT           "Taksi",IDC_ABOUT_1,7,7,200,8
+    LTEXT           "Desktop Video Recorder",IDC_STATIC,7,15,200,8
+    LTEXT           "For: GDI, DirectX8, 9, and OpenGL",IDC_STATIC,7,24,200,
                     8
-    LTEXT           "",IDC_ABOUT_4,7,33,140,8
-    LTEXT           "Copyright©2004 Anton Jouline (Juce)",IDC_STATIC,7,41,
-                    140,8
-    LTEXT           "http://taksi.sourceforge.net/",IDC_STATIC,7,50,140,8
-    LTEXT           "Copyright©1992-2006 Dennis Robinson",IDC_STATIC,7,58,
-                    140,8
-    LTEXT           "http://www.menasoft.com/taksi",IDC_STATIC,7,67,140,8
+    LTEXT           "",IDC_ABOUT_4,7,33,200,8
     ICON            ID_APP,ID_APP,186,70,20,20
+    EDITTEXT        IDC_ABOUT_5,7,42,177,48,ES_MULTILINE | ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER
 END
 
 
@@ -460,6 +455,7 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDC_C_CustomUseCurrent  "Use the currently hooked applications information in the dialog"
     IDC_C_StatsClear        "Clear the stats values"
 END
 
@@ -472,7 +468,11 @@ STRINGTABLE
 BEGIN
     IDC_C_UseOverheadCompensation 
                             "Check = compensate for the overhead of recording to keep videos at their original speed. (Good for cinematics) Unchecked = play videos as observed during record."
-	IDC_C_CustomUseCurrent "Use the currently hooked applications information in the dialog"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_ABOUT_5             "Copyright©2004 Anton Jouline (Juce)\r\nhttp://taksi.sourceforge.net/\r\nCopyright©1992-2006 Dennis Robinson (Menace)\r\nhttp://www.menasoft.com/taksi"
 END
 
 #endif    // English (U.S.) resources
