@@ -32,6 +32,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		..\BUILD.txt = ..\BUILD.txt
+		TaksiInstaller\desktop.ini = TaksiInstaller\desktop.ini
 		Makefile = Makefile
 		taksi.ini = taksi.ini
 		..\doc\TaksiHistory.txt = ..\doc\TaksiHistory.txt
