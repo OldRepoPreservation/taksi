@@ -3,6 +3,7 @@
 // main controls.
 //
 #include "../stdafx.h"
+#include <richedit.h>	// NM_RCLICK
 #include "Taksi.h"
 #include "resource.h"
 #include "guiConfig.h"
@@ -238,7 +239,7 @@ void CGui::UpdateButtonToolTips()
 		TCHAR szText[ _MAX_PATH ];
 		if ( iLen > 0 )
 		{
-			_sntprintf( szText, COUNTOF(szText), _T("(%s) %s"), szHotKey, szHelp );
+			iLen = _sntprintf( szText, COUNTOF(szText), _T("(%s) %s"), szHotKey, szHelp );
 			pszText = szText;
 		}
 		else
@@ -264,17 +265,23 @@ void CGui::OnCommandHelpURL() // static
 	CHttpLink_GotoURL( _T("http://taksi.sourceforge.net/"), SW_SHOWNORMAL );
 }
 
+static void About_OnInitDialog( HWND hwndDlg )
+{
+	TCHAR szTmp[ _MAX_PATH ];
+	int iLen = g_GUI.MakeWindowTitle( szTmp, NULL );
+	iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, ", (built:" __DATE__ ")" );
+	SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTmp );
+
+	LoadString( g_hInst, IDC_ABOUT_5, szTmp, COUNTOF(szTmp));
+	SetDlgItemText( hwndDlg, IDC_ABOUT_5, szTmp );
+}
+
 BOOL CALLBACK AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
 { 
     switch (message) 
     { 
 	case WM_INITDIALOG:
-		{
-			TCHAR szTmp[ _MAX_PATH ];
-			int iLen = g_GUI.MakeWindowTitle( szTmp, NULL );
-			iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, ", (built:" __DATE__ ")" );
-			SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTmp );
-		}
+		About_OnInitDialog(hwndDlg);
 		break;
 	case WM_COMMAND: 
 		switch (LOWORD(wParam)) 
@@ -335,14 +342,14 @@ void CGui::UpdateMenuPopupHotKey( HMENU hMenu, TAKSI_HOTKEY_TYPE eKey )
 		else
 		{
 			_sntprintf( szMenuText+iLenMenuText, COUNTOF(szMenuText) - iLenMenuText,
-				_T(" (%s)"), szHotKey );
+				_T("\t(%s)"), szHotKey );
 		}
 	}
 	else
 	{
 		if ( pszParen )
 		{
-			ASSERT(pszParen[-1] == ' ');
+			ASSERT(pszParen[-1] == '\t');
 			pszParen[-1] = '\0';	// get rid of the key and space.
 		}
 	}

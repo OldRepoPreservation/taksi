@@ -14,5 +14,5 @@
 #define TAKSI_VERSION_RES_N		0,7,6,1
 #define TAKSI_VERSION_RES_S		"0,7,6,1"
 
-#define TAKSI_COPYRIGHT "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson\0"
+#define TAKSI_COPYRIGHT "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson (Menace)\0"
      
