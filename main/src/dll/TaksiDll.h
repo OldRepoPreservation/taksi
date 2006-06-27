@@ -145,7 +145,7 @@ public:
 	void StopGraphXMode();
 	void DetachGraphXMode();
 	bool StartGraphXMode( TAKSI_GRAPHX_TYPE eMode );
-	HRESULT AttachGraphXMode( HWND hWnd );
+	HRESULT AttachGraphXModeW( HWND hWnd );
 
 	bool OnDllProcessAttach();
 	bool OnDllProcessDetach();

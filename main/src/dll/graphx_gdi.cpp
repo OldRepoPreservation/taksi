@@ -223,6 +223,10 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		g_GDI.m_bGotFrameInfo = false;
 		g_GDI.m_iReentrant--;
 		DEBUG_MSG((  "CTaksiGDI::WM_DESTROY" LOG_CR ));
+		if ( g_Proc.IsProcPrime())
+		{
+			sg_Dll.SendReHookMessage();
+		}
 		return lRes;
 		}
 	case WM_SIZE:
