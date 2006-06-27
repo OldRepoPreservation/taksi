@@ -5,6 +5,7 @@ OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
 
 KNOWN BUGS:
+1 FPS not recording properly?
 switching hook not always working correctly. 2 instances of the same app?
 Should auto prefer graphics hook over opengl over GDI hook. 
 GDI indicator drawn over overlapped windows. bleeds through.

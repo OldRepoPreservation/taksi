@@ -138,13 +138,13 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		// Set the DLL implants on whoever gets the focus!
 		// ASSUME DLL_PROCESS_ATTACH was called.
 		// TAKSI_INDICATE_Hooked
-		// wParam = NULL. can be null of losing focus.
+		// wParam = NULL. can be null if losing focus or desktop
 		if ( g_Proc.m_bIsProcessSpecial )
 			break;
 		LOG_MSG(( "HookCBTProc: nCode=0x%x, wParam=0x%x" LOG_CR, (DWORD)nCode, wParam ));
 		if ( wParam == NULL )	// ignore this!
 			break;
-		if ( g_Proc.AttachGraphXMode( (HWND) wParam ) == S_OK )
+		if ( g_Proc.AttachGraphXModeW( (HWND) wParam ) == S_OK )
 		{
 			g_Proc.CheckProcessCustom();	// determine frame capturing algorithm 
 		}
@@ -253,20 +253,33 @@ void CTaksiDll::UpdateConfigCustom()
 	m_dwConfigChangeCount++;
 }
 
+void CTaksiDll::SendReHookMessage()
+{
+	// My window went away, i must rehook to get a new window.
+	// ASSUME: i was the current hook. then we probably weant to re-hook some other app.
+	// if .exe is still running, tell it to re-install the CBT hook
+
+	if ( m_bMasterExiting )
+		return;
+	if ( m_hMasterWnd == NULL )
+		return;
+	if ( ! ::PostMessage( m_hMasterWnd, WM_APP_REHOOKCBT, 0, 0 ))
+	{
+		LOG_WARN(( "Post message for Master to re-hook CBT FAILED." LOG_CR ));
+	}
+	else
+	{
+		LOG_MSG(( "Post message for Master to re-hook CBT." LOG_CR ));
+	}
+}
+
 void CTaksiDll::OnDetachProcess()
 {
 	if ( g_Proc.IsProcPrime())
 	{
-		sg_ProcStats.InitProcStats();	// no prime anymore!
+		sg_ProcStats.InitProcStats();	// not prime anymore!
 		HookCBT_Uninstall();
-
-		// If i was the current hook. then we probably weant to re-hook some other app.
-		// if .exe is still running, tell it to re-install the CBT hook
-		if ( !m_bMasterExiting && m_hMasterWnd )
-		{
-			::PostMessage(m_hMasterWnd, WM_APP_REHOOKCBT, 0, 0 );
-			LOG_MSG(( "Post message for Master to re-hook CBT." LOG_CR));
-		}
+		SendReHookMessage();
 	}
 }
 
@@ -393,6 +406,7 @@ bool CTaksiProcess::CheckProcessSpecial() const
 
 	static const TCHAR* sm_SpecialNames[] = 
 	{
+		_T("dbgmon"),	// debugger!
 		_T("devenv"),	// debugger!
 		_T("dwwin"),	// debugger! crash
 		_T("js7jit"),	// debugger!
@@ -406,7 +420,7 @@ bool CTaksiProcess::CheckProcessSpecial() const
 			return true;
 	}
 
-#if 0
+#if 1
 	// Check if it's Windows Explorer. We don't want to hook it either.
 	TCHAR szExplorer[_MAX_PATH];
 	::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
@@ -497,7 +511,7 @@ bool CTaksiProcess::StartGraphXMode( TAKSI_GRAPHX_TYPE eMode )
 	return true;
 }
 
-HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
+HRESULT CTaksiProcess::AttachGraphXModeW( HWND hWnd )
 {
 	// see if any of supported graphics API DLLs are already loaded. (and can be hooked)
 	// ARGS:
@@ -511,12 +525,10 @@ HRESULT CTaksiProcess::AttachGraphXMode( HWND hWnd )
 
 	if (m_bIsProcessSpecial)	// Dont hook special apps like My EXE or Explorer.
 		return S_FALSE;
+	if ( hWnd == NULL )	// losing focus i guess. ignore that.
+		return S_FALSE;
 
-	if ( hWnd )
-	{
-		hWnd = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
-	}
-	m_hWndHookTry = hWnd;
+	m_hWndHookTry = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
 
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 

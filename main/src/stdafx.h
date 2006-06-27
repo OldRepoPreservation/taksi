@@ -172,6 +172,7 @@ public:
 
 	void OnDetachProcess();
 	HRESULT LogMessage( const TCHAR* pszPrefix );	// LOG_NAME_DLL
+	void SendReHookMessage();
 
 	bool IsHookCBT() const
 	{
