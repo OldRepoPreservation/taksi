@@ -29,9 +29,11 @@ CTaksiLogFile g_Log;			// Log file for each process. seperate
 
 static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] = 
 {
+#ifdef USE_DX
+	&g_DX8,	// TAKSI_GRAPHX_DX8
+	&g_DX9,	// TAKSI_GRAPHX_DX9
+#endif
 	&g_OGL,	// TAKSI_GRAPHX_OGL
-	&g_DX8,
-	&g_DX9,
 	&g_GDI,	// TAKSI_GRAPHX_GDI // Last
 };
 
@@ -685,7 +687,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
 	}
 
-	// ASSUME HookCBTProc will call AttachGraphXMode later
+	// ASSUME HookCBTProc will call AttachGraphXModeW later
 	return true;
 }
 

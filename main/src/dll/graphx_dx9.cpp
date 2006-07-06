@@ -1,5 +1,6 @@
 //
 // graphx_dx9.cpp
+// must be in seperate file from DX8
 //
 #include "../stdafx.h"
 #include "TaksiDll.h"
@@ -906,7 +907,11 @@ bool CTaksiDX9::HookFunctions()
 
 	DEBUG_MSG(( "CTaksiDX9::HookFunctions: checking JMP-implants..." LOG_CR));
 
-	m_Hook_Present.InstallHook(s_D3D9_Present,DX9_Present);
+	if ( ! m_Hook_Present.InstallHook(s_D3D9_Present,DX9_Present))
+	{
+		LOG_WARN(( "CTaksiDX9::HookFunctions: FAILED to InstallHook!" LOG_CR));
+		return false;
+	}
 	m_Hook_Reset.InstallHook(s_D3D9_Reset,DX9_Reset);
 
 	return __super::HookFunctions();

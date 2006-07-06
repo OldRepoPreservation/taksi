@@ -4,15 +4,15 @@
 // so as not to impact the version control system to much as this changes more than any other file.
 #pragma once
 
-#define TAKSI_VERSION_N			0x0761
+#define TAKSI_VERSION_N			0x0762
 #ifdef _DEBUG
-#define TAKSI_VERSION_S			"0.761 (Debug)"
+#define TAKSI_VERSION_S			"0.762 (Debug)"
 #else
-#define TAKSI_VERSION_S			"0.761"
+#define TAKSI_VERSION_S			"0.762"
 #endif
 // for VS_VERSION_INFO VERSIONINFO 
-#define TAKSI_VERSION_RES_N		0,7,6,1
-#define TAKSI_VERSION_RES_S		"0,7,6,1"
+#define TAKSI_VERSION_RES_N		0,7,6,2
+#define TAKSI_VERSION_RES_S		"0,7,6,2"
 
 #define TAKSI_COPYRIGHT "Parts Copyright©2004 Anton Jouline (Juce) and Copyright©2006 Dennis Robinson (Menace)\0"
      
