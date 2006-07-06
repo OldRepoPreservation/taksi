@@ -66,6 +66,7 @@ enum TAKSI_CFGPROP_TYPE
 	TAKSI_CFGPROP_QTY,
 };
 
+#pragma pack(4)	// try to be explicit about this since its shared.
 struct LIBSPEC CTaksiConfigData
 {
 	// Interprocess shared data block.
@@ -108,6 +109,7 @@ public:
 	// DWORD m_dwHelpShown;	// What help messages have been shown so far. throttle help.
 };
 extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set via CGuiConfig
+#pragma pack()
 
 struct LIBSPEC CTaksiConfig : public CIniObject, public CTaksiConfigData
 {

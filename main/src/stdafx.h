@@ -91,11 +91,11 @@ enum TAKSI_INDICATE_TYPE
 enum TAKSI_GRAPHX_TYPE
 {
 	// enumerate the avilable modes we support.
-	TAKSI_GRAPHX_OGL = 0,
 #ifdef USE_DX
 	TAKSI_GRAPHX_DX8,
 	TAKSI_GRAPHX_DX9,
 #endif
+	TAKSI_GRAPHX_OGL,
 	TAKSI_GRAPHX_GDI,	// put this last. prefer other modes over this.
 	TAKSI_GRAPHX_QTY,
 };
@@ -108,6 +108,7 @@ enum TAKSI_PROCSTAT_TYPE
 	TAKSI_PROCSTAT_QTY,
 };
 
+#pragma pack(4)	// try to be explicit about this since its shared.
 struct LIBSPEC CTaksiProcStats
 {
 	// Record relevant stats on the current foreground app/process.
@@ -160,7 +161,9 @@ public:
 	DWORD m_dwPropChangedMask;		// TAKSI_PROCSTAT_TYPE mask
 };
 extern LIBSPEC CTaksiProcStats sg_ProcStats;	// For display in the Taksi.exe app.
+#pragma pack()	// try to be explicit about this since its shared.
 
+#pragma pack(4)	// try to be explicit about this since its shared.
 struct LIBSPEC CTaksiDll
 {
 	// This structure is interprocess SHARED!
@@ -193,6 +196,14 @@ public:
 	HHOOK	m_hHookCBT;			// SetWindowsHookEx( WH_CBT ) for hooking new processes
 	int		m_iProcessCount;	// how many processes attached?
 
+	TCHAR m_szIniDir[_MAX_PATH];		// what dir to find the INI file and put the log files.
+
+#define LOG_NAME_DLL	_T("TaksiDll.log")	// common log shared by all processes.
+
+	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
+	DWORD m_dwHotKeyMask;	// TAKSI_HOTKEY_TYPE mask from App.
+	int m_iMasterUpdateCount;	// how many WM_APP_UPDATE messages unprocessed.
+
 #ifdef USE_DX
 	// keep Direct3D-related pointers, tested just once for all.
 	// DX8
@@ -202,14 +213,6 @@ public:
 	UINT_PTR m_nDX9_Present;
 	UINT_PTR m_nDX9_Reset;
 #endif
-
-public:
-	TCHAR m_szIniDir[_MAX_PATH];		// what dir to find the INI file and put the log files.
-
-#define LOG_NAME_DLL	_T("TaksiDll.log")	// common log shared by all processes.
-
-	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
-	DWORD m_dwHotKeyMask;	// TAKSI_HOTKEY_TYPE mask from App.
-	int m_iMasterUpdateCount;	// how many WM_APP_UPDATE messages unprocessed.
 };
 extern LIBSPEC CTaksiDll sg_Dll;
+#pragma pack()

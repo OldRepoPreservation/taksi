@@ -1,10 +1,12 @@
 //
 // Test_DX9.cpp
+// must be in seperate file from DX8
 //
 #include "../stdafx.h"
 #include "Taksi.h"
 
 #ifdef USE_DX
+#include <d3d9types.h>
 #include <d3d9.h>
 
 typedef IDirect3D9* (STDMETHODCALLTYPE *DIRECT3DCREATE9)(UINT);
@@ -51,8 +53,11 @@ bool Test_DirectX9( HWND hWnd )
     d3dpp.BackBufferFormat = d3ddm.Format;
 
 	IRefPtr<IDirect3DDevice9> pD3DDevice;
-	hRes = pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+	hRes = pD3D->CreateDevice( 
+		D3DADAPTER_DEFAULT,
+		D3DDEVTYPE_HAL,	// the device we suppose any app would be using.
+		hWnd,
+		D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
 		&d3dpp, IREF_GETPPTR(pD3DDevice,IDirect3DDevice9));
     if (FAILED(hRes))
     {
