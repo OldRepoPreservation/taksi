@@ -171,6 +171,7 @@ HWND FindWindowTop( HWND hWnd )
 	return hWnd;
 }
 
+#if 0
 HWND FindWindowForProcessID( DWORD dwProcessID )
 {
 	// look through all the top level windows for the window that has this processid.
@@ -217,6 +218,7 @@ HWND FindWindowForProcessID( DWORD dwProcessID )
 	}
 	return hWndBest;
 }
+#endif
 
 HINSTANCE CHttpLink_GotoURL( const TCHAR* pszURL, int iShowCmd )
 {

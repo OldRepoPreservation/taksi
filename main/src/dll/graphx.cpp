@@ -234,6 +234,8 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	// Called for each frame as it is about to be drawn.
 	// NOTE: a hook is not truly complete til PresentFrameBegin() is called.
 
+	ASSERT( m_bHookedFunctions );
+
 	// Switching to hook some other app?
 	if ( sg_Dll.IsHookCBT())
 	{
@@ -392,8 +394,9 @@ HRESULT CTaksiGraphX::AttachGraphXMode()
 	// DLL_PROCESS_ATTACH
 	// Check the DLL that would support this graphics mode.
 	// NOTE: Dont force graphics DLL to load. just look for its presense.
+	// ONLY CALLED FROM: AttachGraphXModeW()
 
-	if (m_bHookedFunctions) 
+	if (m_bHookedFunctions)		// already hooked so dont do anything else.
 		return S_FALSE;
 
 	const TCHAR* pszName = get_DLLName();	// virtual

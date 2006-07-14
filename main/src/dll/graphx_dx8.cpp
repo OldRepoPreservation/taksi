@@ -828,6 +828,7 @@ CTaksiDX8::~CTaksiDX8()
 
 bool CTaksiDX8::HookFunctions()
 {
+	// ONLY CALLED FROM AttachGraphXMode()
 	// This function hooks two IDirect3DDevice8 methods
 	// hook IDirect3DDevice8::Present(), using code modifications at run-time.
 	// ALGORITHM: we overwrite the beginning of real IDirect3DDevice8::Present
