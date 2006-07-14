@@ -87,7 +87,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 		ASSERT(0);
 		return false;
 	}
-#ifdef _DEBUG
+#if 0 // def _DEBUG
 	char szTmp[_MAX_PATH*2];
 	if ( PropGet(eProp,szTmp,sizeof(szTmp)) < 0 )
 	{
@@ -480,7 +480,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		ASSERT(0);
 		return false;
 	}
-#ifdef _DEBUG
+#if 0 // def _DEBUG
 	char szTmp[_MAX_PATH*2];
 	if ( PropGet(eProp,szTmp,sizeof(szTmp)) < 0 )
 	{

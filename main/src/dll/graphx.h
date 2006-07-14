@@ -12,6 +12,7 @@
 struct CTaksiGraphX : public CDllFile
 {
 	// a generic graphics mode base class.
+	// Base for: CTaksiDX8, CTaksiDX9, CTaksiGDI etc,
 public:
 	CTaksiGraphX()
 		: m_bHookedFunctions(false)
@@ -29,6 +30,7 @@ public:
 protected:
 	virtual bool HookFunctions()
 	{
+		// ONLY CALLED FROM AttachGraphXMode()
 		ASSERT( IsValidDll());
 		DEBUG_MSG(( "CTaksiGraphX::HookFunctions done." LOG_CR ));
 		return true;
@@ -52,8 +54,8 @@ private:
 
 public:
 	static const DWORD sm_IndColors[TAKSI_INDICATE_QTY];
-	bool m_bHookedFunctions;	// HookFunctions() called and returned true
-	bool m_bGotFrameInfo;		// GetFrameInfo() called. set to false to re-read the info.
+	bool m_bHookedFunctions;	// HookFunctions() called and returned true. may not have called PresentFrameBegin() yet tho.
+	bool m_bGotFrameInfo;		// GetFrameInfo() called. set to false to re-read the info. PresentFrameBegin success.
 };
 
 #ifdef USE_DX

@@ -218,7 +218,7 @@ HWND CTaksiDX9::GetFrameInfo( SIZE& rSize ) // virtual
 {
 	// Determine format of back buffer and its dimensions.
 	// will set m_bGotFrameInfo
-	if ( m_pDevice == NULL )
+	if ( m_pDevice == NULL )	// PresentFrameBegin not called yet!
 	{
 		return NULL;
 	}
@@ -885,6 +885,7 @@ CTaksiDX9::~CTaksiDX9()
 
 bool CTaksiDX9::HookFunctions()
 {
+	// ONLY CALLED FROM AttachGraphXMode()
 	// This function hooks two IDirect3DDevice9 methods, using code overwriting technique. 
 	// hook IDirect3DDevice9::Present(), using code modifications at run-time.
 	// ALGORITHM: we overwrite the beginning of real IDirect3DDevice9::Present

@@ -17,7 +17,7 @@ CTaksiDll sg_Dll = {0};			// API to present to the EXE
 CTaksiConfigData sg_Config = {0};	// Read from the INI file. and set via CGuiConfig
 CTaksiProcStats sg_ProcStats = {0};	// For display in the Taksi.exe app.
 #pragma data_seg()
-#pragma comment(linker, "/section:.SHARED,rws")
+#pragma comment(linker, "/section:.SHARED,rws") // tell the linker what this is.
 
 //**************************************************************************************
 // End of Inter-Process shared section 
@@ -34,7 +34,7 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] =
 	&g_DX9,	// TAKSI_GRAPHX_DX9
 #endif
 	&g_OGL,	// TAKSI_GRAPHX_OGL
-	&g_GDI,	// TAKSI_GRAPHX_GDI // Last
+	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
 };
 
 //**************************************************************************************
@@ -135,12 +135,13 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 	// ASSERT(sg_Dll.IsHookCBT());
 	switch (nCode)
 	{
-	// HCBT_CREATEWND
+	// case HCBT_CREATEWND:
+	case HCBT_ACTIVATE:
 	case HCBT_SETFOCUS:
-		// Set the DLL implants on whoever gets the focus!
+		// Set the DLL implants on whoever gets the focus/activation!
 		// ASSUME DLL_PROCESS_ATTACH was called.
 		// TAKSI_INDICATE_Hooked
-		// wParam = NULL. can be null if losing focus or desktop
+		// wParam = NULL. can be null if losing focus ? (NULL not used for desktop in this case)
 		if ( g_Proc.m_bIsProcessSpecial )
 			break;
 		LOG_MSG(( "HookCBTProc: nCode=0x%x, wParam=0x%x" LOG_CR, (DWORD)nCode, wParam ));
@@ -521,22 +522,27 @@ HRESULT CTaksiProcess::AttachGraphXModeW( HWND hWnd )
 	//  NULL = the Process just attached.
 	// NOTE: 
 	//  Not truly attached til PresentFrameBegin() is called.
+	//  We may already be attached to some window.
+	//  ONLY CALLED FROM: HookCBTProc()
 	// TODO:
 	//  Graphics modes should usurp GDI
-	//  Allow changing windows inside the same process.???
 
 	if (m_bIsProcessSpecial)	// Dont hook special apps like My EXE or Explorer.
 		return S_FALSE;
 	if ( hWnd == NULL )	// losing focus i guess. ignore that.
 		return S_FALSE;
 
+	// Allow changing windows inside the same process.???
 	m_hWndHookTry = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
+	if ( m_hWndHookTry == NULL )
+		return S_FALSE;
 
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
 	// NOTE: We can only use ONE!
+	LOG_MSG(( "ATTACHGRAPHXMODEW: 0x%x" LOG_CR, m_hWndHookTry ));
 
-	HRESULT hRes;
+	HRESULT hRes = S_FALSE;
 	for ( int i=0; i<COUNTOF(s_GraphxModes); i++ )
 	{
 		hRes = s_GraphxModes[i]->AttachGraphXMode();
@@ -560,7 +566,7 @@ void CTaksiProcess::StopGraphXMode()
 
 void CTaksiProcess::DetachGraphXMode()
 {
-	// the DLL is unloading or some other app now has the main focus/hook.
+	// we are unloading or some other app now has the main focus/hook.
 	StopGraphXMode();
 
 	// give graphics module a chance to clean up.

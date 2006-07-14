@@ -63,13 +63,11 @@ HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
 	// Get the window and its size.
 	// Find the primary window for the process.
 	// Whole screen ??
-	if ( m_hWnd == NULL )
-	{
-		m_hWnd = FindWindowForProcessID( ::GetCurrentProcessId());
-		if ( m_hWnd == NULL )
-			return NULL;
-	}
 
+	if ( m_hWnd == NULL )	// should not happen. should already be set by m_hWndHookTry
+	{
+		return NULL;
+	}
 	if ( sg_Config.m_bGDIFrame )
 	{
 		// Record the whole window include non client area.
@@ -288,6 +286,7 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
 HRESULT CTaksiGDI::AttachGraphXMode()
 {
+	// ONLY CALLED FROM: AttachGraphXModeW()
 	if ( ! sg_Config.m_bGDIUse )	// not allowed.
 	{
 		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
@@ -298,14 +297,16 @@ HRESULT CTaksiGDI::AttachGraphXMode()
 bool CTaksiGDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
+	// ONLY CALLED FROM AttachGraphXMode()
+
 	ASSERT( IsValidDll());
-	if ( ! sg_Config.m_bGDIUse )	// not allowed.
+	ASSERT( sg_Config.m_bGDIUse );	// not allowed.
+
+	if ( m_hWnd == NULL )	// must find the window first. m_hWndHookTry
 	{
-		return false;
-	}
-	if ( m_hWnd == NULL )	// must find the window first.
-	{
-		m_hWnd = g_Proc.m_hWndHookTry;
+		m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGraphXModeW()
+		if ( m_hWnd == NULL )
+			return false;
 		m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
 		if ( m_hWnd == NULL )
 			return false;
@@ -319,7 +320,7 @@ bool CTaksiGDI::HookFunctions()
 		return false;
 	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) WndProcHook );
 
-	// Set up a timer to give me a frame rate / basic update time.
+	// Set up a timer to give me a frame rate / basic update time. seperate from WM_PAINT
 	m_uTimerId = ::SetTimer( m_hWnd, IDT_TIMER, 1000, NULL );
 	if ( m_uTimerId == 0 )
 	{
