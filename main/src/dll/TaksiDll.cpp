@@ -6,6 +6,9 @@
 #include "TaksiDll.h"
 #include "graphx.h"
 #include "HotKeys.h"
+#ifdef USE_GDIP
+#include <gdiplus.h>
+#endif
 
 //**************************************************************************************
 // Shared by all procuniesses variables. 
@@ -36,6 +39,10 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] =
 	&g_OGL,	// TAKSI_GRAPHX_OGL
 	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
 };
+
+#ifdef USE_GDIP
+static ULONG_PTR s_gdiplusToken = 0;
+#endif
 
 //**************************************************************************************
 
@@ -693,6 +700,10 @@ bool CTaksiProcess::OnDllProcessAttach()
 		DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
 	}
 
+#ifdef USE_GDIP
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&s_gdiplusToken, &gdiplusStartupInput, NULL);
+#endif
 	// ASSUME HookCBTProc will call AttachGraphXModeW later
 	return true;
 }
@@ -718,6 +729,13 @@ bool CTaksiProcess::OnDllProcessDetach()
 
 	// close specific log file 
 	g_Log.CloseLogFile();
+
+#ifdef USE_GDIP
+	if ( s_gdiplusToken )
+	{
+		Gdiplus::GdiplusShutdown(s_gdiplusToken);
+	}
+#endif
 
 	// log information on which process unmapped the DLL 
 	sg_Dll.LogMessage( _T("unmapped: "));

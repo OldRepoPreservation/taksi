@@ -115,6 +115,21 @@ bool CVideoFrame::AllocPadXY( int cx, int cy, int iBPP, int iPad )
 	return AllocForm(FrameForm);
 }
 
+void CVideoFrame::SetupBITMAPINFOHEADER( BITMAPINFOHEADER& bmih ) const
+{
+	bmih.biSize = sizeof(BITMAPINFOHEADER);
+	bmih.biWidth = m_Size.cx;
+	bmih.biHeight = m_Size.cy;
+	bmih.biPlanes = 1;
+	bmih.biBitCount = m_iBPP*8;
+	bmih.biCompression = BI_RGB;
+	bmih.biSizeImage = 0;
+	bmih.biXPelsPerMeter = 0;
+	bmih.biYPelsPerMeter = 0;
+	bmih.biClrUsed = 0;
+	bmih.biClrImportant = 0;
+}
+
 HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 {
 	// Writes a BMP file
@@ -135,33 +150,33 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 		return hRes;	// 
 	}
 
+	DWORD dwSizeBytes = get_SizeBytes();
+
 	// fill in the headers
 	BITMAPFILEHEADER bmfh;
 	bmfh.bfType = 0x4D42; // 'BM'
-	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + get_SizeBytes();
+	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + dwSizeBytes;
 	bmfh.bfReserved1 = 0;
 	bmfh.bfReserved2 = 0;
 	bmfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
 	DWORD dwBytesWritten;
 	::WriteFile(File, &bmfh, sizeof(bmfh), &dwBytesWritten, NULL);
+	if ( dwBytesWritten != sizeof(bmfh) )
+	{
+	}
 
 	BITMAPINFOHEADER bmih;
-	bmih.biSize = sizeof(BITMAPINFOHEADER);
-	bmih.biWidth = m_Size.cx;
-	bmih.biHeight = m_Size.cy;
-	bmih.biPlanes = 1;
-	bmih.biBitCount = m_iBPP*8;
-	bmih.biCompression = BI_RGB;
-	bmih.biSizeImage = 0;
-	bmih.biXPelsPerMeter = 0;
-	bmih.biYPelsPerMeter = 0;
-	bmih.biClrUsed = 0;
-	bmih.biClrImportant = 0;
+	SetupBITMAPINFOHEADER(bmih);
 	::WriteFile(File, &bmih, sizeof(bmih), &dwBytesWritten, NULL);
+	if ( dwBytesWritten != sizeof(bmih) )
+	{
+	}
 
-	::WriteFile(File, m_pPixels, get_SizeBytes(), &dwBytesWritten, NULL);
-
+	::WriteFile(File, m_pPixels, dwSizeBytes, &dwBytesWritten, NULL);
+	if ( dwBytesWritten != dwSizeBytes )
+	{
+	}
 	return S_OK;
 }
 
