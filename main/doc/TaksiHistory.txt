@@ -381,3 +381,7 @@ Ver 0.760 RELEASE
 v0.762
 DirectX8 fails to CreateDivice when there is already a DirectX8 app open.
 returns D3DERR_OUTOFVIDEOMEMORY. Seems to be a MS documentation bug with D3DCREATE_DISABLE_DRIVER_MANAGEMENT.
+
+v0.763
+Use GDI+ libraries to save as PNG, could easily be extended to save JPG , does anyone care?
+

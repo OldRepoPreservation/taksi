@@ -69,6 +69,7 @@ public:
 	bool AllocForm( const CVideoFrameForm& form );
 	bool AllocPadXY( int cx, int cy, int iBPP=3, int iPad=sizeof(DWORD));	// padded to 4 bytes
 
+	void SetupBITMAPINFOHEADER( BITMAPINFOHEADER& bmih ) const;
 	HRESULT SaveAsBMP( const TCHAR* pszFilename ) const;
 
 public:

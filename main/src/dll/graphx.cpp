@@ -6,6 +6,41 @@
 #include "graphx.h"
 #include "HotKeys.h"
 
+#ifdef USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+#include <Gdiplus.h>
+using namespace Gdiplus;
+//#include <GdiplusHelperFunctions.h>
+#pragma comment(lib,"gdiplus.lib")
+
+static int GetEncoderClsid( const WCHAR* format, CLSID* pClsid )
+{
+   UINT  num = 0;          // number of image encoders
+   UINT  size = 0;         // size of the image encoder array in bytes
+   GetImageEncodersSize(&num, &size);
+   if(size == 0)
+      return -1;  // Failure
+
+   ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+   if(pImageCodecInfo == NULL)
+      return -1;  // Failure
+
+   GetImageEncoders(num, size, pImageCodecInfo);
+
+   for(UINT j = 0; j < num; ++j)
+   {
+      if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+      {
+         *pClsid = pImageCodecInfo[j].Clsid;
+         free(pImageCodecInfo);
+         return j;  // Success
+      }    
+   }
+
+   free(pImageCodecInfo);
+   return -1;  // Failure
+}
+#endif
+
 // D3DCOLOR format is high to low, Alpha, Blue, Green, Red
 const DWORD CTaksiGraphX::sm_IndColors[TAKSI_INDICATE_QTY] = 
 {
@@ -40,11 +75,57 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 
 	// save as bitmap
 	TCHAR szFileName[_MAX_PATH];
-	g_Proc.MakeFileName( szFileName, "bmp" );
 
+#ifdef USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+	int iLenStr = g_Proc.MakeFileName( szFileName, "png" );
+
+	static CLSID encoderClsid = {0};	// we should just hard code this ?
+	if ( encoderClsid.Data1 == 0 )
+	{	// {557CF406-1A04-11D3-9A73-0000F81EF32E}
+		int result = GetEncoderClsid( L"image/png", &encoderClsid);
+		if ( result < 0 )
+		{
+			hRes = E_FAIL;
+			goto do_failout;
+		}
+	}
+
+	BITMAPINFO bmi;
+	frame.SetupBITMAPINFOHEADER(bmi.bmiHeader);
+
+	Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromBITMAPINFO(&bmi,frame.m_pPixels);
+	if ( pBitmap == NULL )
+	{
+		hRes = E_FAIL;
+		goto do_failout;
+	}
+
+	WCHAR wFileName[_MAX_PATH];
+	int iLenW = ::MultiByteToWideChar( CP_UTF8, 0, szFileName, iLenStr+1, wFileName, COUNTOF(wFileName));
+
+	// EncoderParameters encoderParams;
+    Gdiplus::Status status = pBitmap->Save( wFileName, &encoderClsid, NULL );  
+	if ( status != Gdiplus::Ok )
+	{
+		if ( status == Gdiplus::Win32Error )
+		{
+			DWORD dwLastError = ::GetLastError();
+			hRes = HRESULT_FROM_WIN32(dwLastError);
+		}
+		else
+		{
+			hRes = E_FAIL;
+		}
+		goto do_failout;
+	}
+#else
+	g_Proc.MakeFileName( szFileName, "bmp" );
 	hRes = frame.SaveAsBMP(szFileName);
+#endif
+
 	if (FAILED(hRes))
 	{
+do_failout:
 		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError),
 			_T("MakeScreenShot(%d) SaveAsBMP '%s' failed. 0%x"),
 			bHalfSize, szFileName, hRes	);

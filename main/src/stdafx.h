@@ -7,6 +7,7 @@
 #endif
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
+#define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 
 // System includes always go first.
 #include <windows.h>
