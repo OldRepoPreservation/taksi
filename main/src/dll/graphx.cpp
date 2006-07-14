@@ -116,8 +116,11 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 		{
 			hRes = E_FAIL;
 		}
+		delete pBitmap;
 		goto do_failout;
 	}
+
+	delete pBitmap;
 #else
 	g_Proc.MakeFileName( szFileName, "bmp" );
 	hRes = frame.SaveAsBMP(szFileName);
