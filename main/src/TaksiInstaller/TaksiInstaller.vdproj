@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_44F983E411D62C63605F104FAE424454"
+        "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4BF8BEC9A8444A2AAFE9700D956125BA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -59,12 +65,6 @@
         {
         "MsmKey" = "8:_A94B31C6B1CF4D60A4C35B231B60AD13"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B7D5F4F1F37D03B7B66F38BF8EA623FE"
-        "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -183,6 +183,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_44F983E411D62C63605F104FAE424454"
+            {
+            "SourcePath" = "8:MSVFW32.dll"
+            "TargetName" = "8:MSVFW32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4BF8BEC9A8444A2AAFE9700D956125BA"
             {
             "SourcePath" = "8:..\\..\\doc\\TaksiHistory.txt"
@@ -283,26 +303,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7D5F4F1F37D03B7B66F38BF8EA623FE"
-            {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_ED02A38A2B9540B1B32359245C0496C8"
             {
             "SourcePath" = "8:..\\..\\doc\\TaksiManual.txt"
@@ -397,22 +397,22 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Taksi Desktop Video Recorder v0.761"
-        "ProductCode" = "8:{EBB05CE8-52DF-4B7C-BDF4-ECC6BB0C3BB1}"
-        "PackageCode" = "8:{BB13C035-5F2B-4060-8233-7C411B7526B0}"
+        "ProductName" = "8:Taksi Desktop Video Recorder v0.763"
+        "ProductCode" = "8:{7F9129B6-C438-4CCB-80CB-A97E9F3B6B8C}"
+        "PackageCode" = "8:{0B9E1368-AF0E-4177-B7AD-0EA8710B5590}"
         "UpgradeCode" = "8:{24F27168-C6D5-4236-B614-30CC5E2D0044}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "ProductVersion" = "8:0.7.61"
+        "ProductVersion" = "8:0.7.63"
         "Manufacturer" = "8:Menasoft"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.menasoft.com/taksi"
-        "Title" = "8:Taksi Desktop Video Recorder v0.761"
+        "Title" = "8:Taksi Desktop Video Recorder v0.763"
         "Subject" = "8:Desktop Video Recorder"
         "ARPCONTACT" = "8:Menasoft"
         "Keywords" = "8:Taksi Desktop Video Recorder"
-        "ARPCOMMENTS" = "8:Taksi Desktop Video Recorder v0.761"
+        "ARPCOMMENTS" = "8:Taksi Desktop Video Recorder v0.763"
         "ARPURLINFOABOUT" = "8:http://www.menasoft.com"
         "ARPPRODUCTICON" = "8:_4F1297FD3B08473FB6C6EFA2EF179DA4"
         "ARPIconIndex" = "3:0"
