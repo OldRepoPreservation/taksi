@@ -6,8 +6,10 @@
 #include "TaksiDll.h"
 #include "graphx.h"
 #include "HotKeys.h"
+
 #ifdef USE_GDIP
 #include <gdiplus.h>
+ULONG_PTR g_gdiplusToken = 0;
 #endif
 
 //**************************************************************************************
@@ -39,10 +41,6 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] =
 	&g_OGL,	// TAKSI_GRAPHX_OGL
 	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
 };
-
-#ifdef USE_GDIP
-static ULONG_PTR s_gdiplusToken = 0;
-#endif
 
 //**************************************************************************************
 
@@ -702,7 +700,15 @@ bool CTaksiProcess::OnDllProcessAttach()
 
 #ifdef USE_GDIP
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::GdiplusStartup(&s_gdiplusToken, &gdiplusStartupInput, NULL);
+	Gdiplus::Status status = Gdiplus::GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
+	if ( status != Gdiplus::Ok )
+	{
+		g_gdiplusToken = 0;
+	}
+	else
+	{
+		ASSERT(g_gdiplusToken);
+	}
 #endif
 	// ASSUME HookCBTProc will call AttachGraphXModeW later
 	return true;
@@ -731,9 +737,9 @@ bool CTaksiProcess::OnDllProcessDetach()
 	g_Log.CloseLogFile();
 
 #ifdef USE_GDIP
-	if ( s_gdiplusToken )
+	if ( g_gdiplusToken )
 	{
-		Gdiplus::GdiplusShutdown(s_gdiplusToken);
+		Gdiplus::GdiplusShutdown(g_gdiplusToken);
 	}
 #endif
 
