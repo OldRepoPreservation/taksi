@@ -27,12 +27,11 @@ AVI doesnt understand < 1 FPS ??
 render the mouse cursor in graphics modes.
 Support auto switch to alternate codec if codec fails ?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
-
+optional BMP,PNG,JPG for still shots ?
 crc diff uncompressed frames with last. compress to empty frame.
 put command menu in the sysmenu of the hooked app ?
 TEST- hook callbacks might not be on the same thread? protect from multithread problems
 Comment tag inside AVI file. TAKSI vX date + user comments?
-Can we use the DirectX JPEG/PNG compressor for screen shots ??
 AVI may not be the best format. has too much overhead. is MPG or WMV better ?
 http://guru.multimedia.cx/category/container-formats/
 smaller AVI index ? only index every nth frame or an index every 1 second ?
