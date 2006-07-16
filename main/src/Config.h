@@ -85,7 +85,7 @@ public:
 	// CAN be set from CGuiConfig
 	TCHAR  m_szCaptureDir[_MAX_PATH];	// files go here!
 	bool   m_bDebugLog;					// keep log files or not?
-	TCHAR  m_szFileNamePostfix[64];
+	TCHAR  m_szFileNamePostfix[64];		// just a text append to the name.
 
 	float  m_fFrameRateTarget;			// What do we want our movies frame rate to be? (f/sec)
 	CVideoCodec m_VideoCodec;			// Video Compression scheme selected
@@ -103,6 +103,7 @@ public:
 	bool   m_bOpenGLUse;
 
 	// CAN NOT be set from CGuiConfig directly
+	TCHAR  m_szImageFormatExt[16];	// the screen shot format tag. JPEG = "image/jpeg", PNG = "image/png"
 	bool   m_bShowIndicator;
 	POINT m_ptMasterWindow;	// previous position of the master EXE window.
 	bool   m_bVideoCodecMsg; // put up the warning message about the codec yet?
