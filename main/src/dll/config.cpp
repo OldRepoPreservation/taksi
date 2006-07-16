@@ -130,6 +130,7 @@ void CTaksiConfigData::InitConfig()
 	m_bGDIFrame = true;
 	m_bUseOverheadCompensation = false;
 
+	strcpy( m_szImageFormatExt, "png" );	// jpeg
 	m_bShowIndicator = true;
 	m_ptMasterWindow.x = 0;
 	m_ptMasterWindow.y = 0;
@@ -342,6 +343,8 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szCaptureDir);
 	case TAKSI_CFGPROP_FileNamePostfix:
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szFileNamePostfix );
+	case TAKSI_CFGPROP_ImageFormatExt:
+		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szImageFormatExt );
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
 		return _snprintf(pszValue, iSizeMax, "%g", m_fFrameRateTarget);
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
@@ -397,12 +400,16 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_DebugLog:
 		m_bDebugLog = atoi(pszValue) ? true : false;
 		break;
+	case TAKSI_CFGPROP_CaptureDir:
+		if (! Str_GetQuoted( m_szCaptureDir, pszValue, sizeof(m_szCaptureDir)))
+			return false;
+		break;
 	case TAKSI_CFGPROP_FileNamePostfix:
 		if (! Str_GetQuoted( m_szFileNamePostfix, pszValue, sizeof(m_szFileNamePostfix)))
 			return false;
 		break;
-	case TAKSI_CFGPROP_CaptureDir:
-		if (! Str_GetQuoted( m_szCaptureDir, pszValue, sizeof(m_szCaptureDir)))
+	case TAKSI_CFGPROP_ImageFormatExt:
+		if (! Str_GetQuoted( m_szImageFormatExt, pszValue, sizeof(m_szImageFormatExt)))
 			return false;
 		break;
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
@@ -508,6 +515,8 @@ bool CTaksiConfig::ReadIniFile()
 		// ASSUME constructor has already set this to all defaults.
 		return false;
 	}
+
+	LOG_MSG(( "Reading INI file '%s'" LOG_CR, szIniFileName ));
 
 	CIniObject* pObj = NULL;
 	while (true)

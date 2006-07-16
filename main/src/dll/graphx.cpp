@@ -12,32 +12,47 @@ using namespace Gdiplus;
 #pragma comment(lib,"gdiplus.lib")
 extern ULONG_PTR g_gdiplusToken;
 
-static HRESULT GetEncoderClsid( const WCHAR* format, CLSID* pClsid )
+static HRESULT GetEncoderClsid( const char* pszFormatExt, CLSID* pClsid )
 {
-   UINT  num = 0;          // number of image encoders
-   UINT  size = 0;         // size of the image encoder array in bytes
-   GetImageEncodersSize(&num, &size);
-   if(size == 0)
-      return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
+	// pszFormat = L"image/png"
+	// "image/jpeg", 
 
-   ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-   if(pImageCodecInfo == NULL)
-      return E_OUTOFMEMORY;  // Failure
+	ASSERT(pszFormatExt);
+	ASSERT(pszFormatExt[0]);
 
-   GetImageEncoders(num, size, pImageCodecInfo);
+	WCHAR wFormat[_MAX_PATH];
+	wcscpy( wFormat, L"image/" );
+	::MultiByteToWideChar( CP_UTF8, 0,
+		pszFormatExt, strlen(pszFormatExt)+1, 
+		wFormat+6, COUNTOF(wFormat)-6 );
 
-   for(UINT j = 0; j < num; ++j)
-   {
-      if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
-      {
-         *pClsid = pImageCodecInfo[j].Clsid;
-         free(pImageCodecInfo);
-         return j;  // Success
-      }    
-   }
+	UINT num = 0;          // number of image encoders
+	UINT size = 0;         // size of the image encoder array in bytes
+	GetImageEncodersSize(&num, &size);
+	if(size == 0)
+	{
+		return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
+	}
 
-   free(pImageCodecInfo);
-   return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
+	ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+	if(pImageCodecInfo == NULL)
+	{
+		return E_OUTOFMEMORY;  // Failure
+	}
+	GetImageEncoders(num, size, pImageCodecInfo);
+
+	for(UINT j = 0; j < num; ++j)
+	{
+		if ( !wcscmp(pImageCodecInfo[j].MimeType, wFormat))
+		{
+			*pClsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return j;  // Success
+		}    
+	}
+
+	free(pImageCodecInfo);
+	return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
 }
 #endif
 
@@ -77,14 +92,14 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 	TCHAR szFileName[_MAX_PATH];
 
 #ifdef USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
-	if ( g_gdiplusToken )
+	if ( g_gdiplusToken && sg_Config.m_szImageFormatExt[0] )
 	{
-		int iLenStr = g_Proc.MakeFileName( szFileName, "png" );
+		int iLenStr = g_Proc.MakeFileName( szFileName, sg_Config.m_szImageFormatExt );
 
 		static CLSID encoderClsid = {0};	// we should just hard code this ?
 		if ( encoderClsid.Data1 == 0 )
-		{	// {557CF406-1A04-11D3-9A73-0000F81EF32E}
-			hRes = GetEncoderClsid( L"image/png", &encoderClsid);
+		{	
+			hRes = GetEncoderClsid( sg_Config.m_szImageFormatExt, &encoderClsid);
 			if ( FAILED(hRes))
 			{
 				goto do_failout;

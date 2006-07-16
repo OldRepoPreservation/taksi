@@ -12,6 +12,8 @@ ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name 
 ConfigProp(GDIFrame,				m_bGDIFrame,	"Record the GDI frame or just the client area")
 ConfigProp(GDIUse,					m_bGDIUse,		"hook GDI mode at all?")
 
+ConfigProp(ImageFormatExt,			m_szImageFormatExt,	"The image format for screen shots (png,bmp,jpeg)")
+
 ConfigProp(KeyboardUseDirectInput,	m_bUseDirectInput,	"use DirectInput for hotkeys else use hooks")
 ConfigProp(MovieFrameRateTarget,	m_fFrameRateTarget,	"desired frame rate of captured video (f/sec)")
 
