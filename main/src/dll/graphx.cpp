@@ -54,6 +54,65 @@ static HRESULT GetEncoderClsid( const char* pszFormatExt, CLSID* pClsid )
 	free(pImageCodecInfo);
 	return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
 }
+
+static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
+{
+	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+	if ( ! g_gdiplusToken )
+		return S_FALSE;
+	if ( sg_Config.m_szImageFormatExt[0] == '\0' )
+		return S_FALSE;
+
+	int iLenStr = g_Proc.MakeFileName( pszFileName, sg_Config.m_szImageFormatExt );
+
+	static CLSID encoderClsid = {0};	// we should just hard code this ?
+	if ( encoderClsid.Data1 == 0 )
+	{	
+		HRESULT hRes = GetEncoderClsid( sg_Config.m_szImageFormatExt, &encoderClsid);
+		if ( FAILED(hRes))
+		{
+			LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ GetEncoderClsid FAILED 0x%x" LOG_CR, hRes ));
+			return hRes;
+		}
+	}
+
+	BITMAPINFO bmi;
+	frame.SetupBITMAPINFOHEADER(bmi.bmiHeader);
+	Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromBITMAPINFO(&bmi,frame.m_pPixels);
+	if ( pBitmap == NULL )
+	{
+		LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ FromBITMAPINFO FAILED" LOG_CR ));
+		return CONVERT10_E_STG_DIB_TO_BITMAP;
+	}
+
+	WCHAR wFileName[_MAX_PATH];
+	int iLenW = ::MultiByteToWideChar( CP_UTF8, 0, pszFileName, iLenStr+1, wFileName, COUNTOF(wFileName));
+
+	// EncoderParameters encoderParams;
+	Gdiplus::Status status = pBitmap->Save( wFileName, &encoderClsid, NULL );  
+
+	HRESULT hRes;
+	if ( status != Gdiplus::Ok )
+	{
+		if ( status == Gdiplus::Win32Error )
+		{
+			DWORD dwLastError = ::GetLastError();
+			hRes = HRESULT_FROM_WIN32(dwLastError);
+		}
+		else
+		{
+			hRes = E_FAIL;
+		}
+		LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ err=0x%x" LOG_CR, hRes ));
+	}
+	else
+	{
+		hRes = S_OK;
+	}
+	delete pBitmap;	//done with it.
+	return hRes;
+}
+
 #endif
 
 // D3DCOLOR format is high to low, Alpha, Blue, Green, Red
@@ -92,58 +151,7 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 	TCHAR szFileName[_MAX_PATH];
 
 #ifdef USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
-	if ( g_gdiplusToken && sg_Config.m_szImageFormatExt[0] )
-	{
-		int iLenStr = g_Proc.MakeFileName( szFileName, sg_Config.m_szImageFormatExt );
-
-		static CLSID encoderClsid = {0};	// we should just hard code this ?
-		if ( encoderClsid.Data1 == 0 )
-		{	
-			hRes = GetEncoderClsid( sg_Config.m_szImageFormatExt, &encoderClsid);
-			if ( FAILED(hRes))
-			{
-				goto do_failout;
-			}
-		}
-
-		BITMAPINFO bmi;
-		frame.SetupBITMAPINFOHEADER(bmi.bmiHeader);
-		Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromBITMAPINFO(&bmi,frame.m_pPixels);
-		if ( pBitmap == NULL )
-		{
-			hRes = CONVERT10_E_STG_DIB_TO_BITMAP;
-			goto do_failout;
-		}
-
-		WCHAR wFileName[_MAX_PATH];
-		int iLenW = ::MultiByteToWideChar( CP_UTF8, 0, szFileName, iLenStr+1, wFileName, COUNTOF(wFileName));
-
-		// EncoderParameters encoderParams;
-		Gdiplus::Status status = pBitmap->Save( wFileName, &encoderClsid, NULL );  
-		if ( status != Gdiplus::Ok )
-		{
-			if ( status == Gdiplus::Win32Error )
-			{
-				DWORD dwLastError = ::GetLastError();
-				hRes = HRESULT_FROM_WIN32(dwLastError);
-			}
-			else
-			{
-				hRes = E_FAIL;
-			}
-do_failout:
-			LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ err=0x%x" LOG_CR, hRes ));
-		}
-		else
-		{
-			hRes = S_OK;
-		}
-		delete pBitmap;
-	}
-	else
-	{
-		hRes = S_FALSE;
-	}
+	hRes = MakeScreenShotGDIP( szFileName, frame );
 #endif
 	if ( hRes != S_OK )
 	{
