@@ -34,12 +34,13 @@ CTaksiLogFile g_Log;			// Log file for each process. seperate
 
 static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] = 
 {
+	NULL,	// TAKSI_GRAPHX_NONE
+	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
+	&g_OGL,	// TAKSI_GRAPHX_OGL
 #ifdef USE_DX
 	&g_DX8,	// TAKSI_GRAPHX_DX8
 	&g_DX9,	// TAKSI_GRAPHX_DX9
 #endif
-	&g_OGL,	// TAKSI_GRAPHX_OGL
-	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
 };
 
 //**************************************************************************************
@@ -104,8 +105,8 @@ void CTaksiProcStats::InitProcStats()
 	m_dwProcessId = 0;
 	m_szProcessFile[0] = '\0';
 	m_szLastError[0] = '\0';
-	m_hWnd = NULL;
-	m_eGraphXMode = TAKSI_GRAPHX_QTY;
+	m_hWndCap = NULL;
+	m_eGraphXMode = TAKSI_GRAPHX_NONE;
 	m_eState = TAKSI_INDICATE_Hooked;		// assume we are looking for focus
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
 }
@@ -423,7 +424,7 @@ bool CTaksiProcess::CheckProcessSpecial() const
 			return true;
 	}
 
-#if 1
+#if 0
 	// Check if it's Windows Explorer. We don't want to hook it either.
 	TCHAR szExplorer[_MAX_PATH];
 	::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
@@ -508,9 +509,26 @@ bool CTaksiProcess::StartGraphXMode( TAKSI_GRAPHX_TYPE eMode )
 	// TODO PresentFrameBegin() was called for this mode.
 	// Does this mode bump all others?
 
-	m_Stats.m_eGraphXMode = (TAKSI_GRAPHX_TYPE) eMode;
-	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
+	if ( m_Stats.m_eGraphXMode == eMode )
+	{
+		return true;
+	}
+	if ( eMode < m_Stats.m_eGraphXMode )
+	{
+		return false;
+	}
+	ASSERT( eMode > TAKSI_GRAPHX_NONE && eMode < TAKSI_GRAPHX_QTY );
 
+	// Unhook any lower priority types.
+	for ( int i=m_Stats.m_eGraphXMode; i<eMode; i++ )
+	{
+		if ( s_GraphxModes[i] == NULL )
+			continue;
+		s_GraphxModes[i]->FreeDll();
+	}
+
+	m_Stats.m_eGraphXMode = eMode;
+	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
 	return true;
 }
 
@@ -543,14 +561,9 @@ HRESULT CTaksiProcess::AttachGraphXModeW( HWND hWnd )
 	LOG_MSG(( "ATTACHGRAPHXMODEW: 0x%x" LOG_CR, m_hWndHookTry ));
 
 	HRESULT hRes = S_FALSE;
-	for ( int i=0; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_GRAPHX_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
 		hRes = s_GraphxModes[i]->AttachGraphXMode();
-		if ( SUCCEEDED(hRes))
-		{
-			StartGraphXMode( (TAKSI_GRAPHX_TYPE) i );
-			break;
-		}
 	}
 	return hRes;
 }
@@ -570,12 +583,12 @@ void CTaksiProcess::DetachGraphXMode()
 	StopGraphXMode();
 
 	// give graphics module a chance to clean up.
-	for ( int i=0; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_GRAPHX_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
 		s_GraphxModes[i]->FreeDll();
 	}
 
-	m_Stats.m_eGraphXMode = TAKSI_GRAPHX_QTY;
+	m_Stats.m_eGraphXMode = TAKSI_GRAPHX_NONE;
 	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
 }
 
