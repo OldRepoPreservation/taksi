@@ -3,6 +3,7 @@
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
 #include "..\stdafx.h"
+#include <gdiplus.h>
 #include "CImageGDIP.h"
 
 CImageGDIPInt g_gdiplus;
@@ -60,7 +61,7 @@ bool CImageGDIPInt::AttachGDIPInt()
 
 	m_Token = 1;	// temporary just to get past the debug code.
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::Status status = GdiplusStartup( &m_Token, &gdiplusStartupInput, NULL);
+	Gdiplus::Status status = Gdiplus::GdiplusStartup( &m_Token, &gdiplusStartupInput, NULL);
 	if ( status != Gdiplus::Ok )
 	{
 		m_Token = 0;
