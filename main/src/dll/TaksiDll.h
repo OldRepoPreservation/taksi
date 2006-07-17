@@ -125,7 +125,6 @@ public:
 		, m_pCustomConfig(NULL)
 		, m_bIsProcessSpecial(false)
 		, m_bStopGraphXMode(false)
-		, m_bRecordPause(false)
 	{
 		m_Stats.InitProcStats();
 		m_Stats.m_dwProcessId = ::GetCurrentProcessId();
@@ -152,7 +151,6 @@ public:
 
 	int MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt );
 	void UpdateStat( TAKSI_PROCSTAT_TYPE eProp );
-	void put_RecordPause( bool bRecordPause );
 
 public:
 	CTaksiProcStats m_Stats;	// For display in the Taksi.exe app.
@@ -167,7 +165,6 @@ public:
 	// if set to true, then CBT should not take any action at all.
 	bool m_bIsProcessSpecial;		// Is Master TAKSI.EXE or special app.
 	bool m_bStopGraphXMode;			// I'm not the main app anymore. unhook the graphics mode.
-	bool m_bRecordPause;			// paused video record by command.
 };
 extern CTaksiProcess g_Proc;
 

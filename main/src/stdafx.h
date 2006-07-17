@@ -202,8 +202,9 @@ public:
 #define LOG_NAME_DLL	_T("TaksiDll.log")	// common log shared by all processes.
 
 	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
-	DWORD m_dwHotKeyMask;	// TAKSI_HOTKEY_TYPE mask from App.
-	int m_iMasterUpdateCount;	// how many WM_APP_UPDATE messages unprocessed.
+	DWORD m_dwHotKeyMask;			// TAKSI_HOTKEY_TYPE mask from App.
+	bool m_bRecordPause;			// paused video record by command.
+	int m_iMasterUpdateCount;		// how many WM_APP_UPDATE messages unprocessed.
 
 #ifdef USE_DX
 	// keep Direct3D-related pointers, tested just once for all.

@@ -186,7 +186,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
 		g_AVIThread.WaitForAllFrames();
 		g_AVIFile.CloseAVI();
-		if ( ! g_Proc.m_bRecordPause )
+		if ( ! sg_Dll.m_bRecordPause )
 		{
 			g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordBegin);	// re-open it later.
 		}
@@ -203,7 +203,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 
 HRESULT CTaksiGraphX::RecordAVI_Start()
 {
-	g_Proc.put_RecordPause( false );
+	sg_Dll.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
 	{
@@ -299,7 +299,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 {
 	// We are actively recording the AVI. a frame is ready.
 	ASSERT( g_AVIFile.IsOpen());
-	if ( g_Proc.m_bRecordPause )	// just skip.
+	if ( sg_Dll.m_bRecordPause )	// just skip.
 		return true;
 
 	// determine whether this frame needs to be grabbed when recording. or just skipped.
@@ -417,8 +417,9 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 
 	if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_RecordPause)) 
 	{
-		g_Proc.put_RecordPause( ! g_Proc.m_bRecordPause );
-		if ( ! g_AVIFile.IsOpen() && ! g_Proc.m_bRecordPause )
+		// toggle pause.
+		sg_Dll.m_bRecordPause = ! sg_Dll.m_bRecordPause;
+		if ( ! g_AVIFile.IsOpen() && ! sg_Dll.m_bRecordPause )
 		{
 			RecordAVI_Start();
 		}
@@ -452,7 +453,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	if ( bChange && ( sg_Config.m_bShowIndicator || g_AVIFile.IsOpen()))
 	{
 		TAKSI_INDICATE_TYPE eIndicate;
-		if ( g_Proc.m_bRecordPause )
+		if ( sg_Dll.m_bRecordPause )
 			eIndicate = TAKSI_INDICATE_RecordPaused;
 		else if ( g_AVIFile.IsOpen())
 			eIndicate = TAKSI_INDICATE_Recording;

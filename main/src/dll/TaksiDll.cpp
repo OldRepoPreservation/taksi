@@ -106,7 +106,7 @@ void CTaksiProcStats::InitProcStats()
 	m_szLastError[0] = '\0';
 	m_hWnd = NULL;
 	m_eGraphXMode = TAKSI_GRAPHX_QTY;
-	m_eState = TAKSI_INDICATE_QTY;	
+	m_eState = TAKSI_INDICATE_Hooked;		// assume we are looking for focus
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
 }
 
@@ -120,8 +120,9 @@ void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
 
 void CTaksiDll::UpdateMaster()
 {
-	// tell the Master EXE to redisplay state info.
-	// Multi thread safe.
+	// tell the Master EXE to redisplay state info. 
+	// sg_ProcStats or sg_Dll has changed
+	// PostMessage is Multi thread safe.
 	if ( m_hMasterWnd == NULL )
 		return;
 	if ( m_bMasterExiting )
@@ -317,6 +318,7 @@ bool CTaksiDll::InitDll()
 	m_hHookCBT = NULL;
 	m_iProcessCount = 0;	// how many processes attached?
 	m_dwHotKeyMask = 0;
+	m_bRecordPause = false;
 
 #ifdef USE_DX
 	m_nDX8_Present = 0; // offset from start of DLL to the interface element i want.
@@ -366,13 +368,6 @@ void CTaksiProcess::UpdateStat( TAKSI_PROCSTAT_TYPE eProp )
 	{
 		LOG_MSG(( "%s" LOG_CR, m_Stats.m_szLastError ));
 	}
-}
-
-void CTaksiProcess::put_RecordPause( bool bRecordPause )
-{
-	if ( m_bRecordPause == bRecordPause )
-		return;
-	m_bRecordPause = bRecordPause;
 }
 
 int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
