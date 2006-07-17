@@ -60,7 +60,6 @@ void CWaveACMInt::DetachACMInt()
 	m_acmGetVersion = NULL;
 }
 
-
 int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle, DWORD dwEnum )
 {
 	// RETURN: IDCANCEL, IDOK

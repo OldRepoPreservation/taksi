@@ -883,7 +883,7 @@ CTaksiDX9::~CTaksiDX9()
 {
 }
 
-bool CTaksiDX9::HookFunctions()
+HRESULT CTaksiDX9::HookFunctions()
 {
 	// ONLY CALLED FROM AttachGraphXMode()
 	// This function hooks two IDirect3DDevice9 methods, using code overwriting technique. 
@@ -895,12 +895,16 @@ bool CTaksiDX9::HookFunctions()
 	// then calls IDirect3DDevice9::Present, then does post-call tasks, then writes
 	// the JMP instruction back into the beginning of IDirect3DDevice9::Present, and
 	// returns.
-	
+
 	ASSERT( IsValidDll());
+	if ( m_bHookedFunctions )
+	{
+		return S_FALSE;
+	}
 	if (!sg_Dll.m_nDX9_Present || !sg_Dll.m_nDX9_Reset)
 	{
 		LOG_WARN(( "CTaksiDX9::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR));
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	
 	s_D3D9_Present = (PFN_DX9_PRESENT)(get_DllInt() + sg_Dll.m_nDX9_Present);
@@ -911,7 +915,7 @@ bool CTaksiDX9::HookFunctions()
 	if ( ! m_Hook_Present.InstallHook(s_D3D9_Present,DX9_Present))
 	{
 		LOG_WARN(( "CTaksiDX9::HookFunctions: FAILED to InstallHook!" LOG_CR));
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	m_Hook_Reset.InstallHook(s_D3D9_Reset,DX9_Reset);
 

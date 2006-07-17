@@ -294,7 +294,7 @@ HRESULT CTaksiGDI::AttachGraphXMode()
 	return __super::AttachGraphXMode();
 }
 
-bool CTaksiGDI::HookFunctions()
+HRESULT CTaksiGDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
 	// ONLY CALLED FROM AttachGraphXMode()
@@ -304,13 +304,15 @@ bool CTaksiGDI::HookFunctions()
 
 	if ( g_Proc.m_hWndHookTry == NULL )
 	{
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	if ( m_hWnd != NULL )	// must find the window first. m_hWndHookTry
 	{
 		// already hooked some window.
 		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGraphXModeW()
-			return true;
+		{
+			return S_FALSE;
+		}
 		// unhook previous? change of focus?
 		UnhookFunctions();
 	}
@@ -320,7 +322,7 @@ bool CTaksiGDI::HookFunctions()
 	if ( m_hWnd == NULL )
 	{
 		DEBUG_ERR(( "CTaksiGDI::HookFunctions GetFrameInfo=NULL" LOG_CR ));
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
 	// SubClass the window.
@@ -330,7 +332,7 @@ bool CTaksiGDI::HookFunctions()
 	{
 		DEBUG_ERR(( "CTaksiGDI::HookFunctions GetWindowLongPtr=NULL" LOG_CR ));
 		m_hWnd = NULL;
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) WndProcHook );
 	ASSERT( GetWindowLongPtr( m_hWnd, GWL_WNDPROC ) == (LONG_PTR) WndProcHook );
@@ -341,7 +343,7 @@ bool CTaksiGDI::HookFunctions()
 	{
 		DEBUG_ERR(( "CTaksiGDI::HookFunctions SetTimer=NULL" LOG_CR ));
 		m_hWnd = NULL;
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	return __super::HookFunctions();
 }
