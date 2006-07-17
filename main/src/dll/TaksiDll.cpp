@@ -8,8 +8,7 @@
 #include "HotKeys.h"
 
 #ifdef USE_GDIP
-#include <gdiplus.h>
-ULONG_PTR g_gdiplusToken = 0;
+#include "../common/CImageGDIP.h"
 #endif
 
 //**************************************************************************************
@@ -707,16 +706,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	}
 
 #ifdef USE_GDIP
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::Status status = Gdiplus::GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
-	if ( status != Gdiplus::Ok )
-	{
-		g_gdiplusToken = 0;
-	}
-	else
-	{
-		ASSERT(g_gdiplusToken);
-	}
+	g_gdiplus.AttachGDIPInt();
 #endif
 	// ASSUME HookCBTProc will call AttachGraphXModeW later
 	return true;
@@ -745,10 +735,7 @@ bool CTaksiProcess::OnDllProcessDetach()
 	g_Log.CloseLogFile();
 
 #ifdef USE_GDIP
-	if ( g_gdiplusToken )
-	{
-		Gdiplus::GdiplusShutdown(g_gdiplusToken);
-	}
+	g_gdiplus.DetachGDIPInt();
 #endif
 
 	// log information on which process unmapped the DLL 

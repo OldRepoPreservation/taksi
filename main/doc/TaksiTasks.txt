@@ -1,41 +1,38 @@
 Taksi Dev Notes and Task TODO list.
-6/21/2006
+7/21/2006
 
 OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
 
 KNOWN BUGS:
 1 FPS not recording properly?
-switching hook not always working correctly. 2 instances of the same app?
-Should auto prefer graphics hook over opengl over GDI hook. 
 GDI indicator drawn over overlapped windows. bleeds through.
 Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
 Some codecs use profiles requiring precise size/format to work.
 
 TODO:
-Full screen GUI record.
+optional BMP,PNG,JPG for still shots ? use GDI+ if present.
 fix installer to default to install for all and ask if they want desktop icon ?
 Allow GUI adjust of the size of the background thread Q
 Support DirectShow plugin codec to get Theora support
 Need message explaining focus changing/hooking.
 Audio
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
-Better frame rate/weight calculation ?
 makefile, Manual.txt completely out of date!
-Context sensative help file.
 AVI doesnt understand < 1 FPS ??
 render the mouse cursor in graphics modes.
 Support auto switch to alternate codec if codec fails ?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
-optional BMP,PNG,JPG for still shots ?
-crc diff uncompressed frames with last. compress to empty frame.
 put command menu in the sysmenu of the hooked app ?
 TEST- hook callbacks might not be on the same thread? protect from multithread problems
-Comment tag inside AVI file. TAKSI vX date + user comments?
+
+Context sensative help file.
+crc diff uncompressed frames with last. compress to empty frame.
 AVI may not be the best format. has too much overhead. is MPG or WMV better ?
 http://guru.multimedia.cx/category/container-formats/
 smaller AVI index ? only index every nth frame or an index every 1 second ?
 reflect state in tooltip ?
+Comment tag inside AVI file. TAKSI vX date + user comments?
 add a watermark or logo ? optionally of course.
 color reduction for GDI. reduce to a smaller number of colors ? for better compression?
 Covert to full unicode and allow translations ?

@@ -307,7 +307,7 @@ HRESULT CTaksiOGL::AttachGraphXMode()
 	return __super::AttachGraphXMode();
 }
 
-bool CTaksiOGL::HookFunctions()
+HRESULT CTaksiOGL::HookFunctions()
 {
 	// ONLY CALLED FROM AttachGraphXMode()
 	// Hooks multiple functions 
@@ -322,13 +322,17 @@ bool CTaksiOGL::HookFunctions()
 	
 	ASSERT( sg_Config.m_bOpenGLUse );	// not allowed.
 	ASSERT( IsValidDll());
+	if ( m_bHookedFunctions )
+	{
+		return S_FALSE;
+	}
   	
 	// initialize function pointers
 #define GRAPHXOGLFUNC(a,b,c) s_##a = (PFN##a) GetProcAddress(#a);\
 	if ( s_##a == NULL ) \
 	{\
 		DEBUG_ERR(( "CTaksiOGL::HookFunctions GetProcAddress FAIL" LOG_CR ));\
-		return false;\
+		return HRESULT_FROM_WIN32(ERROR_NOT_EXPORT_FORMAT);\
 	}
 #include "GraphX_OGL.TBL"
 #undef GRAPHXOGLFUNC
@@ -336,7 +340,7 @@ bool CTaksiOGL::HookFunctions()
 	DEBUG_MSG(( "CTaksiOGL::HookFunctions: checking JMP-implant..." LOG_CR));
 	if ( ! m_Hook.InstallHook(s_wglSwapBuffers,OGL_WglSwapBuffers))
 	{
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
 	return __super::HookFunctions();

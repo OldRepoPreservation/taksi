@@ -389,4 +389,6 @@ Use GDI+ libraries to save as PNG, could easily be extended to save JPG?
 v0.765
 GDI might not be avail for Win2K, temporarily remove til i can make it dynamic.
 Change hooking mech so it hooks all API's then takes the 'best' success API.
+Should auto prefer graphics hook over opengl over GDI hook. 
+Full screen GUI record.
 

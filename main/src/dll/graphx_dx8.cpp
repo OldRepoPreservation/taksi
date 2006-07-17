@@ -826,7 +826,7 @@ CTaksiDX8::~CTaksiDX8()
 {
 }
 
-bool CTaksiDX8::HookFunctions()
+HRESULT CTaksiDX8::HookFunctions()
 {
 	// ONLY CALLED FROM AttachGraphXMode()
 	// This function hooks two IDirect3DDevice8 methods
@@ -840,10 +840,14 @@ bool CTaksiDX8::HookFunctions()
 	// returns.
 	
 	ASSERT( IsValidDll());
+	if ( m_bHookedFunctions )
+	{
+		return S_FALSE;
+	}
 	if (!sg_Dll.m_nDX8_Present || !sg_Dll.m_nDX8_Reset)
 	{
 		LOG_WARN(( "CTaksiDX8::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR ));
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
 	s_D3D8_Present = (PFN_DX8_PRESENT)(get_DllInt() + sg_Dll.m_nDX8_Present);
@@ -854,7 +858,7 @@ bool CTaksiDX8::HookFunctions()
 	if ( ! m_Hook_Present.InstallHook(s_D3D8_Present,DX8_Present))
 	{
 		LOG_WARN(( "CTaksiDX8::HookFunctions: FAILED to InstallHook!" LOG_CR));
-		return false;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	m_Hook_Reset.InstallHook(s_D3D8_Reset,DX8_Reset);
 	return __super::HookFunctions();

@@ -29,12 +29,13 @@ public:
 	void RecordAVI_Reset();
 
 protected:
-	virtual bool HookFunctions()
+	virtual HRESULT HookFunctions()
 	{
 		// ONLY CALLED FROM AttachGraphXMode()
 		ASSERT( IsValidDll());
 		DEBUG_MSG(( "CTaksiGraphX::HookFunctions done." LOG_CR ));
-		return true;
+		m_bHookedFunctions = true;
+		return S_OK;
 	}
 	virtual void UnhookFunctions()
 	{
@@ -78,7 +79,7 @@ public:
 		return TAKSI_GRAPHX_DX8;
 	}
 
-	virtual bool HookFunctions();
+	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();
 
@@ -118,7 +119,7 @@ public:
 		return TAKSI_GRAPHX_DX9;
 	}
 
-	virtual bool HookFunctions();
+	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();
 
@@ -163,7 +164,7 @@ public:
 
 	virtual HRESULT AttachGraphXMode();
 
-	virtual bool HookFunctions();
+	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();
 
@@ -203,7 +204,7 @@ public:
 	}
 
 	virtual HRESULT AttachGraphXMode();
-	virtual bool HookFunctions();
+	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();
 
