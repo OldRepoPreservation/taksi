@@ -652,6 +652,7 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	case WM_TIMER:
 		return g_GUI.OnTimer((UINT) wParam );
 	case WM_APP_UPDATE:
+		// from UpdateMaster()
 		// Use m_iMasterUpdateCount to throttle these ?
 		g_GUI.UpdateButtonToolTips();
 		g_GUI.UpdateButtonStates();
