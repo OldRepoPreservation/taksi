@@ -117,7 +117,7 @@ bool CGuiConfig::Custom_ReadHook()
 	if ( sg_ProcStats.m_szProcessFile[0] == '\0' )
 		return false;
 	TCHAR szTitle[ _MAX_PATH ];
-	int iLen = GetWindowText( sg_ProcStats.m_hWnd, szTitle, COUNTOF(szTitle));
+	int iLen = GetWindowText( sg_ProcStats.m_hWndCap, szTitle, COUNTOF(szTitle));
 	if ( iLen <= 0 )
 		return false;
 	m_pCustomCur = g_Config.CustomConfig_Lookup(szTitle);
@@ -174,12 +174,13 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 	{
 		const TCHAR* sm_szNames[TAKSI_GRAPHX_QTY+1] = 
 		{
+		_T(""),
+		_T("GDI"),		// TAKSI_GRAPHX_GDI
 		_T("OpenGL"),	// TAKSI_GRAPHX_OGL
 #ifdef USE_DX
 		_T("DirectX8"), // TAKSI_GRAPHX_DX8
 		_T("DirectX9"), // TAKSI_GRAPHX_DX9
 #endif
-		_T("GDI"),		// TAKSI_GRAPHX_GDI
 		_T(""),
 		};
 		int i = stats.m_eGraphXMode;

@@ -201,9 +201,9 @@ void CTaksiGraphX::RecordAVI_Reset()
 	}
 
 	// is HWND still valid ? 
-	if ( ! ::IsWindow( g_Proc.m_Stats.m_hWnd ))
+	if ( ! ::IsWindow( g_Proc.m_Stats.m_hWndCap ))
 	{
-		g_Proc.m_Stats.m_hWnd = NULL;	// must re-query for this
+		g_Proc.m_Stats.m_hWndCap = NULL;	// must re-query for this
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_Wnd);
 	}
 	m_bGotFrameInfo = false;	// must get it again.
@@ -268,7 +268,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	}
 
 	ASSERT( g_AVIFile.IsOpen());
-	LOG_MSG(( "PresentFrameBegin Recording started." LOG_CR));
+	LOG_MSG(( "RecordAVI_Start Recording started." LOG_CR));
 
 	hRes = g_AVIThread.StartAVIThread();
 	if ( IS_ERROR(hRes))
@@ -372,7 +372,15 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	if ( sg_Dll.m_bMasterExiting )
 		return;
 
-	if ( g_Proc.IsProcPrime() && sg_Dll.m_dwHotKeyMask )
+	// Declare we have a working GraphXMode hook.
+	if ( ! g_Proc.StartGraphXMode( get_GraphXType()))
+	{
+		// mode not allowed!
+		return;	
+	}
+
+	// Force hotkeys on the prime process.
+	if ( sg_Dll.m_dwHotKeyMask && g_Proc.IsProcPrime())
 	{
 		g_HotKeys.m_dwHotKeyMask |= sg_Dll.m_dwHotKeyMask;
 		sg_Dll.m_dwHotKeyMask = 0;
@@ -383,8 +391,8 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	{
 		// Determine HWND for our app window, and window/device dimensions. 
 		DEBUG_TRACE(( "PresentFrameBegin.GetFrameInfo" LOG_CR ));
-		g_Proc.m_Stats.m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );	// virtual
-		if ( ! g_Proc.m_Stats.m_hWnd )	
+		g_Proc.m_Stats.m_hWndCap = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );	// virtual
+		if ( ! g_Proc.m_Stats.m_hWndCap )	
 		{
 			// This is fatal i can not proceed!
 			LOG_WARN(( "PresentFrameBegin.GetFrameInfo FAILED!" LOG_CR));
@@ -511,6 +519,7 @@ HRESULT CTaksiGraphX::AttachGraphXMode()
 	// Check the DLL that would support this graphics mode.
 	// NOTE: Dont force graphics DLL to load. just look for its presense.
 	// ONLY CALLED FROM: AttachGraphXModeW()
+	// Not fully attached til PresentFrameBegin() is called.
 
 	if (m_bHookedFunctions)		// already hooked so dont do anything else.
 		return S_FALSE;

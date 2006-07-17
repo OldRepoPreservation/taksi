@@ -302,28 +302,45 @@ bool CTaksiGDI::HookFunctions()
 	ASSERT( IsValidDll());
 	ASSERT( sg_Config.m_bGDIUse );	// not allowed.
 
-	if ( m_hWnd == NULL )	// must find the window first. m_hWndHookTry
+	if ( g_Proc.m_hWndHookTry == NULL )
 	{
-		m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGraphXModeW()
-		if ( m_hWnd == NULL )
-			return false;
-		m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
-		if ( m_hWnd == NULL )
-			return false;
+		return false;
+	}
+	if ( m_hWnd != NULL )	// must find the window first. m_hWndHookTry
+	{
+		// already hooked some window.
+		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGraphXModeW()
+			return true;
+		// unhook previous? change of focus?
+		UnhookFunctions();
+	}
+
+	m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGraphXModeW()
+	m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
+	if ( m_hWnd == NULL )
+	{
+		DEBUG_ERR(( "CTaksiGDI::HookFunctions GetFrameInfo=NULL" LOG_CR ));
+		return false;
 	}
 
 	// SubClass the window.
-	if ( m_WndProcOld )	// already hooked!
-		return true;
+	ASSERT( m_WndProcOld == NULL );	// already hooked!
 	m_WndProcOld = (WNDPROC) GetWindowLongPtr( m_hWnd, GWL_WNDPROC );
 	if ( m_WndProcOld == NULL )
+	{
+		DEBUG_ERR(( "CTaksiGDI::HookFunctions GetWindowLongPtr=NULL" LOG_CR ));
+		m_hWnd = NULL;
 		return false;
+	}
 	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) WndProcHook );
+	ASSERT( GetWindowLongPtr( m_hWnd, GWL_WNDPROC ) == (LONG_PTR) WndProcHook );
 
 	// Set up a timer to give me a frame rate / basic update time. seperate from WM_PAINT
 	m_uTimerId = ::SetTimer( m_hWnd, IDT_TIMER, 1000, NULL );
 	if ( m_uTimerId == 0 )
 	{
+		DEBUG_ERR(( "CTaksiGDI::HookFunctions SetTimer=NULL" LOG_CR ));
+		m_hWnd = NULL;
 		return false;
 	}
 	return __super::HookFunctions();
@@ -331,21 +348,31 @@ bool CTaksiGDI::HookFunctions()
 
 void CTaksiGDI::UnhookFunctions()
 {
-	if ( m_WndProcOld == NULL )	// not hooked!
+	if ( m_hWnd == NULL )	// not hooked!
 		return;
-	ASSERT(m_hWnd);
 	// Release the timer.
 	if ( m_uTimerId )
 	{
 		::KillTimer( m_hWnd, IDT_TIMER );
 		m_uTimerId = 0;
 	}
-	SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) m_WndProcOld );
+
+	// test if this is stacked?
+	ASSERT( m_WndProcOld != NULL );	// hooked?!
+	if ( GetWindowLongPtr( m_hWnd, GWL_WNDPROC ) == (LONG_PTR) WndProcHook )
+	{
+		SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) m_WndProcOld );
+	}
+	else
+	{
+		DEBUG_ERR(( "CTaksiGDI::UnhookFunctions FAILED Unhook!" ));
+	}
 	m_WndProcOld = NULL;
 
 	// repaint just the indicator part ???
 	RECT rect = { INDICATOR_X, INDICATOR_Y, INDICATOR_X+INDICATOR_Width, INDICATOR_Y+INDICATOR_Height };
 	::InvalidateRect(m_hWnd,NULL,false);	// repaint just to be safe.
+	m_hWnd = NULL;
 
 	__super::UnhookFunctions();
 }

@@ -173,7 +173,7 @@ bool CTaksiKeyboard::InstallHookKeys( bool bDummy )
 	UninstallHookKeys();
 	DEBUG_TRACE(( "CTaksiKeyboard::InstallHookKeys(%d)." LOG_CR, bDummy ));
 
-	DWORD dwThreadId = ::GetWindowThreadProcessId( g_Proc.m_Stats.m_hWnd, NULL );
+	DWORD dwThreadId = ::GetWindowThreadProcessId( g_Proc.m_Stats.m_hWndCap, NULL );
 	m_hHookKeys = ::SetWindowsHookEx( WH_KEYBOARD, ( bDummy ) ? DummyKeyboardProc : KeyboardProc, g_hInst, dwThreadId );
 
 	DEBUG_MSG(( "CTaksiKeyboard::InstallHookKeys(%d)=%08x" LOG_CR, bDummy, (UINT_PTR)m_hHookKeys ));

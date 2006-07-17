@@ -7,7 +7,7 @@
 #endif
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
-#define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+// #define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 
 // System includes always go first.
 #include <windows.h>
@@ -92,12 +92,13 @@ enum TAKSI_INDICATE_TYPE
 enum TAKSI_GRAPHX_TYPE
 {
 	// enumerate the avilable modes we support.
+	TAKSI_GRAPHX_NONE = 0,
+	TAKSI_GRAPHX_GDI,	// prefer other modes over this.
+	TAKSI_GRAPHX_OGL,	// usually a static linked dll, so rarely get a false positive.
 #ifdef USE_DX
 	TAKSI_GRAPHX_DX8,
 	TAKSI_GRAPHX_DX9,
 #endif
-	TAKSI_GRAPHX_OGL,
-	TAKSI_GRAPHX_GDI,	// put this last. prefer other modes over this.
 	TAKSI_GRAPHX_QTY,
 };
 
@@ -149,7 +150,7 @@ public:
 	// dynamic info.
 	TCHAR m_szLastError[ _MAX_PATH ];	// last error message (if action failed)
 
-	HWND m_hWnd;	// the window the graphics is in
+	HWND m_hWndCap;	// the window the graphics is in
 	SIZE m_SizeWnd;	// the window/backbuffer size. (pixels)
 	TAKSI_GRAPHX_TYPE m_eGraphXMode;
 

@@ -21,6 +21,7 @@ public:
 	}
 
 	virtual const TCHAR* get_DLLName() const = 0;
+	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const = 0;
 
 	virtual HRESULT AttachGraphXMode();
 	void PresentFrameBegin( bool bChange );
@@ -72,6 +73,10 @@ public:
 	{
 		return TEXT("d3d8.dll");
 	}
+	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	{
+		return TAKSI_GRAPHX_DX8;
+	}
 
 	virtual bool HookFunctions();
 	virtual void UnhookFunctions();
@@ -107,6 +112,10 @@ public:
 	virtual const TCHAR* get_DLLName() const
 	{
 		return TEXT("d3d9.dll");
+	}
+	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	{
+		return TAKSI_GRAPHX_DX9;
 	}
 
 	virtual bool HookFunctions();
@@ -147,6 +156,10 @@ public:
 	{
 		return TEXT("opengl32.dll");
 	}
+	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	{
+		return TAKSI_GRAPHX_OGL;
+	}
 
 	virtual HRESULT AttachGraphXMode();
 
@@ -183,6 +196,10 @@ public:
 	virtual const TCHAR* get_DLLName() const
 	{
 		return TEXT("user32.dll");
+	}
+	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	{
+		return TAKSI_GRAPHX_GDI;
 	}
 
 	virtual HRESULT AttachGraphXMode();
