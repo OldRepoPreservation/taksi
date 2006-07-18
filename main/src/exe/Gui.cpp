@@ -377,7 +377,10 @@ BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip)
 	tnd.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
 	tnd.uCallbackMessage = WM_APP_TRAY_NOTIFICATION;
 	tnd.hIcon = hIcon;
-	lstrcpyn(tnd.szTip, pszTip, sizeof(tnd.szTip));
+	if ( pszTip )
+		lstrcpyn(tnd.szTip, pszTip, sizeof(tnd.szTip));
+	else
+		tnd.szTip[0] = '\0';
 
 	return Shell_NotifyIcon(dwMessage, &tnd);
 }
@@ -422,20 +425,21 @@ bool CGui::TrayIcon_Create()
 	// so give the people what they want.
 	// Set up my tray menu.
 
-	if ( ! TrayIcon_Command(NIM_ADD, NULL, NULL))
+	TCHAR szBuff[ _MAX_PATH ];
+    LoadString( g_hInst, IDS_APP_DESC, szBuff, sizeof(szBuff));
+
+	HICON hIcon = (HICON) LoadImage(g_hInst,MAKEINTRESOURCE(ID_APP), IMAGE_ICON, 16, 16, 0);
+	if ( ! TrayIcon_Command(NIM_ADD, hIcon, szBuff))
 		return false;
+
+	DestroyIcon(hIcon);
 
 	m_hTrayIconMenuDummy = LoadMenu(g_hInst, MAKEINTRESOURCE(IDM_TRAYICON));
 	m_hTrayIconMenu = GetSubMenu(m_hTrayIconMenuDummy, 0);
 	if ( m_hTrayIconMenu == NULL )
 		return false;
 
-	TCHAR szBuff[ _MAX_PATH ];
-    LoadString( g_hInst, IDS_APP_DESC, szBuff, sizeof(szBuff));
-
-	HICON hIcon = (HICON) LoadImage(g_hInst,MAKEINTRESOURCE(ID_APP), IMAGE_ICON, 16, 16, 0);
-	TrayIcon_Command( NIM_MODIFY, hIcon, szBuff);
-	DestroyIcon(hIcon);
+	// TrayIcon_Command( NIM_MODIFY, hIcon, szBuff);
 	return true;
 }
 #endif
