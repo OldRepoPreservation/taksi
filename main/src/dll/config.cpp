@@ -126,7 +126,7 @@ void CTaksiConfigData::InitConfig()
 	m_bUseDirectInput = true;
 
 	m_bOpenGLUse = false;
-	m_bGDIUse = false;
+	m_bGDIUse = true;
 	m_bGDIFrame = true;
 	m_bUseOverheadCompensation = false;
 
