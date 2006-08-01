@@ -19,7 +19,8 @@ static void CImageGDIP_DebugPoint( const char* pszName )
 #define CImageGDIP_DebugPoint(pszName)
 #endif
 
-// Fix the weird obscured links.
+// Create a set of stubs to make the calls to the dll.
+// Fix the weird obscured links. obscured through calls in LIB/H that call the DLL
 namespace Gdiplus
 {
 extern "C"
@@ -42,7 +43,7 @@ CImageGDIPInt::~CImageGDIPInt()
 bool CImageGDIPInt::AttachGDIPInt()
 {
 	//  if we have already linked to the API's, then just succeed...
-	if ( IsValidDll() || m_Token )
+	if ( m_Token )
 		return true;
 
 	HRESULT hRes = LoadDll( _T("gdiplus.dll"));
