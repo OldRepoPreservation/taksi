@@ -12,7 +12,7 @@
 #endif
 
 //**************************************************************************************
-// Shared by all procuniesses variables. 
+// Shared by all processes
 // NOTE: Must be init with 0
 // WARN: Constructors WILL BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
 //**************************************************************************************
