@@ -68,12 +68,12 @@ bool Test_DirectX9( HWND hWnd )
 	// step 4: store method addresses in out vars
 	UINT_PTR* pVTable = (UINT_PTR*)(*((UINT_PTR*)pD3DDevice.get_RefObj()));
 	ASSERT(pVTable);
-	sg_Dll.m_nDX9_Present = ( pVTable[TAKSI_INTF_DX9_Present] - _DX9.get_DllInt());
-	sg_Dll.m_nDX9_Reset = ( pVTable[TAKSI_INTF_DX9_Reset] - _DX9.get_DllInt());
+	sg_Shared.m_nDX9_Present = ( pVTable[TAKSI_INTF_DX9_Present] - _DX9.get_DllInt());
+	sg_Shared.m_nDX9_Reset = ( pVTable[TAKSI_INTF_DX9_Reset] - _DX9.get_DllInt());
 
 	LOG_MSG(("Test_DirectX9: %08x, Present=0%x, Reset=0%x " LOG_CR,
 		(UINT_PTR)pD3DDevice.get_RefObj(),
-		sg_Dll.m_nDX9_Present, sg_Dll.m_nDX9_Reset ));
+		sg_Shared.m_nDX9_Present, sg_Shared.m_nDX9_Reset ));
 
 	return true;
 }

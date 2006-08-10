@@ -844,14 +844,14 @@ HRESULT CTaksiDX8::HookFunctions()
 	{
 		return S_FALSE;
 	}
-	if (!sg_Dll.m_nDX8_Present || !sg_Dll.m_nDX8_Reset)
+	if (!sg_Shared.m_nDX8_Present || !sg_Shared.m_nDX8_Reset)
 	{
 		LOG_WARN(( "CTaksiDX8::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR ));
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
-	s_D3D8_Present = (PFN_DX8_PRESENT)(get_DllInt() + sg_Dll.m_nDX8_Present);
-	s_D3D8_Reset = (PFN_DX8_RESET)(get_DllInt() + sg_Dll.m_nDX8_Reset);
+	s_D3D8_Present = (PFN_DX8_PRESENT)(get_DllInt() + sg_Shared.m_nDX8_Present);
+	s_D3D8_Reset = (PFN_DX8_RESET)(get_DllInt() + sg_Shared.m_nDX8_Reset);
 
 	DEBUG_MSG(( "CTaksiDX8::HookFunctions:checking JMP-implants..."));
 

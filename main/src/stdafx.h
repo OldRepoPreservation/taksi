@@ -47,7 +47,7 @@ public:
 	HRESULT OpenLogFile( const TCHAR* pszFileName );
 	void CloseLogFile();
 	virtual int EventStr( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, const LOGCHAR* pszMsg );
-public:
+private:
 	CNTHandle m_File;
 };
 extern LIBSPEC CTaksiLogFile g_Log;
@@ -166,14 +166,14 @@ extern LIBSPEC CTaksiProcStats sg_ProcStats;	// For display in the Taksi.exe app
 #pragma pack()	// try to be explicit about this since its shared.
 
 #pragma pack(4)	// try to be explicit about this since its shared.
-struct LIBSPEC CTaksiDll
+struct LIBSPEC CTaksiShared
 {
 	// This structure is interprocess SHARED!
 	// NOTE: So it CANT have a constructor or contain any data types that do!!
 public:
 
-	bool InitDll();
-	void DestroyDll();
+	bool InitShared();
+	void DestroyShared();
 
 	void OnDetachProcess();
 	HRESULT LogMessage( const TCHAR* pszPrefix );	// LOG_NAME_DLL
@@ -217,5 +217,5 @@ public:
 	UINT_PTR m_nDX9_Reset;
 #endif
 };
-extern LIBSPEC CTaksiDll sg_Dll;
+extern LIBSPEC CTaksiShared sg_Shared;
 #pragma pack()

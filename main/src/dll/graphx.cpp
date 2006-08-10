@@ -148,7 +148,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
 		g_AVIThread.WaitForAllFrames();
 		g_AVIFile.CloseAVI();
-		if ( ! sg_Dll.m_bRecordPause )
+		if ( ! sg_Shared.m_bRecordPause )
 		{
 			g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordBegin);	// re-open it later.
 		}
@@ -165,7 +165,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 
 HRESULT CTaksiGraphX::RecordAVI_Start()
 {
-	sg_Dll.m_bRecordPause = false;
+	sg_Shared.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
 	{
@@ -237,7 +237,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 		_T("AVI record started"));
 	g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 
-	sg_Dll.UpdateMaster();
+	sg_Shared.UpdateMaster();
 	return S_OK;
 }
 
@@ -254,14 +254,14 @@ void CTaksiGraphX::RecordAVI_Stop()
 		"AVI file recorded. Stopped." );
 	g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 
-	sg_Dll.UpdateMaster();
+	sg_Shared.UpdateMaster();
 }
 
 bool CTaksiGraphX::RecordAVI_Frame()
 {
 	// We are actively recording the AVI. a frame is ready.
 	ASSERT( g_AVIFile.IsOpen());
-	if ( sg_Dll.m_bRecordPause )	// just skip.
+	if ( sg_Shared.m_bRecordPause )	// just skip.
 		return true;
 
 	// determine whether this frame needs to be grabbed when recording. or just skipped.
@@ -306,14 +306,14 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	ASSERT( m_bHookedFunctions );
 
 	// Switching to hook some other app?
-	if ( sg_Dll.IsHookCBT())
+	if ( sg_Shared.IsHookCBT())
 	{
 		// Success!! we hooked a process! make this the prime process.
 		if ( ! g_Proc.IsProcPrime())
 		{
 			LOG_MSG(( "PresentFrameBegin: New Prime Focus." LOG_CR));
 			sg_ProcStats.CopyProcStats( g_Proc.m_Stats );
-			sg_Dll.HookCBT_Uninstall(); // thread safe?
+			sg_Shared.HookCBT_Uninstall(); // thread safe?
 		}
 	}
 	else if ( ! g_Proc.IsProcPrime())
@@ -323,7 +323,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		return;
 	}
 
-	if ( sg_Dll.m_bMasterExiting )
+	if ( sg_Shared.m_bMasterExiting )
 		return;
 
 	// Declare we have a working GraphXMode hook.
@@ -334,10 +334,10 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	}
 
 	// Force hotkeys on the prime process.
-	if ( sg_Dll.m_dwHotKeyMask && g_Proc.IsProcPrime())
+	if ( sg_Shared.m_dwHotKeyMask && g_Proc.IsProcPrime())
 	{
-		g_HotKeys.m_dwHotKeyMask |= sg_Dll.m_dwHotKeyMask;
-		sg_Dll.m_dwHotKeyMask = 0;
+		g_HotKeys.m_dwHotKeyMask |= sg_Shared.m_dwHotKeyMask;
+		sg_Shared.m_dwHotKeyMask = 0;
 	}
 
 	// if the frame format has changed i want to know about that now
@@ -388,8 +388,8 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_RecordPause)) 
 	{
 		// toggle pause.
-		sg_Dll.m_bRecordPause = ! sg_Dll.m_bRecordPause;
-		if ( ! g_AVIFile.IsOpen() && ! sg_Dll.m_bRecordPause )
+		sg_Shared.m_bRecordPause = ! sg_Shared.m_bRecordPause;
+		if ( ! g_AVIFile.IsOpen() && ! sg_Shared.m_bRecordPause )
 		{
 			RecordAVI_Start();
 		}
@@ -423,11 +423,11 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	if ( bChange && ( sg_Config.m_bShowIndicator || g_AVIFile.IsOpen()))
 	{
 		TAKSI_INDICATE_TYPE eIndicate;
-		if ( sg_Dll.m_bRecordPause )
+		if ( sg_Shared.m_bRecordPause )
 			eIndicate = TAKSI_INDICATE_RecordPaused;
 		else if ( g_AVIFile.IsOpen())
 			eIndicate = TAKSI_INDICATE_Recording;
-		else if ( sg_Dll.IsHookCBT()) 
+		else if ( sg_Shared.IsHookCBT()) 
 			eIndicate = TAKSI_INDICATE_Hooked;
 		else
 			eIndicate = TAKSI_INDICATE_Ready;
@@ -435,7 +435,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		{
 			g_Proc.m_Stats.m_eState = eIndicate;
 			g_Proc.UpdateStat(TAKSI_PROCSTAT_State);
-			sg_Dll.UpdateMaster();
+			sg_Shared.UpdateMaster();
 		}
 		HRESULT hRes = DrawIndicator( eIndicate );
 		if ( IS_ERROR(hRes))	//virtual
@@ -449,7 +449,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 void CTaksiGraphX::PresentFrameEnd()
 {
 	// check unhook flag
-	if ( sg_Dll.m_bMasterExiting || g_Proc.m_bStopGraphXMode )
+	if ( sg_Shared.m_bMasterExiting || g_Proc.m_bStopGraphXMode )
 	{
 		DEBUG_TRACE(( "PresentFrameEnd:StopGraphXMode." LOG_CR ));
 		UnhookFunctions();					// we're ordered to unhook methods.
@@ -459,7 +459,7 @@ void CTaksiGraphX::PresentFrameEnd()
 	}
 
 	// check if we need to reconfigure
-	if ( sg_Dll.m_dwConfigChangeCount != g_Proc.m_dwConfigChangeCount && 
+	if ( sg_Shared.m_dwConfigChangeCount != g_Proc.m_dwConfigChangeCount && 
 		! g_AVIFile.IsOpen())
 	{
 		LOG_MSG(( "PresentFrameEnd:m_dwConfigChangeCount (%d)..." LOG_CR, g_Proc.m_dwConfigChangeCount ));

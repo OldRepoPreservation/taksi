@@ -901,14 +901,14 @@ HRESULT CTaksiDX9::HookFunctions()
 	{
 		return S_FALSE;
 	}
-	if (!sg_Dll.m_nDX9_Present || !sg_Dll.m_nDX9_Reset)
+	if (!sg_Shared.m_nDX9_Present || !sg_Shared.m_nDX9_Reset)
 	{
 		LOG_WARN(( "CTaksiDX9::HookFunctions: No info on 'Present' and/or 'Reset'." LOG_CR));
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	
-	s_D3D9_Present = (PFN_DX9_PRESENT)(get_DllInt() + sg_Dll.m_nDX9_Present);
-	s_D3D9_Reset = (PFN_DX9_RESET)(get_DllInt() + sg_Dll.m_nDX9_Reset);
+	s_D3D9_Present = (PFN_DX9_PRESENT)(get_DllInt() + sg_Shared.m_nDX9_Present);
+	s_D3D9_Reset = (PFN_DX9_RESET)(get_DllInt() + sg_Shared.m_nDX9_Reset);
 
 	DEBUG_MSG(( "CTaksiDX9::HookFunctions: checking JMP-implants..." LOG_CR));
 

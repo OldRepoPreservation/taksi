@@ -72,12 +72,12 @@ bool Test_DirectX8( HWND hWnd )
 	// step 4: store method addresses in out vars
 	UINT_PTR* pVTable = (UINT_PTR*)(*((UINT_PTR*)pD3DDevice.get_RefObj()));
 	ASSERT(pVTable);
-	sg_Dll.m_nDX8_Present = ( pVTable[TAKSI_INTF_DX8_Present] - _DX8.get_DllInt());
-	sg_Dll.m_nDX8_Reset = ( pVTable[TAKSI_INTF_DX8_Reset] - _DX8.get_DllInt());
+	sg_Shared.m_nDX8_Present = ( pVTable[TAKSI_INTF_DX8_Present] - _DX8.get_DllInt());
+	sg_Shared.m_nDX8_Reset = ( pVTable[TAKSI_INTF_DX8_Reset] - _DX8.get_DllInt());
 
 	LOG_MSG(("Test_DirectX8: %08x, Present=0%x, Reset=0%x" LOG_CR, 
 		(UINT_PTR)pD3DDevice.get_RefObj(),
-		sg_Dll.m_nDX8_Present, sg_Dll.m_nDX8_Reset ));
+		sg_Shared.m_nDX8_Present, sg_Shared.m_nDX8_Reset ));
 
 	return true;
 }

@@ -101,7 +101,7 @@ int CGui::GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const
 		return IDB_ConfigOpen_1;	// only 1 state.
 
 	case TAKSI_HOTKEY_HookModeToggle:
-		if ( sg_Dll.IsHookCBT())
+		if ( sg_Shared.IsHookCBT())
 			return IDB_HookModeToggle_2;
 		return( IDB_HookModeToggle_1 );
 
@@ -470,7 +470,7 @@ bool CGui::OnCommandKey( TAKSI_HOTKEY_TYPE eKey )
 {
 	if ( GetButtonState(eKey) <= 0 )
 		return false;
-	sg_Dll.m_dwHotKeyMask |= (1<<eKey);
+	sg_Shared.m_dwHotKeyMask |= (1<<eKey);
 	UpdateButtonStates();
 	return true;
 }
@@ -500,13 +500,13 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case TAKSI_HOTKEY_HookModeToggle:
 	case IDB_HookModeToggle_1:
-		if ( sg_Dll.IsHookCBT())
+		if ( sg_Shared.IsHookCBT())
 		{
-			sg_Dll.HookCBT_Uninstall();
+			sg_Shared.HookCBT_Uninstall();
 		}
 		else
 		{
-			sg_Dll.HookCBT_Install();
+			sg_Shared.HookCBT_Install();
 		}
 		UpdateButtonStates();
 		return true;
@@ -639,7 +639,7 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 #ifdef USE_TRAYICON
 		g_GUI.TrayIcon_Command( NIM_DELETE, NULL, NULL);
 #endif
-		sg_Dll.m_hMasterWnd = NULL;
+		sg_Shared.m_hMasterWnd = NULL;
 		g_GUI.m_hWnd = NULL;
 		::PostQuitMessage(1);
 		break;
@@ -663,7 +663,7 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		return 1;
 	case WM_APP_REHOOKCBT:
 		// Re-install system-wide hook
-		sg_Dll.HookCBT_Install();
+		sg_Shared.HookCBT_Install();
 		g_GUI.UpdateButtonStates();
 		return 1;
 

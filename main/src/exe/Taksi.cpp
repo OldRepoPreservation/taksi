@@ -115,7 +115,7 @@ static void InitApp()
 		sg_ProcStats.m_szLastError, COUNTOF(sg_ProcStats.m_szLastError));
 
 #ifdef _DEBUG
-	CTaksiDll* pDll = &sg_Dll;
+	CTaksiShared* pDll = &sg_Shared;
 #endif
 
 	InitCommonControls();
@@ -155,7 +155,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 #endif
 
 	// Set HWND for reference by the DLL
-	if ( ! sg_Dll.InitMasterWnd(g_GUI.m_hWnd))
+	if ( ! sg_Shared.InitMasterWnd(g_GUI.m_hWnd))
 	{
 		return -1;
 	}
@@ -173,6 +173,6 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	}
 
 	// Free memory taken by custom configs etc.
-	sg_Dll.DestroyDll();
+	sg_Shared.DestroyShared();
 	return 0;
 }
