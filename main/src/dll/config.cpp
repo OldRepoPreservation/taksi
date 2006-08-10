@@ -506,7 +506,7 @@ bool CTaksiConfig::ReadIniFile()
 	// Returns true if successful.
 
 	char szIniFileName[_MAX_PATH];
-	lstrcpy(szIniFileName, sg_Dll.m_szIniDir );
+	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
 	lstrcat(szIniFileName, TAKSI_INI_FILE);
 
 	FILE* pFile = fopen(szIniFileName, "rt");
@@ -589,7 +589,7 @@ bool CTaksiConfig::WriteIniFile()
 	DWORD nSizeOld = 0;
 
 	char szIniFileName[_MAX_PATH];
-	lstrcpy(szIniFileName, sg_Dll.m_szIniDir );
+	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
 	lstrcat(szIniFileName, TAKSI_INI_FILE);
 
 	// first read all lines

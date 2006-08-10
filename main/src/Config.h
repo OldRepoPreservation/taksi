@@ -70,7 +70,7 @@ enum TAKSI_CFGPROP_TYPE
 struct LIBSPEC CTaksiConfigData
 {
 	// Interprocess shared data block.
-	// NOTE: cant have a constructor for this! since we put it in CTaksiDll SHARED
+	// NOTE: cant have a constructor for this! since we put it in CTaksiShared SHARED
 	// Some params can be set from CGuiConfig.
 
 	void InitConfig();

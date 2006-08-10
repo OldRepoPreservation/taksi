@@ -17,7 +17,7 @@
 // WARN: Constructors WILL BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
 //**************************************************************************************
 #pragma data_seg(".SHARED") // ".HKT" ".SHARED"
-CTaksiDll sg_Dll = {0};			// API to present to the EXE 
+CTaksiShared sg_Shared = {0};		// API to present to the Master EXE 
 CTaksiConfigData sg_Config = {0};	// Read from the INI file. and set via CGuiConfig
 CTaksiProcStats sg_ProcStats = {0};	// For display in the Taksi.exe app.
 #pragma data_seg()
@@ -34,11 +34,11 @@ CTaksiLogFile g_Log;			// Log file for each process. seperate
 static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] = 
 {
 	NULL,	// TAKSI_GRAPHX_NONE
-	&g_GDI,	// TAKSI_GRAPHX_GDI // Last, since all apps do GDI
+	&g_GDI,	// TAKSI_GRAPHX_GDI // lowest priority, since all apps do GDI
 	&g_OGL,	// TAKSI_GRAPHX_OGL
 #ifdef USE_DX
 	&g_DX8,	// TAKSI_GRAPHX_DX8
-	&g_DX9,	// TAKSI_GRAPHX_DX9
+	&g_DX9,	// TAKSI_GRAPHX_DX9 // almost no apps load this unless they are going to use it.
 #endif
 };
 
@@ -118,27 +118,13 @@ void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
 
 //**************************************************************************************
 
-void CTaksiDll::UpdateMaster()
-{
-	// tell the Master EXE to redisplay state info. 
-	// sg_ProcStats or sg_Dll has changed
-	// PostMessage is Multi thread safe.
-	if ( m_hMasterWnd == NULL )
-		return;
-	if ( m_bMasterExiting )
-		return;
-	if ( ::PostMessage( m_hMasterWnd, WM_APP_UPDATE, 0, 0 ))
-	{
-		m_iMasterUpdateCount ++;	// count unprocessed WM_APP_UPDATE messages
-	}
-}
-
-LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CTaksiShared::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	// WH_CBT = computer-based training - hook procedure
 	// NOTE: This is how we inject this DLL into other processes.
-	// NOTE: There is a race condition here where sg_Dll.m_hHookCBT can be NULL. 
-	// ASSERT(sg_Dll.IsHookCBT());
+	// NOTE: There is a race condition here where sg_Shared.m_hHookCBT can be NULL. 
+	// NOTE: This can probably get called on any thread?!
+	// ASSERT(sg_Shared.IsHookCBT());
 	switch (nCode)
 	{
 	// case HCBT_CREATEWND:
@@ -161,13 +147,13 @@ LRESULT CALLBACK CTaksiDll::HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 	}
 
 	// We must pass the all messages on to CallNextHookEx.
-	return ::CallNextHookEx(sg_Dll.m_hHookCBT, nCode, wParam, lParam);
+	return ::CallNextHookEx(sg_Shared.m_hHookCBT, nCode, wParam, lParam);
 }
 
-bool CTaksiDll::HookCBT_Install(void)
+bool CTaksiShared::HookCBT_Install(void)
 {
 	// Installer for calling of HookCBTProc 
-	// This causes my dll to be loaded into another process space.
+	// This causes my dll to be loaded into another process space. (And hook it!)
 	if ( IsHookCBT())
 	{
 		LOG_MSG(( "HookCBT_Install: already installed. (0x%x)" LOG_CR, m_hHookCBT ));
@@ -183,7 +169,7 @@ bool CTaksiDll::HookCBT_Install(void)
 	return( IsHookCBT());
 }
 
-bool CTaksiDll::HookCBT_Uninstall(void)
+bool CTaksiShared::HookCBT_Uninstall(void)
 {
 	// Uninstaller for WH_CBT
 	// NOTE: This may not be the process that started the hook
@@ -196,19 +182,36 @@ bool CTaksiDll::HookCBT_Uninstall(void)
 
 	if ( ::UnhookWindowsHookEx( m_hHookCBT ))
 	{
-		LOG_MSG(( "CTaksiDll::HookCBT_Uninstall: hHookCBT=0%x,ProcID=%d" LOG_CR,
+		LOG_MSG(( "CTaksiShared::HookCBT_Uninstall: hHookCBT=0%x,ProcID=%d" LOG_CR,
 			m_hHookCBT, ::GetCurrentProcessId()));
 	}
 	else
 	{
-		DEBUG_ERR(( "CTaksiDll::HookCBT_Uninstall FAIL" LOG_CR ));
+		DEBUG_ERR(( "CTaksiShared::HookCBT_Uninstall FAIL" LOG_CR ));
 	}
 	m_hHookCBT = NULL;
 	UpdateMaster();
 	return true;
 }
 
-HRESULT CTaksiDll::LogMessage( const TCHAR* pszPrefix )
+//**************************************************************************************
+
+void CTaksiShared::UpdateMaster()
+{
+	// tell the Master EXE to redisplay state info. 
+	// sg_ProcStats or sg_Shared has changed
+	// PostMessage is Multi thread safe.
+	if ( m_hMasterWnd == NULL )
+		return;
+	if ( m_bMasterExiting )
+		return;
+	if ( ::PostMessage( m_hMasterWnd, WM_APP_UPDATE, 0, 0 ))
+	{
+		m_iMasterUpdateCount ++;	// count unprocessed WM_APP_UPDATE messages
+	}
+}
+
+HRESULT CTaksiShared::LogMessage( const TCHAR* pszPrefix )
 {
 	// Log a common shared message for the dll, not the process.
 	// LOG_NAME_DLL
@@ -243,26 +246,15 @@ HRESULT CTaksiDll::LogMessage( const TCHAR* pszPrefix )
 	return dwBytesWritten;
 }
 
-bool CTaksiDll::InitMasterWnd(HWND hWnd)
+void CTaksiShared::UpdateConfigCustom()
 {
-	// The TAKSI.EXE App just started.
-	ASSERT(hWnd);
-	m_hMasterWnd = hWnd;
-	m_iMasterUpdateCount = 0;
-
-	// Install the hook
-	return HookCBT_Install();
-}
-
-void CTaksiDll::UpdateConfigCustom()
-{
-	DEBUG_MSG(( "CTaksiDll::UpdateConfigCustom" LOG_CR ));
+	DEBUG_MSG(( "CTaksiShared::UpdateConfigCustom" LOG_CR ));
 	// Increase the reconf-counter thus telling all the mapped DLLs that
 	// they need to reconfigure themselves. (and check m_Config)
 	m_dwConfigChangeCount++;
 }
 
-void CTaksiDll::SendReHookMessage()
+void CTaksiShared::SendReHookMessage()
 {
 	// My window went away, i must rehook to get a new window.
 	// ASSUME: i was the current hook. then we probably weant to re-hook some other app.
@@ -282,8 +274,22 @@ void CTaksiDll::SendReHookMessage()
 	}
 }
 
-void CTaksiDll::OnDetachProcess()
+//**************************************************************************************
+
+bool CTaksiShared::InitMasterWnd(HWND hWnd)
 {
+	// The Master TAKSI.EXE App just started.
+	ASSERT(hWnd);
+	m_hMasterWnd = hWnd;
+	m_iMasterUpdateCount = 0;
+
+	// Install the hook
+	return HookCBT_Install();
+}
+
+void CTaksiShared::OnDetachProcess()
+{
+	// some process is detaching. assume this is NOT the master process.
 	if ( g_Proc.IsProcPrime())
 	{
 		sg_ProcStats.InitProcStats();	// not prime anymore!
@@ -292,11 +298,11 @@ void CTaksiDll::OnDetachProcess()
 	}
 }
 
-void CTaksiDll::DestroyDll()
+void CTaksiShared::DestroyShared()
 {
 	// Master App Taksi.EXE is exiting. so close up shop.
 	// Set flag, so that TaksiDll knows to unhook device methods
-	DEBUG_TRACE(( "CTaksiDll::DestroyDll" LOG_CR ));
+	DEBUG_TRACE(( "CTaksiShared::DestroyShared" LOG_CR ));
 	// Signal to unhook from IDirect3DDeviceN methods
 	m_bMasterExiting = true;
 
@@ -304,12 +310,12 @@ void CTaksiDll::DestroyDll()
 	HookCBT_Uninstall();
 }
 
-bool CTaksiDll::InitDll()
+bool CTaksiShared::InitShared()
 {
 	// Call this only once the first time.
 	// determine my file name 
 	ASSERT(g_hInst);
-	DEBUG_MSG(( "CTaksiDll::InitDll" LOG_CR ));
+	DEBUG_MSG(( "CTaksiShared::InitShared" LOG_CR ));
 
 	m_dwVersionStamp = TAKSI_VERSION_N;
 	m_hMasterWnd = NULL;
@@ -432,12 +438,12 @@ bool CTaksiProcess::CheckProcessSpecial() const
 		return true;
 #endif
 
-	if ( ! ::IsWindow( sg_Dll.m_hMasterWnd ) && ! sg_Dll.m_bMasterExiting )
+	if ( ! ::IsWindow( sg_Shared.m_hMasterWnd ) && ! sg_Shared.m_bMasterExiting )
 	{
 		// The master app is gone! this is bad! This shouldnt really happen
-		LOG_MSG(( "Taksi.EXE App is NOT Loaded! unload dll (0x%x)" LOG_CR, sg_Dll.m_hMasterWnd ));
-		sg_Dll.m_hMasterWnd = NULL;
-		sg_Dll.m_bMasterExiting = true;
+		LOG_MSG(( "Taksi.EXE App is NOT Loaded! unload dll (0x%x)" LOG_CR, sg_Shared.m_hMasterWnd ));
+		sg_Shared.m_hMasterWnd = NULL;
+		sg_Shared.m_bMasterExiting = true;
 		return true;
 	}
 
@@ -449,7 +455,7 @@ void CTaksiProcess::CheckProcessCustom()
 	// We have found a new process.
 	// determine frame capturing algorithm special for the process.
 
-	m_dwConfigChangeCount = sg_Dll.m_dwConfigChangeCount;
+	m_dwConfigChangeCount = sg_Shared.m_dwConfigChangeCount;
 
 	// free the old custom config, if one existed
 	if (m_pCustomConfig)
@@ -596,6 +602,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	// DLL_PROCESS_ATTACH
 	// We have attached to a new process. via the CBT most likely.
 	// This is called before anything else.
+	// NOTE: HookCBTProc is probably already active and could be called at any time!
 
 	// Get Name of the process the DLL is attaching to
 	if ( ! ::GetModuleFileName(NULL, m_Stats.m_szProcessFile, sizeof(m_Stats.m_szProcessFile)))
@@ -628,9 +635,9 @@ bool CTaksiProcess::OnDllProcessAttach()
 	if ( bProcMaster )
 	{
 		// First time here!
-		if ( ! sg_Dll.InitDll())
+		if ( ! sg_Shared.InitShared())
 		{
-			DEBUG_ERR(( "InitDll FAILED!" LOG_CR ));
+			DEBUG_ERR(( "InitShared FAILED!" LOG_CR ));
 			return false;
 		}
 		sg_ProcStats.InitProcStats();
@@ -638,20 +645,20 @@ bool CTaksiProcess::OnDllProcessAttach()
 	}
 	else
 	{
-		if ( sg_Dll.m_dwVersionStamp != TAKSI_VERSION_N )	// this is weird!
+		if ( sg_Shared.m_dwVersionStamp != TAKSI_VERSION_N )	// this is weird!
 		{
-			DEBUG_ERR(( "InitDll BAD VERSION 0%x != 0%x" LOG_CR, sg_Dll.m_dwVersionStamp, TAKSI_VERSION_N ));
+			DEBUG_ERR(( "InitShared BAD VERSION 0%x != 0%x" LOG_CR, sg_Shared.m_dwVersionStamp, TAKSI_VERSION_N ));
 			return false;
 		}
 	}
 
 #ifdef _DEBUG
-	CTaksiDll* pDll = &sg_Dll;
+	CTaksiShared* pDll = &sg_Shared;
 	CTaksiConfigData* pConfig = &sg_Config;
 #endif
 
-	sg_Dll.m_iProcessCount ++;
-	LOG_MSG(( "DLL_PROCESS_ATTACH '%s' v" TAKSI_VERSION_S " (num=%d)" LOG_CR, pszTitle, sg_Dll.m_iProcessCount ));
+	sg_Shared.m_iProcessCount ++;
+	LOG_MSG(( "DLL_PROCESS_ATTACH '%s' v" TAKSI_VERSION_S " (num=%d)" LOG_CR, pszTitle, sg_Shared.m_iProcessCount ));
 
 	// determine process handle that is loading this DLL. 
 	m_Stats.m_dwProcessId = ::GetCurrentProcessId();
@@ -675,7 +682,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 	g_FrameRate.InitFreqUnits();
 
 	// log information on which process mapped the DLL
-	sg_Dll.LogMessage( _T("mapped: "));
+	sg_Shared.LogMessage( _T("mapped: "));
 
 #ifdef USE_LOGFILE
 	// open log file, specific for this process
@@ -684,7 +691,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		TCHAR szLogName[ _MAX_PATH ];
 		int iLen = _sntprintf( szLogName, COUNTOF(szLogName)-1, 
 			_T("%sTaksi_%s.log"), 
-			sg_Dll.m_szIniDir, m_szProcessTitleNoExt ); 
+			sg_Shared.m_szIniDir, m_szProcessTitleNoExt ); 
 		HRESULT hRes = g_Log.OpenLogFile(szLogName);
 		if ( IS_ERROR(hRes))
 		{
@@ -702,7 +709,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		DEBUG_TRACE(( "sg_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
 		DEBUG_TRACE(( "sg_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
 		DEBUG_TRACE(( "sg_Config.m_bGDIUse=%d" LOG_CR, sg_Config.m_bGDIUse));
-		DEBUG_TRACE(( "sg_Dll.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Dll.m_hHookCBT));
+		DEBUG_TRACE(( "sg_Shared.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Shared.m_hHookCBT));
 	}
 
 #ifdef USE_GDIP
@@ -715,7 +722,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 bool CTaksiProcess::OnDllProcessDetach()
 {
 	// DLL_PROCESS_DETACH
-	LOG_MSG(( "DLL_PROCESS_DETACH (num=%d)" LOG_CR, sg_Dll.m_iProcessCount ));
+	LOG_MSG(( "DLL_PROCESS_DETACH (num=%d)" LOG_CR, sg_Shared.m_iProcessCount ));
 
 	DetachGraphXMode();
 
@@ -723,7 +730,7 @@ bool CTaksiProcess::OnDllProcessDetach()
 	g_UserKeyboard.UninstallHookKeys();
 
 	// uninstall system-wide hook. then re-install it later if i want.
-	sg_Dll.OnDetachProcess();
+	sg_Shared.OnDetachProcess();
 
 	if (m_pCustomConfig)
 	{
@@ -739,8 +746,8 @@ bool CTaksiProcess::OnDllProcessDetach()
 #endif
 
 	// log information on which process unmapped the DLL 
-	sg_Dll.LogMessage( _T("unmapped: "));
-	sg_Dll.m_iProcessCount --;
+	sg_Shared.LogMessage( _T("unmapped: "));
+	sg_Shared.m_iProcessCount --;
 	return true;
 }
 

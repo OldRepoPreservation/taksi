@@ -223,7 +223,7 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		DEBUG_MSG((  "CTaksiGDI::WM_DESTROY" LOG_CR ));
 		if ( g_Proc.IsProcPrime())
 		{
-			sg_Dll.SendReHookMessage();
+			sg_Shared.SendReHookMessage();
 		}
 		return lRes;
 		}

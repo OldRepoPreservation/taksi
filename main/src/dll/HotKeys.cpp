@@ -261,17 +261,17 @@ void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	{
 	case TAKSI_HOTKEY_ConfigOpen:
 		// Open the config dialog window.
-		ASSERT(sg_Dll.m_hMasterWnd);
-		PostMessage( sg_Dll.m_hMasterWnd, WM_COMMAND, IDC_HOTKEY_FIRST + TAKSI_HOTKEY_ConfigOpen, 0 );
+		ASSERT(sg_Shared.m_hMasterWnd);
+		PostMessage( sg_Shared.m_hMasterWnd, WM_COMMAND, IDC_HOTKEY_FIRST + TAKSI_HOTKEY_ConfigOpen, 0 );
 		return;
 	case TAKSI_HOTKEY_HookModeToggle:
 		// don't switch during video capture?
 		if ( g_AVIFile.IsOpen())
 			return;
-		if ( sg_Dll.IsHookCBT())
+		if ( sg_Shared.IsHookCBT())
 		{
 			LOG_MSG(( "CTaksiHotKeys::DoHotKey:Signaling to unhook CBT." LOG_CR));
-			if ( sg_Dll.HookCBT_Uninstall())
+			if ( sg_Shared.HookCBT_Uninstall())
 			{
 				LOG_MSG(( "CTaksiHotKeys::DoHotKey:CBT unhooked." LOG_CR));
 				// change indicator to "green"
@@ -280,7 +280,7 @@ void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 		else
 		{
 			LOG_MSG(( "CTaksiHotKeys::DoHotKey: Signaling to install CBT hook." LOG_CR));
-			sg_Dll.HookCBT_Install();
+			sg_Shared.HookCBT_Install();
 		}
 		return;
 	case TAKSI_HOTKEY_IndicatorToggle:

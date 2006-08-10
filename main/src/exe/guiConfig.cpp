@@ -39,7 +39,7 @@ void CGuiConfig::OnChanges()
 {
 	SetStatusText( MAKEINTRESOURCE(IDS_STATUS_CHANGES));
 	SetSaveState( true );
-	sg_Dll.UpdateMaster();
+	sg_Shared.UpdateMaster();
 }
 
 //******************************************************
@@ -347,7 +347,7 @@ void CGuiConfig::OnCommandRestore(void)
 	
 	UpdateSettings(g_Config);	// push out to the dialog.
 	sg_Config.CopyConfig(g_Config);
-	sg_Dll.UpdateConfigCustom();	// indicate global changes have been made.
+	sg_Shared.UpdateConfigCustom();	// indicate global changes have been made.
 
 	// modify status text
 	SetStatusText( MAKEINTRESOURCE(IDS_STATUS_RESTORED));
@@ -389,7 +389,7 @@ void CGuiConfig::OnCommandSave()
 	{
 		// Apply new settings globally
 		SetSaveState( false );
-		sg_Dll.UpdateConfigCustom();	// make global change.
+		sg_Shared.UpdateConfigCustom();	// make global change.
 		SetStatusText( MAKEINTRESOURCE(IDS_STATUS_SAVED));
 	}
 	else
