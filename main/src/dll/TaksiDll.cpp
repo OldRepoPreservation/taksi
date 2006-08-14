@@ -14,7 +14,7 @@
 //**************************************************************************************
 // Shared by all processes
 // NOTE: Must be init with 0
-// WARN: Constructors WILL BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
+// WARN: Constructors WOULD BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
 //**************************************************************************************
 #pragma data_seg(".SHARED") // ".HKT" ".SHARED"
 CTaksiShared sg_Shared = {0};		// API to present to the Master EXE 
