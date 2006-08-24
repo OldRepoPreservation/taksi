@@ -885,7 +885,7 @@ CTaksiDX9::~CTaksiDX9()
 
 HRESULT CTaksiDX9::HookFunctions()
 {
-	// ONLY CALLED FROM AttachGraphXMode()
+	// ONLY CALLED FROM AttachGraphXAPI()
 	// This function hooks two IDirect3DDevice9 methods, using code overwriting technique. 
 	// hook IDirect3DDevice9::Present(), using code modifications at run-time.
 	// ALGORITHM: we overwrite the beginning of real IDirect3DDevice9::Present

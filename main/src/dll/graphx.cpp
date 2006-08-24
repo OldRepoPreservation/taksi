@@ -13,7 +13,11 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 {
 	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 	if ( ! g_gdiplus.m_Token )
-		return S_FALSE;
+	{
+		g_gdiplus.AttachGDIPInt();
+		if ( ! g_gdiplus.m_Token )
+			return S_FALSE;
+	}
 	if ( sg_Config.m_szImageFormatExt[0] == '\0' )
 		return S_FALSE;
 
@@ -319,15 +323,15 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	else if ( ! g_Proc.IsProcPrime())
 	{
 		// Dispose of myself! a new process has taken over.
-		g_Proc.m_bStopGraphXMode = true;
+		g_Proc.m_bStopGraphXAPI = true;
 		return;
 	}
 
 	if ( sg_Shared.m_bMasterExiting )
 		return;
 
-	// Declare we have a working GraphXMode hook.
-	if ( ! g_Proc.StartGraphXMode( get_GraphXType()))
+	// Declare we have a working GraphXAPI hook.
+	if ( ! g_Proc.StartGraphXAPI( get_GraphXAPI()))
 	{
 		// mode not allowed!
 		return;	
@@ -449,11 +453,11 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 void CTaksiGraphX::PresentFrameEnd()
 {
 	// check unhook flag
-	if ( sg_Shared.m_bMasterExiting || g_Proc.m_bStopGraphXMode )
+	if ( sg_Shared.m_bMasterExiting || g_Proc.m_bStopGraphXAPI )
 	{
-		DEBUG_TRACE(( "PresentFrameEnd:StopGraphXMode." LOG_CR ));
+		DEBUG_TRACE(( "PresentFrameEnd:StopGraphXAPI." LOG_CR ));
 		UnhookFunctions();					// we're ordered to unhook methods.
-		g_Proc.StopGraphXMode();
+		g_Proc.StopGraphXAPIs();
 		// the dll should now unload?
 		return;
 	}
@@ -467,18 +471,23 @@ void CTaksiGraphX::PresentFrameEnd()
 	}
 }
 
-HRESULT CTaksiGraphX::AttachGraphXMode()
+HRESULT CTaksiGraphX::AttachGraphXAPI()
 {
 	// DLL_PROCESS_ATTACH
 	// Check the DLL that would support this graphics mode.
 	// NOTE: Dont force graphics DLL to load. just look for its presense.
-	// ONLY CALLED FROM: AttachGraphXModeW()
+	// ONLY CALLED FROM: AttachGraphXAPIs()
 	// Not fully attached til PresentFrameBegin() is called.
+
+	if ( ! sg_Config.m_abUseAPI[ get_GraphXAPI() ] )	// not allowed.
+	{
+		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
+	}
 
 	const TCHAR* pszName = get_DLLName();	// virtual
 	if ( !FindDll(pszName)) // already loaded?
 	{
-		DEBUG_TRACE(( "AttachGraphXMode NO '%s'" LOG_CR, pszName ));
+		DEBUG_TRACE(( "AttachGraphXAPI NO '%s'" LOG_CR, pszName ));
 		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
 	}
 
@@ -491,7 +500,7 @@ HRESULT CTaksiGraphX::AttachGraphXMode()
 	}
 
 	m_bHookedFunctions = true;	
-	LOG_MSG(( "AttachGraphXMode '%s'" LOG_CR, pszName ));
+	LOG_MSG(( "AttachGraphXAPI '%s'" LOG_CR, pszName ));
 	// NOTE: a hook is not truly complete til PresentFrameBegin() is called.
 	m_bGotFrameInfo = false;	// must update this ASAP.
 	return S_OK;

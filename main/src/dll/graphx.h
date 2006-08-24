@@ -21,9 +21,9 @@ public:
 	}
 
 	virtual const TCHAR* get_DLLName() const = 0;
-	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const = 0;
+	virtual TAKSI_API_TYPE get_GraphXAPI() const = 0;
 
-	virtual HRESULT AttachGraphXMode();
+	HRESULT AttachGraphXAPI();
 	void PresentFrameBegin( bool bChange );
 	void PresentFrameEnd();
 	void RecordAVI_Reset();
@@ -31,7 +31,7 @@ public:
 protected:
 	virtual HRESULT HookFunctions()
 	{
-		// ONLY CALLED FROM AttachGraphXMode()
+		// ONLY CALLED FROM AttachGraphXAPI()
 		ASSERT( IsValidDll());
 		DEBUG_MSG(( "CTaksiGraphX::HookFunctions done." LOG_CR ));
 		m_bHookedFunctions = true;
@@ -74,9 +74,9 @@ public:
 	{
 		return TEXT("d3d8.dll");
 	}
-	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	virtual TAKSI_API_TYPE get_GraphXAPI() const
 	{
-		return TAKSI_GRAPHX_DX8;
+		return TAKSI_API_DX8;
 	}
 
 	virtual HRESULT HookFunctions();
@@ -114,9 +114,9 @@ public:
 	{
 		return TEXT("d3d9.dll");
 	}
-	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	virtual TAKSI_API_TYPE get_GraphXAPI() const
 	{
-		return TAKSI_GRAPHX_DX9;
+		return TAKSI_API_DX9;
 	}
 
 	virtual HRESULT HookFunctions();
@@ -157,12 +157,10 @@ public:
 	{
 		return TEXT("opengl32.dll");
 	}
-	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	virtual TAKSI_API_TYPE get_GraphXAPI() const
 	{
-		return TAKSI_GRAPHX_OGL;
+		return TAKSI_API_OGL;
 	}
-
-	virtual HRESULT AttachGraphXMode();
 
 	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
@@ -198,12 +196,11 @@ public:
 	{
 		return TEXT("user32.dll");
 	}
-	virtual TAKSI_GRAPHX_TYPE get_GraphXType() const
+	virtual TAKSI_API_TYPE get_GraphXAPI() const
 	{
-		return TAKSI_GRAPHX_GDI;
+		return TAKSI_API_GDI;
 	}
 
-	virtual HRESULT AttachGraphXMode();
 	virtual HRESULT HookFunctions();
 	virtual void UnhookFunctions();
 	virtual void FreeDll();

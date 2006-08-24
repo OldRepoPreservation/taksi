@@ -284,24 +284,12 @@ LRESULT CALLBACK CTaksiGDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	return ::CallWindowProc( g_GDI.m_WndProcOld, hWnd, uMsg, wParam, lParam );
 }
 
-HRESULT CTaksiGDI::AttachGraphXMode()
-{
-	// ONLY CALLED FROM: AttachGraphXModeW()
-	if ( ! sg_Config.m_bGDIUse )	// not allowed.
-	{
-		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
-	}
-	return __super::AttachGraphXMode();
-}
-
 HRESULT CTaksiGDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
-	// ONLY CALLED FROM AttachGraphXMode()
+	// ONLY CALLED FROM AttachGraphXAPI()
 
 	ASSERT( IsValidDll());
-	ASSERT( sg_Config.m_bGDIUse );	// not allowed.
-
 	if ( g_Proc.m_hWndHookTry == NULL )
 	{
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
@@ -309,7 +297,7 @@ HRESULT CTaksiGDI::HookFunctions()
 	if ( m_hWnd != NULL )	// must find the window first. m_hWndHookTry
 	{
 		// already hooked some window.
-		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGraphXModeW()
+		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGraphXAPIs()
 		{
 			return S_FALSE;
 		}
@@ -317,7 +305,7 @@ HRESULT CTaksiGDI::HookFunctions()
 		UnhookFunctions();
 	}
 
-	m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGraphXModeW()
+	m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGraphXAPIs()
 	m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
 	if ( m_hWnd == NULL )
 	{

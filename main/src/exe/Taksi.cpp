@@ -22,12 +22,17 @@ const TCHAR* CheckIntResource( const TCHAR* pszText, TCHAR* pszTmp )
 	return pszTmp;
 }
 
-void DlgTODO( HWND hWnd, const TCHAR* pszMsg )
+int DlgHelp( HWND hWnd, const TCHAR* pszMsg, UINT uType )
 {
-	// Explain to the user why this doesnt work yet.
+	// uType = MB_OK
 	if ( pszMsg == NULL )
+	{
+		// Explain to the user why this doesnt work yet.
 		pszMsg = _T("TODO");
-	MessageBox( hWnd, pszMsg, g_szAppTitle, MB_OK );
+	}
+	TCHAR szTmp[ _MAX_PATH ];
+	pszMsg = CheckIntResource( pszMsg, szTmp );
+	return ::MessageBox( hWnd, pszMsg, g_szAppTitle, uType );
 }
 
 void CheckVideoCodec( HWND hWnd, const ICINFO& info )
@@ -43,10 +48,7 @@ void CheckVideoCodec( HWND hWnd, const ICINFO& info )
 
 	if ( info.dwSize == 0 && bCompressed )
 	{
-		MessageBox( hWnd, 
-			_T("The selected video codec doesnt work on this system.\n")
-			_T("Please check the configuration dialog"),
-			g_szAppTitle, MB_OK );
+		DlgHelp( hWnd, MAKEINTRESOURCE(IDS_HELP_CODEC_FAIL));
 		return;
 	}
 
@@ -59,21 +61,14 @@ void CheckVideoCodec( HWND hWnd, const ICINFO& info )
 	{
 	case MAKEFOURCC('D','I','B',' '): // no compress.
 	case MAKEFOURCC('d','i','b',' '): // no compress.
+		// IDS_HELP_CODEC_DIB
 		ASSERT( ! bCompressed );
-		iRet = MessageBox( hWnd, 
-			_T("The selected video codec uses a VERY large amount of disk space.\n")
-			_T("You probably want to check the configuration dialog and pick a better codec."),
-			g_szAppTitle, MB_OK );
+		iRet = DlgHelp( hWnd, MAKEINTRESOURCE(IDS_HELP_CODEC_DIB));
 		break;
 	case MAKEFOURCC('m','s','v','c'): // Video1 = CRAM
 	case MAKEFOURCC('M','S','V','C'): // Video1 = CRAM
-		// just warn that the codec isnt very good.
-		iRet = MessageBox( hWnd, 
-			_T("The selected video codec (MS-CRAM)\n")
-			_T("is popular and has low CPU usage\n")
-			_T("but does not have very good compression.\n")
-			_T("You may want to check the configuration dialog and pick a different codec."),
-			g_szAppTitle, MB_OK );
+		// just warn that the codec isnt very good. IDS_HELP_CODEC_CRAM
+		iRet = DlgHelp( hWnd, MAKEINTRESOURCE(IDS_HELP_CODEC_CRAM));
 		break;
 #if 0
 		// MPEG4 may slow frames per sec.
@@ -84,6 +79,9 @@ void CheckVideoCodec( HWND hWnd, const ICINFO& info )
 	if ( iRet == IDCANCEL )	// dont show this again!
 	{
 	}
+
+	// Instructions on how to capture a window.
+	iRet = DlgHelp( hWnd, MAKEINTRESOURCE(IDS_HELP_CAPTURE));
 }
 
 static void InitApp()
@@ -97,10 +95,7 @@ static void InitApp()
 	HRESULT hRes = g_Config.FixCaptureDir();
 	if ( FAILED(hRes))
 	{
-		MessageBox( NULL, 
-			_T("Cant create save file directory.\n")
-			_T("Please check the configuration dialog"),
-			g_szAppTitle, MB_OK );
+		DlgHelp( NULL, MAKEINTRESOURCE(IDS_ERR_SAVEDIR));
 	}
 
 	// Test my codec.

@@ -4,6 +4,11 @@
 //
 #define ID_APP                          100
 #define IDS_STRING101                   101
+#define IDS_HELP_CODEC_CRAM             101
+#define IDS_HELP_CODEC_DIB              102
+#define IDS_HELP_CODEC_FAIL             103
+#define IDS_ERR_SAVEDIR                 104
+#define IDS_HELP_CAPTURE                105
 #define IDD_GuiConfig                   110
 #define IDD_GuiConfigTab1               111
 #define IDD_GuiConfigTab2               112
@@ -71,13 +76,16 @@
 #define IDC_C_StatFrameRate             1063
 #define IDC_C_StatDataRecorded          1064
 #define IDC_C_StatFormat                1065
-#define IDC_C_StatGraphXMode            1066
+#define IDC_C_StatGraphXAPI             1066
 #define IDC_C_StatsClear                1067
-#define IDC_C_UseOverheadCompensation   1072
-#define IDC_C_GDIUse                    1073
-#define IDC_C_GDIFull                   1074
-#define IDC_C_GDIFrame                  1075
-#define IDC_C_OpenGLUse                 1076
+#define IDC_C_UseOverheadCompensation   1071
+#define IDC_C_GDIFull                   1072
+#define IDC_C_GDIFrame                  1073
+#define IDC_C_UseGDI                    1075
+#define IDC_C_UseOGL                    1076
+#define IDC_C_UseDX8                    1077
+#define IDC_C_UseDX9                    1078
+#define IDC_C_UseGDI2                   1079
 #define IDC_EDIT1                       1088
 #define IDC_RICHEDIT21                  1089
 #define IDS_APP_DESC                    2000

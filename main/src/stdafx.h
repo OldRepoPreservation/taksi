@@ -7,7 +7,9 @@
 #endif
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
-//#define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+
+// NOTE: This causes a hang bug when closing Taksi before closing the app!
+// #define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 
 // System includes always go first.
 #include <windows.h>
@@ -89,19 +91,6 @@ enum TAKSI_INDICATE_TYPE
 	TAKSI_INDICATE_QTY,
 };
 
-enum TAKSI_GRAPHX_TYPE
-{
-	// enumerate the available modes we support.
-	TAKSI_GRAPHX_NONE = 0,
-	TAKSI_GRAPHX_GDI,	// prefer all other modes over this.
-	TAKSI_GRAPHX_OGL,	// a static linked dll, so can get a false positive.
-#ifdef USE_DX
-	TAKSI_GRAPHX_DX8,
-	TAKSI_GRAPHX_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
-#endif
-	TAKSI_GRAPHX_QTY,
-};
-
 enum TAKSI_PROCSTAT_TYPE
 {
 #define ProcStatProp(a,b,c,d) TAKSI_PROCSTAT_##a,
@@ -152,7 +141,7 @@ public:
 
 	HWND m_hWndCap;	// the window the graphics is in
 	SIZE m_SizeWnd;	// the window/backbuffer size. (pixels)
-	TAKSI_GRAPHX_TYPE m_eGraphXMode;
+	TAKSI_API_TYPE m_eGraphXAPI;
 
 	TAKSI_INDICATE_TYPE m_eState;	// What are we doing with the process?
 	float m_fFrameRate;			// measured frame rate. recording or not.

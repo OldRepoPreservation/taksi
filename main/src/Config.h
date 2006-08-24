@@ -26,6 +26,19 @@ enum TAKSI_CUSTOM_TYPE
 	TAKSI_CUSTOM_QTY,
 };
 
+enum TAKSI_API_TYPE
+{
+	// enumerate the available modes we support.
+	TAKSI_API_NONE = 0,
+	TAKSI_API_GDI,	// prefer all other modes over this.
+	TAKSI_API_OGL,	// a static linked dll, so can get a false positive.
+#ifdef USE_DX
+	TAKSI_API_DX8,
+	TAKSI_API_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
+#endif
+	TAKSI_API_QTY,
+};
+
 struct LIBSPEC CTaksiConfigCustom : public CIniObject
 {
 	// Custom frame rate/weight settings for a specific app.
@@ -99,8 +112,7 @@ public:
 
 	bool   m_bUseOverheadCompensation;
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
-	bool   m_bGDIUse;		// hook GDI mode at all?
-	bool   m_bOpenGLUse;
+	bool   m_abUseAPI[TAKSI_API_QTY];	// Use this API? true by default
 
 	// CAN NOT be set from CGuiConfig directly
 	TCHAR  m_szImageFormatExt[16];	// the screen shot format tag. JPEG = "image/jpeg", PNG = "image/png"
