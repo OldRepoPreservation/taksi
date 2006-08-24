@@ -180,15 +180,19 @@ BEGIN
     ICON            ID_APP,ID_APP,247,7,20,20
     CONTROL         "Compensate for record overhead in frame rate",
                     IDC_C_UseOverheadCompensation,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,37,196,10
-    CONTROL         "Hook GDI",IDC_C_GDIUse,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,63,196,10
+                    WS_TABSTOP,7,37,169,10
+    CONTROL         "Hook GDI",IDC_C_UseGDI,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,50,89,10
     CONTROL         "Allow capture of full desktop",IDC_C_GDIFull,"Button",
-                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,76,196,10
+                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,50,136,10
     CONTROL         "Record GDI Frame",IDC_C_GDIFrame,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,89,196,10
-    CONTROL         "Hook OpenGL",IDC_C_OpenGLUse,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,50,196,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,63,137,10
+    CONTROL         "Hook OpenGL",IDC_C_UseOGL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,63,89,10
+    CONTROL         "Hook DirectX8",IDC_C_UseDX8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,76,89,10
+    CONTROL         "Hook DirectX9",IDC_C_UseDX9,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,89,89,10
 END
 
 IDD_GuiConfigTab6 DIALOGEX 4, 14, 274, 113
@@ -218,7 +222,7 @@ BEGIN
                     ES_READONLY
     LTEXT           "MB",IDC_STATIC,167,84,35,8
     PUSHBUTTON      "C",IDC_C_StatsClear,250,83,12,12
-    EDITTEXT        IDC_C_StatGraphXMode,217,65,45,14,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_C_StatGraphXAPI,217,65,45,14,ES_AUTOHSCROLL | 
                     ES_READONLY
 END
 
@@ -375,6 +379,11 @@ END
 STRINGTABLE 
 BEGIN
     ID_APP                  "Taksi"
+    IDS_HELP_CODEC_CRAM     "The selected video codec (MS-CRAM)\nis popular and has low CPU usage\nbut does not have very good compression.\nYou may want to check the configuration dialog and pick a different codec."
+    IDS_HELP_CODEC_DIB      "The selected video codec uses a VERY large amount of disk space.\nYou probably want to check the configuration dialog and pick a better codec."
+    IDS_HELP_CODEC_FAIL     "The selected video codec doesnt work on this system.\nPlease check the configuration dialog."
+    IDS_ERR_SAVEDIR         "Cant create save file directory.\nPlease check the configuration dialog."
+    IDS_HELP_CAPTURE        "When the 'App Hook' button is blue, select the window you want to hook\nWhen the 'App Hook' turns green and the green square appears on the app\nYou may press 'Record' to start recording."
     IDD_GuiConfigTab1       "Directory"
 END
 
@@ -457,17 +466,13 @@ STRINGTABLE
 BEGIN
     IDC_C_CustomUseCurrent  "Use the currently hooked applications information in the dialog"
     IDC_C_StatsClear        "Clear the stats values"
+    IDC_C_UseOverheadCompensation 
+                            "Check = compensate for the overhead of recording to keep videos at their original speed. (Good for cinematics) Unchecked = play videos as observed during record."
 END
 
 STRINGTABLE 
 BEGIN
     IDC_C_VideoCodecButton  "Video Codecs - Select a video codec to compress the video stream as it is recorded."
-END
-
-STRINGTABLE 
-BEGIN
-    IDC_C_UseOverheadCompensation 
-                            "Check = compensate for the overhead of recording to keep videos at their original speed. (Good for cinematics) Unchecked = play videos as observed during record."
 END
 
 STRINGTABLE 

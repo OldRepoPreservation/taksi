@@ -170,23 +170,23 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%d x %d"), stats.m_SizeWnd.cx, stats.m_SizeWnd.cy  );
 		SetWindowText( m_hControlStatFormat, szTmp );
 	}
-	if ( dwMask & (1<<TAKSI_PROCSTAT_GraphXMode))
+	if ( dwMask & (1<<TAKSI_PROCSTAT_GraphXAPI))
 	{
-		const TCHAR* sm_szNames[TAKSI_GRAPHX_QTY+1] = 
+		const TCHAR* sm_szNames[TAKSI_API_QTY+1] = 
 		{
 		_T(""),
-		_T("GDI"),		// TAKSI_GRAPHX_GDI
-		_T("OpenGL"),	// TAKSI_GRAPHX_OGL
+		_T("GDI"),		// TAKSI_API_GDI
+		_T("OpenGL"),	// TAKSI_API_OGL
 #ifdef USE_DX
-		_T("DirectX8"), // TAKSI_GRAPHX_DX8
-		_T("DirectX9"), // TAKSI_GRAPHX_DX9
+		_T("DirectX8"), // TAKSI_API_DX8
+		_T("DirectX9"), // TAKSI_API_DX9
 #endif
 		_T(""),
 		};
-		int i = stats.m_eGraphXMode;
+		int i = stats.m_eGraphXAPI;
 		if ( i < 0 || i >= COUNTOF(sm_szNames))
 			i = COUNTOF(sm_szNames)-1;
-		SetWindowText( m_hControlStatGraphXMode, sm_szNames[i] );
+		SetWindowText( m_hControlStatGraphXAPI, sm_szNames[i] );
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_State))
 	{
@@ -314,9 +314,12 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	Custom_Init(config.m_pCustomList);
 
 	// Display options
-	UPDATE_CHECK(GDIUse,config.m_bGDIUse);
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
-	UPDATE_CHECK(OpenGLUse,config.m_bOpenGLUse);
+
+	UPDATE_CHECK(UseGDI,config.m_abUseAPI[TAKSI_API_GDI]);
+	UPDATE_CHECK(UseOGL,config.m_abUseAPI[TAKSI_API_OGL]);
+	UPDATE_CHECK(UseDX8,config.m_abUseAPI[TAKSI_API_DX8]);
+	UPDATE_CHECK(UseDX9,config.m_abUseAPI[TAKSI_API_DX9]);
 
 	m_bDataUpdating = false;
 }
@@ -571,11 +574,11 @@ bool CGuiConfig::OnHelp( LPHELPINFO pHelpInfo )
     int iLen = LoadString( g_hInst, pHelpInfo->iCtrlId, szTmp, sizeof(szTmp));
 	if ( iLen <= 0 )
 	{
-		DlgTODO( g_GUIConfig, "TODO: No context help for this" );
+		DlgHelp( g_GUIConfig, "TODO: No context help for this" );
 		return true;
 	}
 
-	::MessageBox( m_hWnd, szTmp, g_szAppTitle, MB_OK );
+	DlgHelp( m_hWnd, szTmp );
 	return true;
 }
 
@@ -644,17 +647,24 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_DebugLog:
 		sg_Config.m_bDebugLog = g_Config.m_bDebugLog = OnCommandCheck( m_hControlDebugLog );
 		return true;
-	case IDC_C_OpenGLUse:
-		sg_Config.m_bOpenGLUse = g_Config.m_bOpenGLUse = OnCommandCheck( m_hControlGDIUse );
-		return true;
-	case IDC_C_GDIUse:
-		sg_Config.m_bGDIUse = g_Config.m_bGDIUse = OnCommandCheck( m_hControlGDIUse );
-		return true;
 	case IDC_C_GDIFrame:
 		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
 		return true;
 	case IDC_C_UseOverheadCompensation:
 		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );
+		return true;
+
+	case IDC_C_UseGDI:
+		sg_Config.m_abUseAPI[TAKSI_API_GDI] = g_Config.m_abUseAPI[TAKSI_API_GDI] = OnCommandCheck( m_hControlUseGDI );
+		return true;
+	case IDC_C_UseOGL:
+		sg_Config.m_abUseAPI[TAKSI_API_OGL] = g_Config.m_abUseAPI[TAKSI_API_OGL] = OnCommandCheck( m_hControlUseOGL );
+		return true;
+	case IDC_C_UseDX8:
+		sg_Config.m_abUseAPI[TAKSI_API_DX8] = g_Config.m_abUseAPI[TAKSI_API_DX8] = OnCommandCheck( m_hControlUseDX8 );
+		return true;
+	case IDC_C_UseDX9:
+		sg_Config.m_abUseAPI[TAKSI_API_DX9] = g_Config.m_abUseAPI[TAKSI_API_DX9] = OnCommandCheck( m_hControlUseDX9 );
 		return true;
 
 	case IDC_C_CaptureDirectory:
@@ -728,7 +738,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 			OnChanges();
 			if ( iDeviceId != WAVE_DEVICE_NONE )
 			{
-				DlgTODO( m_hWnd, "TODO: Audio doesnt actually work yet" );
+				DlgHelp( m_hWnd, "TODO: Audio doesnt actually work yet" );
 			}
 		}
 		}

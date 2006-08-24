@@ -125,8 +125,7 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 	m_bUseDirectInput = true;
 
-	m_bOpenGLUse = false;
-	m_bGDIUse = true;
+	memset( m_abUseAPI, 0xFF, sizeof(m_abUseAPI));
 	m_bGDIFrame = true;
 	m_bUseOverheadCompensation = false;
 
@@ -155,8 +154,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
 	m_bUseDirectInput = config.m_bUseDirectInput;
 
-	m_bOpenGLUse = config.m_bOpenGLUse;
-	m_bGDIUse = config.m_bGDIUse;		// hook GDI mode at all?
+	memcpy( m_abUseAPI, config.m_abUseAPI, sizeof(m_abUseAPI));	// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
 	m_bUseOverheadCompensation = config.m_bUseOverheadCompensation;
 
@@ -378,10 +376,16 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%d,%d", m_ptMasterWindow.x, m_ptMasterWindow.y );
 	case TAKSI_CFGPROP_GDIFrame:
 		return _snprintf(pszValue, iSizeMax, m_bGDIFrame? "1" : "0" );
-	case TAKSI_CFGPROP_GDIUse:
-		return _snprintf(pszValue, iSizeMax, m_bGDIUse? "1" : "0" );
-	case TAKSI_CFGPROP_OpenGLUse:
-		return _snprintf(pszValue, iSizeMax, m_bOpenGLUse? "1" : "0" );
+
+	case TAKSI_CFGPROP_UseGDI:
+		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_GDI]? "1" : "0" );
+	case TAKSI_CFGPROP_UseOGL:
+		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_OGL]? "1" : "0" );
+	case TAKSI_CFGPROP_UseDX8:
+		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_DX8]? "1" : "0" );
+	case TAKSI_CFGPROP_UseDX9:
+		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_DX9]? "1" : "0" );
+
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		return _snprintf(pszValue, iSizeMax, m_bUseOverheadCompensation? "1" : "0" );
 
@@ -474,11 +478,11 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_GDIFrame:
 		m_bGDIFrame = atoi(pszValue) ? true : false;
 		break;
-	case TAKSI_CFGPROP_GDIUse:
-		m_bGDIUse = atoi(pszValue) ? true : false;
+	case TAKSI_CFGPROP_UseGDI:
+		m_abUseAPI[TAKSI_API_GDI] = atoi(pszValue) ? true : false;
 		break;
-	case TAKSI_CFGPROP_OpenGLUse:
-		m_bOpenGLUse = atoi(pszValue) ? true : false;
+	case TAKSI_CFGPROP_UseOGL:
+		m_abUseAPI[TAKSI_API_OGL] = atoi(pszValue) ? true : false;
 		break;
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		m_bUseOverheadCompensation = atoi(pszValue) ? true : false;

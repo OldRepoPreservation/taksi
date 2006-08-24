@@ -298,18 +298,9 @@ EXTERN_C __declspec(dllexport) BOOL APIENTRY OGL_WglSwapBuffers(HDC hdc)
 
 //*******************************************************************
 
-HRESULT CTaksiOGL::AttachGraphXMode()
-{
-	if ( ! sg_Config.m_bOpenGLUse )	// not allowed.
-	{
-		return HRESULT_FROM_WIN32(ERROR_DLL_NOT_FOUND);
-	}
-	return __super::AttachGraphXMode();
-}
-
 HRESULT CTaksiOGL::HookFunctions()
 {
-	// ONLY CALLED FROM AttachGraphXMode()
+	// ONLY CALLED FROM AttachGraphXAPI()
 	// Hooks multiple functions 
 	// hook wglSwapBuffers, using code modifications at run-time.
 	// ALGORITHM: we overwrite the beginning of real wglSwapBuffers
@@ -320,7 +311,6 @@ HRESULT CTaksiOGL::HookFunctions()
 	// the JMP instruction back into the beginning of wglSwapBuffers, and
 	// returns.
 	
-	ASSERT( sg_Config.m_bOpenGLUse );	// not allowed.
 	ASSERT( IsValidDll());
 	if ( m_bHookedFunctions )
 	{

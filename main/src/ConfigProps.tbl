@@ -7,17 +7,24 @@ ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")
 
 ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end with a backslash)")
 ConfigProp(DebugLog,				m_bDebugLog,	"Debug Log kept?")
+
+#ifdef USE_DX
+ConfigProp(UseDX8,					m_abAPIUse[TAKSI_API_DX8],	"hook DirectX8 API or not?")
+ConfigProp(UseDX9,					m_abAPIUse[TAKSI_API_DX9],	"hook DirectX9 API or not?")
+#endif
+
+ConfigProp(UseGDI,					m_abAPIUse[TAKSI_API_GDI],	"hook GDI API or not?")
+ConfigProp(UseOGL,					m_abAPIUse[TAKSI_API_OGL],	"hook OpenGL API or not?")
+
 ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name with this")
 
-ConfigProp(GDIFrame,				m_bGDIFrame,	"Record the GDI frame or just the client area")
-ConfigProp(GDIUse,					m_bGDIUse,		"hook GDI mode at all?")
+ConfigProp(GDIFrame,				m_bGDIFrame,		"Record the GDI frame or just the client area")
 
 ConfigProp(ImageFormatExt,			m_szImageFormatExt,	"The image format for screen shots (png,bmp,jpeg)")
 
 ConfigProp(KeyboardUseDirectInput,	m_bUseDirectInput,	"use DirectInput for hotkeys else use hooks")
 ConfigProp(MovieFrameRateTarget,	m_fFrameRateTarget,	"desired frame rate of captured video (f/sec)")
 
-ConfigProp(OpenGLUse,				m_bOpenGLUse,		"Use openGL hooking or not")
 ConfigProp(PosMasterWindow,			m_ptMasterWindow,	"Position of the master window" )
 
 ConfigProp(ShowIndicator,			m_bShowIndicator,	"Show the indicator on the window")

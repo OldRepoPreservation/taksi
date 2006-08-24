@@ -31,14 +31,14 @@ HINSTANCE g_hInst = NULL;		// Handle for the dll for the current process.
 CTaksiProcess g_Proc;			// information about the process i am attached to.
 CTaksiLogFile g_Log;			// Log file for each process. seperate
 
-static CTaksiGraphX* const s_GraphxModes[ TAKSI_GRAPHX_QTY ] = 
+static CTaksiGraphX* const s_GraphxModes[ TAKSI_API_QTY ] = 
 {
-	NULL,	// TAKSI_GRAPHX_NONE
-	&g_GDI,	// TAKSI_GRAPHX_GDI // lowest priority, since all apps do GDI
-	&g_OGL,	// TAKSI_GRAPHX_OGL
+	NULL,	// TAKSI_API_NONE
+	&g_GDI,	// TAKSI_API_GDI // lowest priority, since all apps do GDI
+	&g_OGL,	// TAKSI_API_OGL
 #ifdef USE_DX
-	&g_DX8,	// TAKSI_GRAPHX_DX8
-	&g_DX9,	// TAKSI_GRAPHX_DX9 // almost no apps load this unless they are going to use it.
+	&g_DX8,	// TAKSI_API_DX8
+	&g_DX9,	// TAKSI_API_DX9 // almost no apps load this unless they are going to use it.
 #endif
 };
 
@@ -48,7 +48,9 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 {
 	CloseLogFile();
 	if ( ! sg_Config.m_bDebugLog)
+	{
 		return HRESULT_FROM_WIN32(ERROR_CANCELLED);
+	}
 
 	m_File.AttachHandle( ::CreateFile( pszFileName,            // file to create 
 		GENERIC_WRITE,                // open for writing 
@@ -105,7 +107,7 @@ void CTaksiProcStats::InitProcStats()
 	m_szProcessFile[0] = '\0';
 	m_szLastError[0] = '\0';
 	m_hWndCap = NULL;
-	m_eGraphXMode = TAKSI_GRAPHX_NONE;
+	m_eGraphXAPI = TAKSI_API_NONE;
 	m_eState = TAKSI_INDICATE_Hooked;		// assume we are looking for focus
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
 }
@@ -139,7 +141,7 @@ LRESULT CALLBACK CTaksiShared::HookCBTProc(int nCode, WPARAM wParam, LPARAM lPar
 		LOG_MSG(( "HookCBTProc: nCode=0x%x, wParam=0x%x" LOG_CR, (DWORD)nCode, wParam ));
 		if ( wParam == NULL )	// ignore this!
 			break;
-		if ( g_Proc.AttachGraphXModeW( (HWND) wParam ) == S_OK )
+		if ( g_Proc.AttachGraphXAPIs( (HWND) wParam ) == S_OK )
 		{
 			g_Proc.CheckProcessCustom();	// determine frame capturing algorithm 
 		}
@@ -509,35 +511,35 @@ void CTaksiProcess::CheckProcessCustom()
 	LOG_MSG(( "CheckProcessCustom: No custom config match." LOG_CR ));
 }
 
-bool CTaksiProcess::StartGraphXMode( TAKSI_GRAPHX_TYPE eMode )
+bool CTaksiProcess::StartGraphXAPI( TAKSI_API_TYPE eAPI )
 {
-	// TODO PresentFrameBegin() was called for this mode.
-	// Does this mode bump all others?
+	// PresentFrameBegin() was called for this API.
+	// This API/mode has successfully attached
 
-	if ( m_Stats.m_eGraphXMode == eMode )
+	if ( m_Stats.m_eGraphXAPI == eAPI )	// its already the primary API
 	{
 		return true;
 	}
-	if ( eMode < m_Stats.m_eGraphXMode )
+	if ( eAPI < m_Stats.m_eGraphXAPI )	// lower priority than the current API.
 	{
 		return false;
 	}
-	ASSERT( eMode > TAKSI_GRAPHX_NONE && eMode < TAKSI_GRAPHX_QTY );
+	ASSERT( eAPI > TAKSI_API_NONE && eAPI < TAKSI_API_QTY );
 
 	// Unhook any lower priority types.
-	for ( int i=m_Stats.m_eGraphXMode; i<eMode; i++ )
+	for ( int i=m_Stats.m_eGraphXAPI; i<eAPI; i++ )
 	{
 		if ( s_GraphxModes[i] == NULL )
 			continue;
 		s_GraphxModes[i]->FreeDll();
 	}
 
-	m_Stats.m_eGraphXMode = eMode;
-	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
+	m_Stats.m_eGraphXAPI = eAPI;
+	UpdateStat( TAKSI_PROCSTAT_GraphXAPI );
 	return true;
 }
 
-HRESULT CTaksiProcess::AttachGraphXModeW( HWND hWnd )
+HRESULT CTaksiProcess::AttachGraphXAPIs( HWND hWnd )
 {
 	// see if any of supported graphics API DLLs are already loaded. (and can be hooked)
 	// ARGS:
@@ -566,14 +568,14 @@ HRESULT CTaksiProcess::AttachGraphXModeW( HWND hWnd )
 	LOG_MSG(( "ATTACHGRAPHXMODEW: 0x%x" LOG_CR, m_hWndHookTry ));
 
 	HRESULT hRes = S_FALSE;
-	for ( int i=TAKSI_GRAPHX_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
-		hRes = s_GraphxModes[i]->AttachGraphXMode();
+		hRes = s_GraphxModes[i]->AttachGraphXAPI();
 	}
 	return hRes;
 }
 
-void CTaksiProcess::StopGraphXMode()
+void CTaksiProcess::StopGraphXAPIs()
 {
 	// this can be called in the PresentFrameEnd
 	g_AVIThread.StopAVIThread();	// kill my work thread, i'm done
@@ -582,19 +584,19 @@ void CTaksiProcess::StopGraphXMode()
 	m_hWndHookTry = NULL;	// Not trying to do anything anymore.
 }
 
-void CTaksiProcess::DetachGraphXMode()
+void CTaksiProcess::DetachGraphXAPIs()
 {
 	// we are unloading or some other app now has the main focus/hook.
-	StopGraphXMode();
+	StopGraphXAPIs();
 
 	// give graphics module a chance to clean up.
-	for ( int i=TAKSI_GRAPHX_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
 		s_GraphxModes[i]->FreeDll();
 	}
 
-	m_Stats.m_eGraphXMode = TAKSI_GRAPHX_NONE;
-	UpdateStat( TAKSI_PROCSTAT_GraphXMode );
+	m_Stats.m_eGraphXAPI = TAKSI_API_NONE;
+	UpdateStat( TAKSI_PROCSTAT_GraphXAPI );
 }
 
 bool CTaksiProcess::OnDllProcessAttach()
@@ -708,14 +710,11 @@ bool CTaksiProcess::OnDllProcessAttach()
 	{
 		DEBUG_TRACE(( "sg_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
 		DEBUG_TRACE(( "sg_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
-		DEBUG_TRACE(( "sg_Config.m_bGDIUse=%d" LOG_CR, sg_Config.m_bGDIUse));
 		DEBUG_TRACE(( "sg_Shared.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Shared.m_hHookCBT));
+		// DEBUG_TRACE(( "sg_Config.m_bUseGDI=%d" LOG_CR, sg_Config.m_abUseAPI[TAKSI_API_GDI]));
 	}
 
-#ifdef USE_GDIP
-	g_gdiplus.AttachGDIPInt();
-#endif
-	// ASSUME HookCBTProc will call AttachGraphXModeW later
+	// ASSUME HookCBTProc will call AttachGraphXAPIs later
 	return true;
 }
 
@@ -724,7 +723,7 @@ bool CTaksiProcess::OnDllProcessDetach()
 	// DLL_PROCESS_DETACH
 	LOG_MSG(( "DLL_PROCESS_DETACH (num=%d)" LOG_CR, sg_Shared.m_iProcessCount ));
 
-	DetachGraphXMode();
+	DetachGraphXAPIs();
 
 	// uninstall keyboard hook. was just for this process anyhow.
 	g_UserKeyboard.UninstallHookKeys();

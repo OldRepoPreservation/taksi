@@ -37,17 +37,20 @@ GuiConfigControl(CustomFrameWeight,    4, "displays current custom frame weight"
 GuiConfigControl(CustomUseCurrent,	   4, "Use the current hooked apps info to fill in text" );
 
 //GuiConfigControl(OverlayVerbose,        5, "Indicator has verbose text")
-GuiConfigControl(OpenGLUse,				5, "Use GDI mode hooking?")
-GuiConfigControl(GDIUse,				5, "Use GDI mode hooking?")
 GuiConfigControl(GDIFull,               5, "")
 GuiConfigControl(GDIFrame,              5, "")
 GuiConfigControl(UseOverheadCompensation, 5, "Attempt to compensate for the overhead of recording")
+
+GuiConfigControl(UseOGL,				5, "Use OpenGL API/mode hooking?")
+GuiConfigControl(UseGDI,				5, "Use GDI API/mode hooking?")
+GuiConfigControl(UseDX8,				5, "Use DirectX8 API/mode hooking?")
+GuiConfigControl(UseDX9,				5, "Use DirectX9 API/mode hooking?")
 
 GuiConfigControl(StatProcessName,		6, "")
 GuiConfigControl(StatLastError,			6, "")
 GuiConfigControl(StatState,				6, "")
 GuiConfigControl(StatFormat,			6, "size of the window.")
-GuiConfigControl(StatGraphXMode,		6, "")
+GuiConfigControl(StatGraphXAPI,			6, "")
 GuiConfigControl(StatFrameRate,			6, "")
 GuiConfigControl(StatDataRecorded,		6, "")
 GuiConfigControl(StatsClear,			6, "button to Clear the stats values.")

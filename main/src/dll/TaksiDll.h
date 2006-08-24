@@ -124,7 +124,7 @@ public:
 		: m_dwConfigChangeCount(0)
 		, m_pCustomConfig(NULL)
 		, m_bIsProcessSpecial(false)
-		, m_bStopGraphXMode(false)
+		, m_bStopGraphXAPI(false)
 	{
 		m_Stats.InitProcStats();
 		m_Stats.m_dwProcessId = ::GetCurrentProcessId();
@@ -141,10 +141,10 @@ public:
 	bool CheckProcessSpecial() const;
 	void CheckProcessCustom();
 
-	void StopGraphXMode();
-	void DetachGraphXMode();
-	bool StartGraphXMode( TAKSI_GRAPHX_TYPE eMode );
-	HRESULT AttachGraphXModeW( HWND hWnd );
+	void StopGraphXAPIs();
+	void DetachGraphXAPIs();
+	HRESULT AttachGraphXAPIs( HWND hWnd );
+	bool StartGraphXAPI( TAKSI_API_TYPE eMode );
 
 	bool OnDllProcessAttach();
 	bool OnDllProcessDetach();
@@ -164,7 +164,7 @@ public:
 
 	// if set to true, then CBT should not take any action at all.
 	bool m_bIsProcessSpecial;		// Is Master TAKSI.EXE or special app.
-	bool m_bStopGraphXMode;			// I'm not the main app anymore. unhook the graphics mode.
+	bool m_bStopGraphXAPI;			// I'm not the main app anymore. unhook the graphics mode.
 };
 extern CTaksiProcess g_Proc;
 
