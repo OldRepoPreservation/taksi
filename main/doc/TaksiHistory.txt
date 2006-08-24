@@ -392,3 +392,8 @@ Change hooking mech so it hooks all API's then takes the 'best' success API.
 Should auto prefer graphics hook over opengl over GDI hook. 
 Full screen GUI record.
 
+v0.77 - dev release 
+8/24/2006
+Attempted a fix for the PNG GDI+ hang on close, by loading GDI+ only on demand.
+Added UseDX8 and UseDX9 flags to allow turning on and off the DX API's
+
