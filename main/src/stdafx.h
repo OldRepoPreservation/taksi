@@ -91,13 +91,13 @@ enum TAKSI_INDICATE_TYPE
 
 enum TAKSI_GRAPHX_TYPE
 {
-	// enumerate the avilable modes we support.
+	// enumerate the available modes we support.
 	TAKSI_GRAPHX_NONE = 0,
-	TAKSI_GRAPHX_GDI,	// prefer other modes over this.
-	TAKSI_GRAPHX_OGL,	// usually a static linked dll, so rarely get a false positive.
+	TAKSI_GRAPHX_GDI,	// prefer all other modes over this.
+	TAKSI_GRAPHX_OGL,	// a static linked dll, so can get a false positive.
 #ifdef USE_DX
 	TAKSI_GRAPHX_DX8,
-	TAKSI_GRAPHX_DX9,
+	TAKSI_GRAPHX_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
 #endif
 	TAKSI_GRAPHX_QTY,
 };
