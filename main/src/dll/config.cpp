@@ -62,6 +62,7 @@ int CTaksiConfigCustom::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CUSTOM_Pattern:
 		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szPattern);
 	default:
+		DEBUG_ERR(("CTaksiConfigCustom::PropGet bad code %d" LOG_CR, eProp ));
 		ASSERT(0);
 		break;
 	}
@@ -84,6 +85,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 		_tcslwr( m_szPattern );
 		break;
 	default:
+		DEBUG_ERR(("CTaksiConfigCustom::PropSet bad code %d" LOG_CR, eProp ));
 		ASSERT(0);
 		return false;
 	}
@@ -390,6 +392,7 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, m_bUseOverheadCompensation? "1" : "0" );
 
 	default:
+		DEBUG_ERR(("CTaksiConfig::PropGet bad code %d" LOG_CR, eProp ));
 		ASSERT(0);
 		break;
 	}
@@ -457,9 +460,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		BYTE bTmp[1024];
 		ZeroMemory( &bTmp, sizeof(bTmp));
 		int iSize = Mem_ReadFromString( bTmp, sizeof(bTmp)-1, pszValue );
-		if ( iSize <= sizeof(PCMWAVEFORMAT))
+		if ( iSize < sizeof(PCMWAVEFORMAT))
 		{
-			ASSERT(0);
+			ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
 			return false;
 		}
 		if ( ! m_AudioCodec.SetFormatBytes( bTmp, iSize ))
@@ -484,10 +487,17 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_UseOGL:
 		m_abUseAPI[TAKSI_API_OGL] = atoi(pszValue) ? true : false;
 		break;
+	case TAKSI_CFGPROP_UseDX8:
+		m_abUseAPI[TAKSI_API_DX8] = atoi(pszValue) ? true : false;
+		break;
+	case TAKSI_CFGPROP_UseDX9:
+		m_abUseAPI[TAKSI_API_DX9] = atoi(pszValue) ? true : false;
+		break;
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		m_bUseOverheadCompensation = atoi(pszValue) ? true : false;
 		break;
 	default:
+		DEBUG_ERR(("CTaksiConfig::PropSet bad code %d" LOG_CR, eProp ));
 		ASSERT(0);
 		return false;
 	}
