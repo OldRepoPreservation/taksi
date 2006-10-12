@@ -25,7 +25,7 @@ const char* CTaksiConfig::sm_Props[TAKSI_CFGPROP_QTY+1] =
 	NULL,
 };
 
-static bool Str_GetQuoted( TCHAR* pszDest, const char* pszSrc, int iLenMax )
+static bool Str_GetQuoted( TCHAR* pszDest, int iLenMax, const char* pszSrc )
 {
 	// NOTE: Quoted string might contain UTF8 chars? so might have protected '"' ??
 	char* pszStartQuote = strchr(pszSrc, '\"');
@@ -38,12 +38,23 @@ static bool Str_GetQuoted( TCHAR* pszDest, const char* pszSrc, int iLenMax )
 	if ( iLen > iLenMax-1 )
 		iLen = iLenMax-1;
 #ifdef _UNICODE
+	// convert to unicode.
 	ASSERT(0);
 #else
 	strncpy( pszDest, pszStartQuote + 1, iLen );
 #endif
 	pszDest[iLen] = '\0';
 	return true;
+}
+
+static int Str_SetQuoted( char* pszDest, int iLenMax, const TCHAR* pszSrc )
+{
+#ifdef _UNICODE
+	// convert from unicode.
+	ASSERT(0);
+#else
+	return _snprintf(pszDest, iLenMax, "\"%s\"", pszSrc);
+#endif
 }
 
 //*****************************************************
@@ -66,7 +77,7 @@ int CTaksiConfigCustom::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CUSTOM_FrameWeight:
 		return _snprintf(pszValue, iSizeMax, "%g", m_fFrameWeight);
 	case TAKSI_CUSTOM_Pattern:
-		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szPattern);
+		return Str_SetQuoted( pszValue, iSizeMax, m_szPattern );
 	default:
 		DEBUG_ERR(("CTaksiConfigCustom::PropGet bad code %d" LOG_CR, eProp ));
 		ASSERT(0);
@@ -86,7 +97,7 @@ bool CTaksiConfigCustom::PropSet( int eProp, const char* pszValue )
 		m_fFrameWeight = (float) atof(pszValue);
 		break;
 	case TAKSI_CUSTOM_Pattern:
-		if (! Str_GetQuoted( m_szPattern, pszValue, sizeof(m_szPattern)))
+		if (! Str_GetQuoted( m_szPattern, COUNTOF(m_szPattern), pszValue ))
 			return false;
 		_tcslwr( m_szPattern );
 		break;
@@ -346,11 +357,11 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CFGPROP_DebugLog:
 		return _snprintf(pszValue, iSizeMax, "%d", m_bDebugLog);
 	case TAKSI_CFGPROP_CaptureDir:
-		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szCaptureDir);
+		return Str_SetQuoted(pszValue, iSizeMax, m_szCaptureDir );
 	case TAKSI_CFGPROP_FileNamePostfix:
-		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szFileNamePostfix );
+		return Str_SetQuoted(pszValue, iSizeMax, m_szFileNamePostfix );
 	case TAKSI_CFGPROP_ImageFormatExt:
-		return _snprintf(pszValue, iSizeMax, "\"%s\"", m_szImageFormatExt );
+		return Str_SetQuoted(pszValue, iSizeMax, m_szImageFormatExt );
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
 		return _snprintf(pszValue, iSizeMax, "%g", m_fFrameRateTarget);
 	case TAKSI_CFGPROP_VKey_ConfigOpen:
@@ -414,15 +425,15 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		m_bDebugLog = atoi(pszValue) ? true : false;
 		break;
 	case TAKSI_CFGPROP_CaptureDir:
-		if (! Str_GetQuoted( m_szCaptureDir, pszValue, sizeof(m_szCaptureDir)))
+		if (! Str_GetQuoted( m_szCaptureDir, COUNTOF(m_szCaptureDir), pszValue))
 			return false;
 		break;
 	case TAKSI_CFGPROP_FileNamePostfix:
-		if (! Str_GetQuoted( m_szFileNamePostfix, pszValue, sizeof(m_szFileNamePostfix)))
+		if (! Str_GetQuoted( m_szFileNamePostfix, COUNTOF(m_szFileNamePostfix), pszValue))
 			return false;
 		break;
 	case TAKSI_CFGPROP_ImageFormatExt:
-		if (! Str_GetQuoted( m_szImageFormatExt, pszValue, sizeof(m_szImageFormatExt)))
+		if (! Str_GetQuoted( m_szImageFormatExt, COUNTOF(m_szImageFormatExt), pszValue))
 			return false;
 		break;
 	case TAKSI_CFGPROP_MovieFrameRateTarget:
