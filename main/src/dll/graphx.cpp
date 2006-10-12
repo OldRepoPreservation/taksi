@@ -2,6 +2,7 @@
 // graphx.cpp
 //
 #include "../stdafx.h"
+#include <tchar.h>
 #include "TaksiDll.h"
 #include "graphx.h"
 #include "HotKeys.h"
@@ -113,7 +114,7 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 	if ( hRes != S_OK )
 #endif
 	{
-		g_Proc.MakeFileName( szFileName, "bmp" );
+		g_Proc.MakeFileName( szFileName, _T("bmp"));
 		hRes = frame.SaveAsBMP(szFileName);
 	}
 	if (FAILED(hRes))
@@ -177,7 +178,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	}
 
 	TCHAR szFileName[_MAX_PATH];
-	g_Proc.MakeFileName( szFileName, "avi" );
+	g_Proc.MakeFileName( szFileName, _T("avi"));
 
 	DEBUG_MSG(( "CTaksiGraphX::RecordAVI_Start (%s)." LOG_CR, szFileName ));
 
@@ -207,8 +208,8 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
-		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
-			"Cant open AVI codec. Error=0x%x. Try a different video codec?", hRes );
+		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+			_T("Cant open AVI codec. Error=0x%x. Try a different video codec?"), hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 		LOG_WARN(("g_AVIFile.OpenAVIFile FAILED 0x%x." LOG_CR, hRes ));
 		return hRes;
@@ -218,8 +219,8 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
-		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
-			"Cant open AVI file. Error=0x%x.", hRes );
+		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+			_T("Cant open AVI file. Error=0x%x."), hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 		LOG_WARN(("g_AVIFile.OpenAVIFile FAILED 0x%x." LOG_CR, hRes ));
 		return hRes;
@@ -231,8 +232,8 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	hRes = g_AVIThread.StartAVIThread();
 	if ( IS_ERROR(hRes))
 	{
-		_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
-			"Cant create AVI thread. Error=0x%x.", hRes );
+		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+			_T("Cant create AVI thread. Error=0x%x."), hRes );
 		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 		return hRes;
 	}
@@ -254,8 +255,8 @@ void CTaksiGraphX::RecordAVI_Stop()
 	g_AVIThread.WaitForAllFrames();
 	g_AVIFile.CloseAVI();
 
-	_snprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
-		"AVI file recorded. Stopped." );
+	_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+		_T("AVI file recorded. Stopped.") );
 	g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 
 	sg_Shared.UpdateMaster();

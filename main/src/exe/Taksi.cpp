@@ -124,7 +124,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 	// NOTE: Dll has already been attached. DLL_PROCESS_ATTACH
 	g_hInst = hInstance;
 
-	HANDLE hMutex = ::CreateMutex( NULL, true, "TaksiMutex" );	// diff name than TAKSI_MASTER_CLASSNAME
+	HANDLE hMutex = ::CreateMutex( NULL, true, _T("TaksiMutex") );	// diff name than TAKSI_MASTER_CLASSNAME
 	if ( ::GetLastError() == ERROR_ALREADY_EXISTS )
 	{
 		// Set focus to the previous window.

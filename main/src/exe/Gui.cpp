@@ -4,6 +4,7 @@
 //
 #include "../stdafx.h"
 #include <richedit.h>	// NM_RCLICK
+#include <tchar.h>
 #include "Taksi.h"
 #include "resource.h"
 #include "guiConfig.h"
@@ -269,7 +270,7 @@ static void About_OnInitDialog( HWND hwndDlg )
 {
 	TCHAR szTmp[ _MAX_PATH ];
 	int iLen = g_GUI.MakeWindowTitle( szTmp, NULL );
-	iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, ", (built:" __DATE__ ")" );
+	iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, _T(", (built:") _T(__DATE__) _T(")") );
 	SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTmp );
 
 	LoadString( g_hInst, IDC_ABOUT_5, szTmp, COUNTOF(szTmp));
@@ -331,7 +332,7 @@ void CGui::UpdateMenuPopupHotKey( HMENU hMenu, TAKSI_HOTKEY_TYPE eKey )
 	TCHAR szHotKey[ _MAX_PATH ];
 	int iLenHotKey = GetHotKeyName( szHotKey, COUNTOF(szHotKey), eKey ); 
 
-	TCHAR* pszParen = strchr( szMenuText, '(' );
+	TCHAR* pszParen = _tcschr( szMenuText, '(' );
 	if ( iLenHotKey > 0 )
 	{
 		if ( pszParen )
@@ -367,7 +368,7 @@ void CGui::OnInitMenuPopup( HMENU hMenu )
 	}
 }
 
-BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, PSTR pszTip)
+BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, TCHAR* pszTip )
 {
 	// dwMessage = NIM_ADD;
 	NOTIFYICONDATA tnd;
@@ -730,7 +731,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 
 	m_hWnd = CreateWindowEx( c_dwExStyle,
 		TAKSI_MASTER_CLASSNAME,      // class name
-		"", // title for our window (appears in the titlebar)
+		_T(""), // title for our window (appears in the titlebar)
 		c_dwStyle,
 		g_Config.m_ptMasterWindow.x, g_Config.m_ptMasterWindow.y,  // initial x, y coordinate
 		1+(rect.right-rect.left), 1+(rect.bottom-rect.top),   // width and height of the window

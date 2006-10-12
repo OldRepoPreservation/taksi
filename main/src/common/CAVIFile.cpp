@@ -270,7 +270,7 @@ void CVideoCodec::CopyCodec( const CVideoCodec& codec )
 	m_v.lpState = NULL;
 }
 
-bool CVideoCodec::CompChooseDlg( HWND hWnd, LPSTR lpszTitle )
+bool CVideoCodec::CompChooseDlg( HWND hWnd, char* lpszTitle )
 {
 	// MUST call CloseCodec() after this.
 	// dwFlags |= ICMF_COMPVARS_VALID ?
@@ -278,7 +278,7 @@ bool CVideoCodec::CompChooseDlg( HWND hWnd, LPSTR lpszTitle )
 	if ( ! ::ICCompressorChoose( hWnd, 
 		ICMF_CHOOSE_ALLCOMPRESSORS, // ICMF_CHOOSE_PREVIEW|ICMF_CHOOSE_KEYFRAME|ICMF_CHOOSE_DATARATE
 		NULL, NULL,
-		&m_v, (LPSTR) lpszTitle ))
+		&m_v, (char*) lpszTitle ))
 	{
 		return false;	// cancelled.
 	}

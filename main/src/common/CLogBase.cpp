@@ -15,7 +15,7 @@ int CLogBase::VDebugEvent( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, cons
 	ASSERT( pszFormat && *pszFormat );
 	_vsnprintf( szTemp, sizeof(szTemp)-1, pszFormat, args );
 #ifdef _WINDOWS
-	::OutputDebugString( szTemp );
+	::OutputDebugStringA( szTemp );
 #endif
 	return 0;
 }
@@ -29,21 +29,21 @@ int CLogBase::EventStr( LOG_GROUP_MASK dwGroupMask, LOGL_TYPE eLogLevel, const L
 		return 0;
 	if ( pszMsg[0] == '\0' )
 		return 0;
-	size_t iLen = lstrlen(pszMsg);
+	size_t iLen = strlen(pszMsg);
 	ASSERT(iLen);
 	bool bHasCRLF = ( pszMsg[iLen-1]=='\r' || pszMsg[iLen-1]=='\n' );
 
 	if ( eLogLevel >= LOGL_ERROR )
 	{
 #ifdef _WINDOWS
-		::OutputDebugString( "ERROR:" );
+		::OutputDebugStringA( "ERROR:" );
 #endif
 	}
 #ifdef _WINDOWS
-	::OutputDebugString( pszMsg );
+	::OutputDebugStringA( pszMsg );
 	if (( dwGroupMask & LOG_GROUP_CRLF ) && ! bHasCRLF )
 	{
-		::OutputDebugString( LOG_CR );
+		::OutputDebugStringA( LOG_CR );
 	}
 #else
 	// LINUX debug log ?

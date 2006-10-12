@@ -127,7 +127,7 @@ extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set vi
 struct LIBSPEC CTaksiConfig : public CIniObject, public CTaksiConfigData
 {
 	// Params read from the INI file.
-#define TAKSI_INI_FILE _T("taksi.ini")
+#define TAKSI_INI_FILE "taksi.ini"
 #define TAKSI_SECTION "TAKSI"
 public:
 	CTaksiConfig();

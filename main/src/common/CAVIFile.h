@@ -95,7 +95,7 @@ public:
     HRESULT OpenCodec( WORD wMode = ICMODE_FASTCOMPRESS );
 	void CloseCodec();
 
-	bool CompChooseDlg( HWND hWnd, LPSTR lpszTitle );
+	bool CompChooseDlg( HWND hWnd, char* lpszTitle );
 	bool CompSupportsConfigure() const;
 	LRESULT CompConfigureDlg( HWND hWndApp );
 

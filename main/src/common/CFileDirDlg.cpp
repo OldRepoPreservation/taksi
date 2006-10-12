@@ -55,7 +55,7 @@ int CALLBACK CFileDirDlg::BrowseCallbackProc( HWND hWnd, UINT uMsg, LPARAM lPara
 	return 0;
 }
 
-HRESULT CFileDirDlg::DoModal( const char* pszPrompt )
+HRESULT CFileDirDlg::DoModal( const TCHAR* pszPrompt )
 {
 	// NOTE: BIF_NEWDIALOGSTYLE must have called OleInitialize
 	IRefPtr<IMalloc> pMalloc;	// COM object.
