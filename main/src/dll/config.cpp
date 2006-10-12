@@ -4,6 +4,7 @@
 #include "../stdafx.h"
 #include "TaksiDll.h"
 #include <ctype.h>	// isspace()
+#include <tchar.h>
 #include "../common/CWaveDevice.h"
 
 #ifndef __PLACEMENT_NEW_INLINE
@@ -24,18 +25,23 @@ const char* CTaksiConfig::sm_Props[TAKSI_CFGPROP_QTY+1] =
 	NULL,
 };
 
-static bool Str_GetQuoted( char* pszDest, const char* pszSrc, int iLenMax )
+static bool Str_GetQuoted( TCHAR* pszDest, const char* pszSrc, int iLenMax )
 {
-	char* pszStartQuote = strstr(pszSrc, "\"");
+	// NOTE: Quoted string might contain UTF8 chars? so might have protected '"' ??
+	char* pszStartQuote = strchr(pszSrc, '\"');
 	if (pszStartQuote == NULL) 
 		return false;
-	char* pszEndQuote = strstr(pszStartQuote + 1, "\"");
+	char* pszEndQuote = strchr(pszStartQuote + 1, '\"');
 	if (pszEndQuote == NULL)
 		return false;
 	int iLen = (int)( pszEndQuote - pszStartQuote ) - 1;
 	if ( iLen > iLenMax-1 )
 		iLen = iLenMax-1;
+#ifdef _UNICODE
+	ASSERT(0);
+#else
 	strncpy( pszDest, pszStartQuote + 1, iLen );
+#endif
 	pszDest[iLen] = '\0';
 	return true;
 }
@@ -131,7 +137,7 @@ void CTaksiConfigData::InitConfig()
 	m_bGDIFrame = true;
 	m_bUseOverheadCompensation = false;
 
-	strcpy( m_szImageFormatExt, "png" );	// jpeg
+	lstrcpy( m_szImageFormatExt, _T("png") );	// jpeg
 	m_bShowIndicator = true;
 	m_ptMasterWindow.x = 0;
 	m_ptMasterWindow.y = 0;
@@ -141,9 +147,9 @@ void CTaksiConfigData::InitConfig()
 
 void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 {
-	strncpy( m_szCaptureDir, config.m_szCaptureDir, sizeof(m_szCaptureDir)-1);
+	_tcsncpy( m_szCaptureDir, config.m_szCaptureDir, COUNTOF(m_szCaptureDir)-1);
 	m_bDebugLog = config.m_bDebugLog;
-	strncpy( m_szFileNamePostfix, config.m_szFileNamePostfix, sizeof(m_szFileNamePostfix));
+	_tcsncpy( m_szFileNamePostfix, config.m_szFileNamePostfix, COUNTOF(m_szFileNamePostfix)-1 );
 
 	m_fFrameRateTarget = config.m_fFrameRateTarget;
 	m_VideoCodec.CopyCodec( config.m_VideoCodec );
@@ -215,7 +221,7 @@ HRESULT CTaksiConfigData::FixCaptureDir()
 	// make sure it ends with backslash.
 	if ( ! FILE_IsDirSep( m_szCaptureDir[iLen-1] )) 
 	{
-		lstrcat(m_szCaptureDir, "\\");
+		lstrcat(m_szCaptureDir, _T("\\"));
 		return S_OK;	// changed
 	}
 
@@ -258,12 +264,12 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindPattern( const TCHAR* pszProc
 	return NULL;
 }
 
-CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindAppId( const char* pszAppId ) const
+CTaksiConfigCustom* CTaksiConfig::CustomConfig_FindAppId( const TCHAR* pszAppId ) const
 {
 	// Looks up a custom config in a list. If not found return NULL
 	for (CTaksiConfigCustom* p=m_pCustomList; p!=NULL; p=p->m_pNext )
 	{
-		if ( ! strcmp(p->m_szAppId, pszAppId))
+		if ( ! lstrcmp(p->m_szAppId, pszAppId))
 			return p;
 	}
 	return NULL;
@@ -285,7 +291,7 @@ CTaksiConfigCustom* CTaksiConfig::CustomConfig_Lookup( const TCHAR* pszAppId, bo
 	if (p == NULL)
 		return NULL;
 
-	strncpy(p->m_szAppId, pszAppId, sizeof(p->m_szAppId)-1);
+	_tcsncpy(p->m_szAppId, pszAppId, COUNTOF(p->m_szAppId)-1);
 	p->m_pNext = m_pCustomList;
 	m_pCustomList = p;
 	return p;
@@ -519,11 +525,15 @@ bool CTaksiConfig::ReadIniFile()
 	// Read an INI file in standard INI file format.
 	// Returns true if successful.
 
-	char szIniFileName[_MAX_PATH];
+	TCHAR szIniFileName[_MAX_PATH];
 	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
-	lstrcat(szIniFileName, TAKSI_INI_FILE);
+	lstrcat(szIniFileName, _T(TAKSI_INI_FILE));
 
-	FILE* pFile = fopen(szIniFileName, "rt");
+#ifdef _UNICODE
+	FILE* pFile = NULL;	ASSERT(0);
+#else
+	FILE* pFile = fopen(szIniFileName, _T("rt"));
+#endif
 	if (pFile == NULL) 
 	{
 		// ASSUME constructor has already set this to all defaults.
@@ -558,9 +568,13 @@ bool CTaksiConfig::ReadIniFile()
 			}
 			else if ( ! strnicmp( pszName, "[" TAKSI_CUSTOM_SECTION " ", sizeof(TAKSI_CUSTOM_SECTION)+1 ))
 			{
-				char szSection[ _MAX_PATH ];
+				TCHAR szSection[ _MAX_PATH ];
+#ifdef _UNICODE
+				ASSERT(0);
+#else
 				strncpy( szSection, pszName+sizeof(TAKSI_CUSTOM_SECTION)+1, sizeof(szSection));
-				char* pszEnd = strstr(szSection, "]");
+#endif
+				TCHAR* pszEnd = _tcschr(szSection, ']');
 				if (pszEnd)
 					*pszEnd = '\0';
 				pObj = CustomConfig_Lookup(szSection,true);
@@ -602,9 +616,9 @@ bool CTaksiConfig::WriteIniFile()
 	char* pFileOld = NULL;
 	DWORD nSizeOld = 0;
 
-	char szIniFileName[_MAX_PATH];
+	TCHAR szIniFileName[_MAX_PATH];
 	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
-	lstrcat(szIniFileName, TAKSI_INI_FILE);
+	lstrcat(szIniFileName, _T(TAKSI_INI_FILE));
 
 	// first read all lines
 	CNTHandle FileOld( ::CreateFile( szIniFileName, 
@@ -628,7 +642,7 @@ bool CTaksiConfig::WriteIniFile()
 	}
 
 	// create new file
-	FILE* pFile = fopen(TAKSI_INI_FILE, "wt");
+	FILE* pFile = fopen( TAKSI_INI_FILE, "wt");
 	if ( pFile == NULL )
 		return false;
 
@@ -656,9 +670,13 @@ bool CTaksiConfig::WriteIniFile()
 			}
 			else if ( ! strnicmp( pszLine, "[" TAKSI_CUSTOM_SECTION " ", sizeof(TAKSI_CUSTOM_SECTION)+1 ))
 			{
-				char szSection[ _MAX_PATH ];
+				TCHAR szSection[ _MAX_PATH ];
+#ifdef _UNICODE
+				ASSERT(0);
+#else
 				strncpy( szSection, pszLine+14, sizeof(szSection));
-				char* pszEnd = strstr(szSection, "]");
+#endif
+				TCHAR* pszEnd = _tcschr(szSection, ']');
 				if (pszEnd)
 					*pszEnd = '\0';
 				pObj = CustomConfig_FindAppId(szSection);

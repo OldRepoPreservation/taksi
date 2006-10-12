@@ -1,6 +1,9 @@
 Taksi Dev Notes and Task TODO list.
 9/25/2006
 
+Covert to full unicode and allow translations ?
+move all text to RC files for translation.
+
 KNOWN BUGS:
 GDI doesnt unhook properly on close of Taksi sometimes. (Explorer.exe error message?)
 Odd time lag at the start of the recording? frozen frame for a few seconds??
@@ -34,7 +37,6 @@ reflect state in tooltip ?
 Comment tag inside AVI file. TAKSI vX date + user comments?
 add a watermark or logo ? optionally of course.
 color reduction for GDI. reduce to a smaller number of colors ? for better compression?
-Covert to full unicode and allow translations ?
 
 AUDIO TASK:
 Get audio from WaveIn (assumes loopback) ? (much easier)

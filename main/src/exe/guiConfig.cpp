@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "guiConfig.h"
 #include <windowsx.h>
+#include <tchar.h>
 #include <commctrl.h>	// HKM_GETHOTKEY
 #include "../common/CFileDirDlg.h"
 #include "../common/CWaveDevice.h"
@@ -70,11 +71,13 @@ void CGuiConfig::Custom_Update( CTaksiConfigCustom* pCfg )
 	SetWindowText( m_hControlCustomPattern,pCfg->m_szPattern);
 
 	TCHAR szTmp[_MAX_PATH];
-	pCfg->PropGet( TAKSI_CUSTOM_FrameRate, szTmp, sizeof(szTmp));
+	// TAKSI_CUSTOM_FrameRate 
+	_sntprintf(szTmp, COUNTOF(szTmp), _T("%g"), pCfg->m_fFrameRate );
 	SetWindowText( m_hControlCustomFrameRate,szTmp);
 
-	pCfg->PropGet( TAKSI_CUSTOM_FrameWeight, szTmp, sizeof(szTmp));
-	SetWindowText( m_hControlCustomFrameWeight, szTmp);
+	// TAKSI_CUSTOM_FrameWeight
+	_sntprintf(szTmp, COUNTOF(szTmp), _T("%g"), pCfg->m_fFrameWeight );
+	SetWindowText( m_hControlCustomFrameWeight, szTmp );
 }
 
 void CGuiConfig::Custom_Read()
@@ -87,15 +90,17 @@ void CGuiConfig::Custom_Read()
 	_tcslwr(m_pCustomCur->m_szPattern);
 
 	TCHAR szTmp[_MAX_PATH];
+	// TAKSI_CUSTOM_FrameRate
 	szTmp[0] = '\0';
 	GetWindowText( m_hControlCustomFrameRate,
 		szTmp, sizeof(szTmp));
-	m_pCustomCur->PropSet( TAKSI_CUSTOM_FrameRate, szTmp );
+	m_pCustomCur->m_fFrameRate = (float) _tstof(szTmp);
 
+	// TAKSI_CUSTOM_FrameWeight:
 	szTmp[0] = '\0';
 	GetWindowText( m_hControlCustomFrameWeight,
 		szTmp, sizeof(szTmp));
-	m_pCustomCur->PropSet( TAKSI_CUSTOM_FrameWeight, szTmp );
+	m_pCustomCur->m_fFrameWeight = (float) _tstof(szTmp);
 }
 
 bool CGuiConfig::Custom_ReadHook( CTaksiConfigCustom* pCfg )
@@ -290,9 +295,13 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	SetWindowText( m_hControlFileNamePostfix, config.m_szFileNamePostfix );
 
 	// Format
-	TCHAR szTmp[_MAX_PATH];
+	char szTmp[_MAX_PATH];
 	config.PropGet( TAKSI_CFGPROP_MovieFrameRateTarget, szTmp, sizeof(szTmp));
+#ifdef _UNICODE
+	ASSERT(0);
+#else
 	SetWindowText( m_hControlFrameRate, szTmp);
+#endif
 
 	UpdateVideoCodec( config.m_VideoCodec, false );
 	UPDATE_CHECK(VideoHalfSize,config.m_bVideoHalfSize);
@@ -376,14 +385,15 @@ void CGuiConfig::OnCommandSave()
 	iLen = GetWindowText( m_hControlFileNamePostfix,
 		g_Config.m_szFileNamePostfix, sizeof(g_Config.m_szFileNamePostfix));
 
-	char szTmp[_MAX_PATH];
+	// TAKSI_CFGPROP_MovieFrameRateTarget
+	TCHAR szTmp[_MAX_PATH];
 	GetWindowText( m_hControlFrameRate, szTmp, sizeof(szTmp));
-	g_Config.PropSet( TAKSI_CFGPROP_MovieFrameRateTarget, szTmp );
+	g_Config.m_fFrameRateTarget = (float) _tstof(szTmp);
 	if ( g_Config.m_fFrameRateTarget <= 0 ) 
 	{
 		// default rate.
 		g_Config.m_fFrameRateTarget = 10;
-		g_Config.PropGet( TAKSI_CFGPROP_MovieFrameRateTarget, szTmp, sizeof(szTmp));
+		_sntprintf( szTmp, COUNTOF(szTmp), _T("%g"), g_Config.m_fFrameRateTarget );
 		SetWindowText( m_hControlFrameRate, szTmp); 
 	}
 
@@ -412,7 +422,7 @@ void CGuiConfig::OnCommandCustomNewButton()
 	Custom_ReadHook();
 
 	// clear out controls
-	SetWindowText( m_hControlCustomSettingsList, m_pCustomCur ? (m_pCustomCur->m_szAppId) : "" );
+	SetWindowText( m_hControlCustomSettingsList, m_pCustomCur ? (m_pCustomCur->m_szAppId) : _T("") );
 	Custom_Update(m_pCustomCur);
 
 	// set focus on appId comboBox
@@ -446,7 +456,7 @@ void CGuiConfig::OnCommandCustomKillFocus()
 	// IDC_C_CustomSettingsList
 	// CBN_KILLFOCUS
 
-	char szTmp[_MAX_PATH];
+	TCHAR szTmp[_MAX_PATH];
 	szTmp[0] = '\0';
 	int iLen = GetWindowText(m_hControlCustomSettingsList, szTmp, sizeof(szTmp));
 	if ( iLen <= 0 )
@@ -472,7 +482,7 @@ void CGuiConfig::OnCommandCustomKillFocus()
 			SendMessage(m_hControlCustomSettingsList, CB_DELETESTRING, idx, 0);
 		}
 		// change appId
-		strncpy(m_pCustomCur->m_szAppId, szTmp, sizeof(szTmp)-1);
+		_tcsncpy( m_pCustomCur->m_szAppId, szTmp, COUNTOF(szTmp)-1);
 		// add a new list item
 		SendMessage(m_hControlCustomSettingsList, CB_ADDSTRING, 0, (LPARAM)m_pCustomCur->m_szAppId);
 		OnChanges();
@@ -492,7 +502,7 @@ void CGuiConfig::OnCommandVideoCodecButton()
 	VideoPrev.InitCodec();
 	VideoPrev.CopyCodec( g_Config.m_VideoCodec );
 	if ( ! g_Config.m_VideoCodec.CompChooseDlg( m_hWnd,
-		_TEXT("Choose video compressor")))
+		"Choose video compressor" ))
 	{
 		return;
 	}
@@ -574,7 +584,7 @@ bool CGuiConfig::OnHelp( LPHELPINFO pHelpInfo )
     int iLen = LoadString( g_hInst, pHelpInfo->iCtrlId, szTmp, sizeof(szTmp));
 	if ( iLen <= 0 )
 	{
-		DlgHelp( g_GUIConfig, "TODO: No context help for this" );
+		DlgHelp( g_GUIConfig, _T("TODO: No context help for this") );
 		return true;
 	}
 
@@ -738,7 +748,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 			OnChanges();
 			if ( iDeviceId != WAVE_DEVICE_NONE )
 			{
-				DlgHelp( m_hWnd, "TODO: Audio doesnt actually work yet" );
+				DlgHelp( m_hWnd, _T("TODO: Audio doesnt actually work yet") );
 			}
 		}
 		}
@@ -914,7 +924,7 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	UpdateProcStats( sg_ProcStats, 0xFFFFFFFF );
 	::SetTimer( m_hWnd, IDT_UpdateStats, 1000, NULL );
 
-	SetStatusText( _TEXT("Taksi: Version " TAKSI_VERSION_S " " __DATE__ "."));
+	SetStatusText( _T("Taksi: Version ") _T(TAKSI_VERSION_S) _T(" ") _T(__DATE__) _T("."));
 	return true;
 }
 
