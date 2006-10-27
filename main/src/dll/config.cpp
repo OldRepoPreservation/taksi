@@ -425,13 +425,18 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	return -1;
 }
 
+static bool GetStrBool( const char* pszVal )
+{
+	return atoi(pszVal)? true : false;
+}
+
 bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 {
 	// TAKSI_CFGPROP_TYPE
 	switch (eProp)
 	{
 	case TAKSI_CFGPROP_DebugLog:
-		m_bDebugLog = atoi(pszValue) ? true : false;
+		m_bDebugLog = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_CaptureDir:
 		if (! Str_GetQuoted( m_szCaptureDir, COUNTOF(m_szCaptureDir), pszValue))
@@ -469,13 +474,13 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		}
 		break;
 	case TAKSI_CFGPROP_KeyboardUseDirectInput:
-		m_bUseDirectInput = atoi(pszValue) ? true : false;
+		m_bUseDirectInput = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_VideoHalfSize:
-		m_bVideoHalfSize = atoi(pszValue) ? true : false;
+		m_bVideoHalfSize = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_VideoCodecMsg:
-		m_bVideoCodecMsg = atoi(pszValue) ? true : false;
+		m_bVideoCodecMsg = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		if ( ! m_VideoCodec.put_Str(pszValue))
@@ -502,28 +507,28 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		m_iAudioDevice = atoi(pszValue);
 		break;
 	case TAKSI_CFGPROP_ShowIndicator:
-		m_bShowIndicator = atoi(pszValue) ? true : false;
+		m_bShowIndicator = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_GDIFrame:
-		m_bGDIFrame = atoi(pszValue) ? true : false;
+		m_bGDIFrame = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_GDIDesktop:
-		m_bGDIDesktop = atoi(pszValue) ? true : false;
+		m_bGDIDesktop = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseGDI:
-		m_abUseAPI[TAKSI_API_GDI] = atoi(pszValue) ? true : false;
+		m_abUseAPI[TAKSI_API_GDI] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseOGL:
-		m_abUseAPI[TAKSI_API_OGL] = atoi(pszValue) ? true : false;
+		m_abUseAPI[TAKSI_API_OGL] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseDX8:
-		m_abUseAPI[TAKSI_API_DX8] = atoi(pszValue) ? true : false;
+		m_abUseAPI[TAKSI_API_DX8] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseDX9:
-		m_abUseAPI[TAKSI_API_DX9] = atoi(pszValue) ? true : false;
+		m_abUseAPI[TAKSI_API_DX9] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseOverheadCompensation:
-		m_bUseOverheadCompensation = atoi(pszValue) ? true : false;
+		m_bUseOverheadCompensation = GetStrBool(pszValue);
 		break;
 	default:
 		DEBUG_ERR(("CTaksiConfig::PropSet bad code %d" LOG_CR, eProp ));
