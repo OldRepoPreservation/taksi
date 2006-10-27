@@ -18,6 +18,7 @@ ConfigProp(UseOGL,					m_abAPIUse[TAKSI_API_OGL],	"hook OpenGL API or not?")
 
 ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name with this")
 
+ConfigProp(GDIDesktop,				m_bGDIDesktop,		"Allow hooking of the GDI Desktop")
 ConfigProp(GDIFrame,				m_bGDIFrame,		"Record the GDI frame or just the client area")
 
 ConfigProp(ImageFormatExt,			m_szImageFormatExt,	"The image format for screen shots (png,bmp,jpeg)")

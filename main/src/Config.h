@@ -112,6 +112,7 @@ public:
 
 	bool   m_bUseOverheadCompensation;
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
+	bool   m_bGDIDesktop;		// record the frame of GDI windows or not ?
 	bool   m_abUseAPI[TAKSI_API_QTY];	// Use this API? true by default
 
 	// CAN NOT be set from CGuiConfig directly

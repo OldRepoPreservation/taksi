@@ -431,14 +431,15 @@ bool CTaksiProcess::CheckProcessSpecial() const
 			return true;
 	}
 
-#if 0
 	// Check if it's Windows Explorer. We don't want to hook it either.
-	TCHAR szExplorer[_MAX_PATH];
-	::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
-	lstrcat(szExplorer, _T("\\explorer.exe"));
-	if (!lstrcmpi( m_Stats.m_szProcessFile, szExplorer))
-		return true;
-#endif
+	if ( ! sg_Config.m_bGDIDesktop )
+	{
+		TCHAR szExplorer[_MAX_PATH];
+		::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
+		lstrcat(szExplorer, _T("\\explorer.exe"));
+		if (!lstrcmpi( m_Stats.m_szProcessFile, szExplorer))
+			return true;
+	}
 
 	if ( ! ::IsWindow( sg_Shared.m_hMasterWnd ) && ! sg_Shared.m_bMasterExiting )
 	{

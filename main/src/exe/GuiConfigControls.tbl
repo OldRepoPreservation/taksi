@@ -37,7 +37,7 @@ GuiConfigControl(CustomFrameWeight,    4, "displays current custom frame weight"
 GuiConfigControl(CustomUseCurrent,	   4, "Use the current hooked apps info to fill in text" );
 
 //GuiConfigControl(OverlayVerbose,        5, "Indicator has verbose text")
-GuiConfigControl(GDIFull,               5, "")
+GuiConfigControl(GDIDesktop,            5, "")
 GuiConfigControl(GDIFrame,              5, "")
 GuiConfigControl(UseOverheadCompensation, 5, "Attempt to compensate for the overhead of recording")
 

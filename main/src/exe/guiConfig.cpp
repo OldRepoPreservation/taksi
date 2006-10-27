@@ -323,6 +323,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	Custom_Init(config.m_pCustomList);
 
 	// Display options
+	UPDATE_CHECK(GDIDesktop,config.m_bGDIDesktop);
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
 
 	UPDATE_CHECK(UseGDI,config.m_abUseAPI[TAKSI_API_GDI]);
@@ -659,6 +660,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case IDC_C_GDIFrame:
 		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
+		return true;
+	case IDC_C_GDIDesktop:
+		sg_Config.m_bGDIDesktop = g_Config.m_bGDIDesktop = OnCommandCheck( m_hControlGDIDesktop );
 		return true;
 	case IDC_C_UseOverheadCompensation:
 		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );

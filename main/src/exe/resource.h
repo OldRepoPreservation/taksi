@@ -79,15 +79,12 @@
 #define IDC_C_StatGraphXAPI             1066
 #define IDC_C_StatsClear                1067
 #define IDC_C_UseOverheadCompensation   1071
-#define IDC_C_GDIFull                   1072
+#define IDC_C_GDIDesktop                1072
 #define IDC_C_GDIFrame                  1073
 #define IDC_C_UseGDI                    1075
 #define IDC_C_UseOGL                    1076
 #define IDC_C_UseDX8                    1077
 #define IDC_C_UseDX9                    1078
-#define IDC_C_UseGDI2                   1079
-#define IDC_EDIT1                       1088
-#define IDC_RICHEDIT21                  1089
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
