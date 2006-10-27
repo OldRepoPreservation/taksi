@@ -146,6 +146,7 @@ void CTaksiConfigData::InitConfig()
 
 	memset( m_abUseAPI, 0xFF, sizeof(m_abUseAPI));
 	m_bGDIFrame = true;
+	m_bGDIDesktop = false;
 	m_bUseOverheadCompensation = false;
 
 	lstrcpy( m_szImageFormatExt, _T("png") );	// jpeg
@@ -175,6 +176,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 
 	memcpy( m_abUseAPI, config.m_abUseAPI, sizeof(m_abUseAPI));	// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
+	m_bGDIDesktop = config.m_bGDIDesktop;
 	m_bUseOverheadCompensation = config.m_bUseOverheadCompensation;
 
 	// CAN NOT be set from CGuiConfig directly
@@ -349,13 +351,18 @@ CTaksiConfig::~CTaksiConfig()
 	m_VideoCodec.DestroyCodec();	// cleanup VFW resources. 
 }
 
+static const char* GetBoolStr( bool bVal )
+{
+	return bVal? "1" : "0";
+}
+
 int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 {
 	// TAKSI_CFGPROP_TYPE
 	switch (eProp)
 	{
 	case TAKSI_CFGPROP_DebugLog:
-		return _snprintf(pszValue, iSizeMax, "%d", m_bDebugLog);
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bDebugLog));
 	case TAKSI_CFGPROP_CaptureDir:
 		return Str_SetQuoted(pszValue, iSizeMax, m_szCaptureDir );
 	case TAKSI_CFGPROP_FileNamePostfix:
@@ -377,11 +384,11 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%d", m_wHotKey[iKey] );
 		}
 	case TAKSI_CFGPROP_KeyboardUseDirectInput:
-		return _snprintf(pszValue, iSizeMax, m_bUseDirectInput ? "1" : "0");
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bUseDirectInput));
 	case TAKSI_CFGPROP_VideoHalfSize:
-		return _snprintf(pszValue, iSizeMax, m_bVideoHalfSize ? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bVideoHalfSize));
 	case TAKSI_CFGPROP_VideoCodecMsg:
-		return _snprintf(pszValue, iSizeMax, m_bVideoCodecMsg ? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bVideoCodecMsg));
 
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		return m_VideoCodec.GetStr(pszValue, iSizeMax);
@@ -390,23 +397,25 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CFGPROP_AudioDevice:
 		return _snprintf(pszValue, iSizeMax, "%d", m_iAudioDevice );
 	case TAKSI_CFGPROP_ShowIndicator:
-		return _snprintf(pszValue, iSizeMax, m_bShowIndicator? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bShowIndicator));
 	case TAKSI_CFGPROP_PosMasterWindow:
 		return _snprintf(pszValue, iSizeMax, "%d,%d", m_ptMasterWindow.x, m_ptMasterWindow.y );
 	case TAKSI_CFGPROP_GDIFrame:
-		return _snprintf(pszValue, iSizeMax, m_bGDIFrame? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIFrame));
+	case TAKSI_CFGPROP_GDIDesktop:
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIDesktop));
 
 	case TAKSI_CFGPROP_UseGDI:
-		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_GDI]? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_GDI]));
 	case TAKSI_CFGPROP_UseOGL:
-		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_OGL]? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_OGL]));
 	case TAKSI_CFGPROP_UseDX8:
-		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_DX8]? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DX8]));
 	case TAKSI_CFGPROP_UseDX9:
-		return _snprintf(pszValue, iSizeMax, m_abUseAPI[TAKSI_API_DX9]? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DX9]));
 
 	case TAKSI_CFGPROP_UseOverheadCompensation:
-		return _snprintf(pszValue, iSizeMax, m_bUseOverheadCompensation? "1" : "0" );
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bUseOverheadCompensation));
 
 	default:
 		DEBUG_ERR(("CTaksiConfig::PropGet bad code %d" LOG_CR, eProp ));
@@ -497,6 +506,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		break;
 	case TAKSI_CFGPROP_GDIFrame:
 		m_bGDIFrame = atoi(pszValue) ? true : false;
+		break;
+	case TAKSI_CFGPROP_GDIDesktop:
+		m_bGDIDesktop = atoi(pszValue) ? true : false;
 		break;
 	case TAKSI_CFGPROP_UseGDI:
 		m_abUseAPI[TAKSI_API_GDI] = atoi(pszValue) ? true : false;

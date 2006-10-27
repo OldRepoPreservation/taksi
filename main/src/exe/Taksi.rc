@@ -183,8 +183,8 @@ BEGIN
                     WS_TABSTOP,7,37,169,10
     CONTROL         "Hook GDI",IDC_C_UseGDI,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,173,50,89,10
-    CONTROL         "Allow capture of full desktop",IDC_C_GDIFull,"Button",
-                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,50,136,10
+    CONTROL         "Allow capture of full desktop",IDC_C_GDIDesktop,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,50,136,10
     CONTROL         "Record GDI Frame",IDC_C_GDIFrame,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,63,137,10
     CONTROL         "Hook OpenGL",IDC_C_UseOGL,"Button",BS_AUTOCHECKBOX | 
