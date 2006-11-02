@@ -397,3 +397,7 @@ v0.77 - dev release
 Attempted a fix for the PNG GDI+ hang on close, by loading GDI+ only on demand.
 Added UseDX8 and UseDX9 flags to allow turning on and off the DX API's
 
+v0.772 - dev release 
+11/2/2006
+Add the option to hook the desktop or not. Partial fix to the GUI hook Exception on close.
+
