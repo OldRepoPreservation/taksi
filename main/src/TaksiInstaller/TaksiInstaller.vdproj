@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7FC3C8DB2FA2621078DFD9CC029E129D"
+        "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -63,7 +69,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C2B815EECB8619BC725BC522F55CDA62"
+        "MsmKey" = "8:_C93D3F61182CF4A0154C103C88110C90"
         "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -223,6 +229,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7FC3C8DB2FA2621078DFD9CC029E129D"
+            {
+            "SourcePath" = "8:gdiplus.dll"
+            "TargetName" = "8:gdiplus.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8E0D3F9660E34A2C8A3BD3EB430E10D9"
             {
             "SourcePath" = "8:..\\taksi.ini"
@@ -283,7 +309,7 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C2B815EECB8619BC725BC522F55CDA62"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C93D3F61182CF4A0154C103C88110C90"
             {
             "SourcePath" = "8:TaksiDll.dll"
             "TargetName" = "8:TaksiDll.dll"
@@ -404,7 +430,7 @@
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "ProductVersion" = "8:0.7.65"
+        "ProductVersion" = "8:0.7.73"
         "Manufacturer" = "8:Menasoft"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.menasoft.com/taksi"
@@ -993,6 +1019,9 @@
                 {
                 }
             }
+        }
+        "VJSharpPlugin"
+        {
         }
     }
 }
