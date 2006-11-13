@@ -21,11 +21,19 @@ public:
 		: m_dwFreqUnits(0)
 		, m_tLastCount(0)
 		, m_fLeftoverWeight(0.0)
-		, m_dwOverheadPenalty(0)
 		, m_dwLastOverhead(0)
+		, m_dwOverheadPenalty(0)
 	{
 	}
+
 	bool InitFreqUnits();
+	void InitStart()
+	{
+		m_fLeftoverWeight = 0;
+		m_tLastCount = 0;
+		m_dwLastOverhead = 0;
+		m_dwOverheadPenalty = 0;
+	}
 
 	DWORD CheckFrameRate();
 

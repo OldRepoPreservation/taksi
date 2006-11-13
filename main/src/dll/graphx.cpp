@@ -193,6 +193,8 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 
 	int iDiv = (sg_Config.m_bVideoHalfSize) ? 2 : 1;
 
+	g_FrameRate.InitStart();
+
 	// allocate buffer for pixel data
 	CVideoFrameForm FrameForm;
 	FrameForm.InitPadded(g_Proc.m_Stats.m_SizeWnd.cx/iDiv, g_Proc.m_Stats.m_SizeWnd.cy/iDiv);
@@ -398,6 +400,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		{
 			RecordAVI_Start();
 		}
+		g_FrameRate.InitStart();
 		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_RecordPause);
 	}
 
