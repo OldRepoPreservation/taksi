@@ -289,17 +289,6 @@ bool CTaksiShared::InitMasterWnd(HWND hWnd)
 	return HookCBT_Install();
 }
 
-void CTaksiShared::OnDetachProcess()
-{
-	// some process is detaching. assume this is NOT the master process.
-	if ( g_Proc.IsProcPrime())
-	{
-		sg_ProcStats.InitProcStats();	// not prime anymore!
-		HookCBT_Uninstall();
-		SendReHookMessage();
-	}
-}
-
 void CTaksiShared::DestroyShared()
 {
 	// Master App Taksi.EXE is exiting. so close up shop.
@@ -455,7 +444,7 @@ bool CTaksiProcess::CheckProcessSpecial() const
 
 void CTaksiProcess::CheckProcessCustom()
 {
-	// We have found a new process.
+	// We have found a new process or config has changed
 	// determine frame capturing algorithm special for the process.
 
 	m_dwConfigChangeCount = sg_Shared.m_dwConfigChangeCount;
@@ -730,7 +719,13 @@ bool CTaksiProcess::OnDllProcessDetach()
 	g_UserKeyboard.UninstallHookKeys();
 
 	// uninstall system-wide hook. then re-install it later if i want.
-	sg_Shared.OnDetachProcess();
+	// some process is detaching. assume this is NOT the master process.
+	if ( IsProcPrime())
+	{
+		sg_ProcStats.InitProcStats();	// not prime anymore!
+		sg_Shared.HookCBT_Uninstall();
+		sg_Shared.SendReHookMessage();
+	}
 
 	if (m_pCustomConfig)
 	{
