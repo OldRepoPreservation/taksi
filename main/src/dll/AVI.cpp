@@ -30,7 +30,7 @@ bool CTaksiFrameRate::InitFreqUnits()
 		return false;	// this cant work!
 	}
 	m_dwFreqUnits = freq.LowPart;
-	m_tLastCount = 0;
+	InitStart();
 	return true;
 }
 

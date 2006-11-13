@@ -401,3 +401,6 @@ v0.772 - dev release
 11/2/2006
 Add the option to hook the desktop or not. Partial fix to the GUI hook Exception on close.
 
+0.774
+11/13/2006
+Attempt to address weird time lag when restarting recording.
