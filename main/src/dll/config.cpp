@@ -39,7 +39,7 @@ static bool Str_GetQuoted( TCHAR* pszDest, int iLenMax, const char* pszSrc )
 		iLen = iLenMax-1;
 #ifdef _UNICODE
 	// convert to unicode.
-	ASSERT(0);
+	iLen = ::MultiByteToWideChar( CP_UTF8, 0, pszStartQuote + 1, iLen, pszDest, iLen );
 #else
 	strncpy( pszDest, pszStartQuote + 1, iLen );
 #endif
@@ -51,7 +51,7 @@ static int Str_SetQuoted( char* pszDest, int iLenMax, const TCHAR* pszSrc )
 {
 #ifdef _UNICODE
 	// convert from unicode.
-	ASSERT(0);
+	return _snprintf(pszDest, iLenMax, "\"%S\"", pszSrc);
 #else
 	return _snprintf(pszDest, iLenMax, "\"%s\"", pszSrc);
 #endif
@@ -558,6 +558,7 @@ bool CTaksiConfig::ReadIniFile()
 	lstrcat(szIniFileName, _T(TAKSI_INI_FILE));
 
 #ifdef _UNICODE
+	// convert from UNICODE. fopen() is multibyte only.
 	FILE* pFile = NULL;	ASSERT(0);
 #else
 	FILE* pFile = fopen(szIniFileName, _T("rt"));

@@ -45,7 +45,12 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 	}
 
 	WCHAR wFileName[_MAX_PATH];
+#ifdef UNICODE
+	lstrcpyn( wFileName, pszFileName, COUNTOF(wFileName)-1 );
+	int iLenW = lstrlen( wFileName );
+#else
 	int iLenW = ::MultiByteToWideChar( CP_UTF8, 0, pszFileName, iLenStr+1, wFileName, COUNTOF(wFileName));
+#endif
 
 	// EncoderParameters encoderParams;
 	Gdiplus::Status status = pBitmap->Save( wFileName, &encoderClsid, NULL );  

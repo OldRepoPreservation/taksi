@@ -72,10 +72,12 @@ public:
 	}
 	void SetHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	{
+		// process the key when we get around to it.
 		m_dwHotKeyMask |= (1<<eHotKey);
 	}
 	void ClearHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	{
+		// done processing the key.
 		m_dwHotKeyMask &= ~(1<<eHotKey);
 	}
 
