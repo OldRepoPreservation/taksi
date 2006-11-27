@@ -13,7 +13,7 @@ CTaksiKeyboard g_UserKeyboard;		// keyboard hook handle. if i cant hook DI. Just
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-CTaksiDI g_UserDI;
+CTaksiDI g_UserDI;	// DirectInput wrapper.
 
 typedef HRESULT (WINAPI *DIRECTINPUT8CREATE)(HINSTANCE, DWORD, REFIID, LPVOID, IDirectInput8**);
 static DIRECTINPUT8CREATE s_DirectInput8Create = NULL;
@@ -334,7 +334,9 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 	// if we're not done at this point, use keyboard hook
 	// install keyboard hook 
 	if ( ! g_UserKeyboard.InstallHookKeys(false))
+	{
 		return Check_GetLastError(MK_E_MUSTBOTHERUSER);
+	}
 	return S_OK;
 }
 

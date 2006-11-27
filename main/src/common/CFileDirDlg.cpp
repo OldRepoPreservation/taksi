@@ -33,9 +33,8 @@ int CALLBACK CFileDirDlg::BrowseCallbackProc( HWND hWnd, UINT uMsg, LPARAM lPara
 		pThis->m_hWnd = hWnd;
 		if ( pThis->m_szDir[0] != '\0' )
 		{
-			//wchar_t wTmp[_MAX_PATH];
-			//Str_SystemToUNICODE( wTmp, COUNTOF(wTmp)-2, pThis->m_sDir );
-			::SendMessage(hWnd,BFFM_SETSELECTION,(WPARAM)true,(LPARAM)(const char*) pThis->m_szDir );
+			// BFFM_SETSELECTION is converted to A or W
+			::SendMessage(hWnd,BFFM_SETSELECTION,(WPARAM)true,(LPARAM) pThis->m_szDir );
 		}
 		break;
 	case BFFM_IUNKNOWN:
