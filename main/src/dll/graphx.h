@@ -54,6 +54,8 @@ private:
 
 	HRESULT MakeScreenShot( bool bHalfSize );
 
+	void ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey );
+
 public:
 	static const DWORD sm_IndColors[TAKSI_INDICATE_QTY];
 	bool m_bHookedFunctions;	// HookFunctions() called and returned true. may not have called PresentFrameBegin() yet tho.

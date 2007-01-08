@@ -179,6 +179,10 @@ public:
 	void UpdateMaster();
 	void UpdateConfigCustom();
 
+	void HotKey_ConfigOpen();
+	void HotKey_IndicatorToggle();
+	void HotKey_HookModeToggle();
+
 public:
 	DWORD	m_dwVersionStamp;	// TAKSI_VERSION_N
 	HWND	m_hMasterWnd;		// The master server EXE's window.
@@ -191,7 +195,7 @@ public:
 #define LOG_NAME_DLL	_T("TaksiDll.log")	// common log shared by all processes.
 
 	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
-	DWORD m_dwHotKeyMask;			// TAKSI_HOTKEY_TYPE mask from App.
+	DWORD m_dwHotKeyMask;			// TAKSI_HOTKEY_TYPE mask from App. Schedule these in FrameBegin()
 	bool m_bRecordPause;			// paused video record by command.
 	int m_iMasterUpdateCount;		// how many WM_APP_UPDATE messages unprocessed.
 

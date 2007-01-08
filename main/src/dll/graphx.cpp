@@ -160,7 +160,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 		g_AVIFile.CloseAVI();
 		if ( ! sg_Shared.m_bRecordPause )
 		{
-			g_HotKeys.SetHotKey(TAKSI_HOTKEY_RecordBegin);	// re-open it later.
+			g_HotKeys.ScheduleHotKey(TAKSI_HOTKEY_RecordBegin);	// re-open it later.
 		}
 	}
 
@@ -309,6 +309,52 @@ bool CTaksiGraphX::RecordAVI_Frame()
 
 //********************************************************
 
+void CTaksiGraphX::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
+{
+	// Open AVI file
+	switch (eHotKey)
+	{
+	case TAKSI_HOTKEY_ConfigOpen:	// Open the config dialog window.
+		sg_Shared.HotKey_ConfigOpen();
+		return;
+	case TAKSI_HOTKEY_HookModeToggle:	// don't switch during video capture?
+		sg_Shared.HotKey_HookModeToggle();
+		return;
+	case TAKSI_HOTKEY_IndicatorToggle:
+		sg_Shared.HotKey_IndicatorToggle();
+		return;
+
+	case TAKSI_HOTKEY_RecordBegin:
+		// toggle video capturing mode
+		if ( g_AVIFile.IsOpen())
+		{
+			RecordAVI_Stop();
+		}
+		else
+		{
+			RecordAVI_Start();
+		}
+		break;
+	case TAKSI_HOTKEY_RecordStop: // Close AVI file.
+		RecordAVI_Stop();
+		break;
+	case TAKSI_HOTKEY_RecordPause:	// toggle pause.
+		sg_Shared.m_bRecordPause = ! sg_Shared.m_bRecordPause;
+		if ( ! g_AVIFile.IsOpen() && ! sg_Shared.m_bRecordPause )
+		{
+			RecordAVI_Start();
+		}
+		g_FrameRate.InitStart();
+		break;
+	case TAKSI_HOTKEY_Screenshot:	// make custom screen shot
+		MakeScreenShot(false);
+		break;
+	case TAKSI_HOTKEY_SmallScreenshot: // make small screen shot
+		MakeScreenShot(true);
+		break;
+	}
+}
+
 void CTaksiGraphX::PresentFrameBegin( bool bChange )
 {
 	// We have hooked the present function of the graphics mode.
@@ -345,13 +391,6 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		return;	
 	}
 
-	// Force hotkeys on the prime process.
-	if ( sg_Shared.m_dwHotKeyMask && g_Proc.IsProcPrime())
-	{
-		g_HotKeys.m_dwHotKeyMask |= sg_Shared.m_dwHotKeyMask;
-		sg_Shared.m_dwHotKeyMask = 0;
-	}
-
 	// if the frame format has changed i want to know about that now
 	if (!m_bGotFrameInfo)
 	{
@@ -369,58 +408,33 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		m_bGotFrameInfo = true;
 	}
 
+	// Force hotkeys on the prime process.
 	if (!g_HotKeys.m_bAttachedHotKeys)
 	{
 		// determine how we are going to handle keyboard hot-keys:
 		g_HotKeys.AttachHotKeysToApp();
 	}
-
 #ifdef USE_DX
 	// Process DirectInput input. polled.
 	if ( g_UserDI.m_bSetup)
 	{
-		g_UserDI.ProcessDirectInput();
+		g_UserDI.ProcessDirectInput(); // will call ScheduleHotKey()
 	}
 #endif
 
-	// Open AVI file
-	if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_RecordBegin)) 
+	DWORD dwHotKeyMask = g_HotKeys.m_dwHotKeyMask;
+	g_HotKeys.m_dwHotKeyMask = 0;
+	if ( sg_Shared.m_dwHotKeyMask && g_Proc.IsProcPrime())
 	{
-		RecordAVI_Start();
-		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_RecordBegin);
+		dwHotKeyMask |= sg_Shared.m_dwHotKeyMask;
+		sg_Shared.m_dwHotKeyMask = 0;
 	}
-
-	// Close AVI file.
-	else if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_RecordStop))
+	for ( int i=0; dwHotKeyMask; i++, dwHotKeyMask>>=1 )
 	{
-		RecordAVI_Stop();
-		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_RecordStop);
-	}
-
-	if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_RecordPause)) 
-	{
-		// toggle pause.
-		sg_Shared.m_bRecordPause = ! sg_Shared.m_bRecordPause;
-		if ( ! g_AVIFile.IsOpen() && ! sg_Shared.m_bRecordPause )
+		if ( dwHotKeyMask & 1 )
 		{
-			RecordAVI_Start();
+			ProcessHotKey( (TAKSI_HOTKEY_TYPE) i );
 		}
-		g_FrameRate.InitStart();
-		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_RecordPause);
-	}
-
-	// make custom screen shot
-	if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_Screenshot))
-	{
-		MakeScreenShot(false);
-		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_Screenshot);
-	}
-
-	// make small screen shot
-	else if ( g_HotKeys.IsHotKey(TAKSI_HOTKEY_SmallScreenshot))
-	{
-		MakeScreenShot(true);
-		g_HotKeys.ClearHotKey(TAKSI_HOTKEY_SmallScreenshot);
 	}
 
 	// write AVI-file, if in recording mode. 

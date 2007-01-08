@@ -276,6 +276,35 @@ void CTaksiShared::SendReHookMessage()
 	}
 }
 
+void CTaksiShared::HotKey_ConfigOpen()
+{
+	ASSERT(sg_Shared.m_hMasterWnd);
+	PostMessage( sg_Shared.m_hMasterWnd, WM_COMMAND, IDC_HOTKEY_FIRST + TAKSI_HOTKEY_ConfigOpen, 0 );
+}
+void CTaksiShared::HotKey_IndicatorToggle()
+{
+	sg_Config.m_bShowIndicator = !sg_Config.m_bShowIndicator;
+}
+void CTaksiShared::HotKey_HookModeToggle()
+{
+	if ( g_AVIFile.IsOpen())
+		return;
+	if ( sg_Shared.IsHookCBT())
+	{
+		LOG_MSG(( "HotKey_HookModeToggle unhook CBT." LOG_CR));
+		if ( sg_Shared.HookCBT_Uninstall())
+		{
+			LOG_MSG(( "CTaksiHotKeys::DoHotKey:CBT unhooked." LOG_CR));
+			// change indicator to "green"
+		}
+	}
+	else
+	{
+		LOG_MSG(( "HotKey_HookModeToggle install CBT hook." LOG_CR));
+		sg_Shared.HookCBT_Install();
+	}
+}
+
 //**************************************************************************************
 
 bool CTaksiShared::InitMasterWnd(HWND hWnd)

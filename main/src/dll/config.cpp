@@ -143,6 +143,7 @@ void CTaksiConfigData::InitConfig()
 	m_wHotKey[TAKSI_HOTKEY_Screenshot]=0x77;
 	m_wHotKey[TAKSI_HOTKEY_SmallScreenshot]=0x76;
 	m_bUseDirectInput = true;
+	m_bUseKeyboard = true;
 
 	memset( m_abUseAPI, 0xFF, sizeof(m_abUseAPI));
 	m_bGDIFrame = true;
@@ -173,6 +174,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
 	m_bUseDirectInput = config.m_bUseDirectInput;
+	m_bUseKeyboard = config.m_bUseKeyboard;
 
 	memcpy( m_abUseAPI, config.m_abUseAPI, sizeof(m_abUseAPI));	// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
