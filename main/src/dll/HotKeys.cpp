@@ -72,6 +72,7 @@ HRESULT CTaksiDI::SetupDirectInput()
 void CTaksiDI::ProcessDirectInput()
 {
 	// process keyboard input using DirectInput
+	// called inside PresentFrameBegin() ONLY
 	if ( !IsValidDll())	// need to call SetupDirectInput()
 		return;
 	ASSERT( m_bSetup );
@@ -144,7 +145,7 @@ void CTaksiDI::ProcessDirectInput()
 			continue;
 
 		// action on key up.
-		g_HotKeys.DoHotKey((TAKSI_HOTKEY_TYPE) i );
+		g_HotKeys.ScheduleHotKey((TAKSI_HOTKEY_TYPE) i );
 	}
 }
 
@@ -199,6 +200,7 @@ LRESULT CALLBACK CTaksiKeyboard::DummyKeyboardProc(int code, WPARAM wParam, LPAR
 LRESULT CALLBACK CTaksiKeyboard::KeyboardProc(int code, WPARAM wParam, LPARAM lParam) // static
 {
 	// SetWindowsHookEx WH_KEYBOARD
+	// NOTE: NO idea what context this is called in!
 	if (code==HC_ACTION)
 	{
 		// NOT using DirectInpout.
@@ -255,53 +257,27 @@ LRESULT CALLBACK CTaksiKeyboard::KeyboardProc(int code, WPARAM wParam, LPARAM lP
 
 void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 {
+	// Do the action now or schedule it for later.
 	LOG_MSG(( "CTaksiHotKeys::DoHotKey: VKEY_* (%d) pressed." LOG_CR, eHotKey ));
 
 	switch(eHotKey)
 	{
-	case TAKSI_HOTKEY_ConfigOpen:
-		// Open the config dialog window.
-		ASSERT(sg_Shared.m_hMasterWnd);
-		PostMessage( sg_Shared.m_hMasterWnd, WM_COMMAND, IDC_HOTKEY_FIRST + TAKSI_HOTKEY_ConfigOpen, 0 );
+	case TAKSI_HOTKEY_ConfigOpen:	// Open the config dialog window.
+		sg_Shared.HotKey_ConfigOpen();
 		return;
-	case TAKSI_HOTKEY_HookModeToggle:
-		// don't switch during video capture?
-		if ( g_AVIFile.IsOpen())
-			return;
-		if ( sg_Shared.IsHookCBT())
-		{
-			LOG_MSG(( "CTaksiHotKeys::DoHotKey:Signaling to unhook CBT." LOG_CR));
-			if ( sg_Shared.HookCBT_Uninstall())
-			{
-				LOG_MSG(( "CTaksiHotKeys::DoHotKey:CBT unhooked." LOG_CR));
-				// change indicator to "green"
-			}
-		}
-		else
-		{
-			LOG_MSG(( "CTaksiHotKeys::DoHotKey: Signaling to install CBT hook." LOG_CR));
-			sg_Shared.HookCBT_Install();
-		}
+	case TAKSI_HOTKEY_HookModeToggle:	// don't switch during video capture?
+		sg_Shared.HotKey_HookModeToggle();
 		return;
 	case TAKSI_HOTKEY_IndicatorToggle:
-		sg_Config.m_bShowIndicator = !sg_Config.m_bShowIndicator;
+		sg_Shared.HotKey_IndicatorToggle();
 		return;
-	case TAKSI_HOTKEY_RecordBegin:
-		// toggle video capturing mode
-		if ( g_AVIFile.IsOpen())
-		{
-			SetHotKey(TAKSI_HOTKEY_RecordStop);
-		}
-		else
-		{
-			SetHotKey(TAKSI_HOTKEY_RecordBegin);
-		}
-		return;
+	case TAKSI_HOTKEY_RecordBegin:	// toggle video capturing mode
 	case TAKSI_HOTKEY_RecordPause:
 	case TAKSI_HOTKEY_RecordStop:
 	case TAKSI_HOTKEY_Screenshot:
 	case TAKSI_HOTKEY_SmallScreenshot:
-		SetHotKey(eHotKey);
+		// schedule to be in the PresentFrameBegin() call.
+		ScheduleHotKey(eHotKey);
 		return;
 	}
 	// shouldnt get here!
@@ -333,9 +309,12 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 #endif
 	// if we're not done at this point, use keyboard hook
 	// install keyboard hook 
-	if ( ! g_UserKeyboard.InstallHookKeys(false))
+	if ( sg_Config.m_bUseKeyboard )
 	{
-		return Check_GetLastError(MK_E_MUSTBOTHERUSER);
+		if ( ! g_UserKeyboard.InstallHookKeys(false))
+		{
+			return Check_GetLastError(MK_E_MUSTBOTHERUSER);
+		}
 	}
 	return S_OK;
 }

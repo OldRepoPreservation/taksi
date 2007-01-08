@@ -65,24 +65,16 @@ public:
 	{
 	}
 
-	void DoHotKey( TAKSI_HOTKEY_TYPE eHotKey );
-	bool IsHotKey( TAKSI_HOTKEY_TYPE eHotKey ) const
-	{
-		return(( m_dwHotKeyMask & (1<<eHotKey)) ? true : false );
-	}
-	void SetHotKey( TAKSI_HOTKEY_TYPE eHotKey )
+	void ScheduleHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	{
 		// process the key when we get around to it.
 		m_dwHotKeyMask |= (1<<eHotKey);
 	}
-	void ClearHotKey( TAKSI_HOTKEY_TYPE eHotKey )
-	{
-		// done processing the key.
-		m_dwHotKeyMask &= ~(1<<eHotKey);
-	}
 
 	HRESULT AttachHotKeysToApp();	// to current app/process.
 	void DetachHotKeys();
+
+	void DoHotKey( TAKSI_HOTKEY_TYPE eHotKey );
 
 public:
 	bool m_bAttachedHotKeys;	// hooked the keyboard or DI for this process.

@@ -109,6 +109,7 @@ public:
 
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
+	bool   m_bUseKeyboard;		// Use WM_KEY hotkeys.
 
 	bool   m_bUseOverheadCompensation;	// for computing the frame rate
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
