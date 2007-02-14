@@ -12,7 +12,8 @@
 
 class LIBSPEC CImageGDIPInt : public CDllFile
 {
-	// Run time binding to the MsAcm32.DLL.
+	// Run time binding to the gdiplus.dll.
+	// Use /DELAYLOAD:gdiplus.dll for win2k !!
 public:
 	CImageGDIPInt();
 	~CImageGDIPInt();
@@ -23,18 +24,9 @@ public:
 	HRESULT GetEncoderClsid( const char* pszFormatExt, CLSID* pClsid );
 
 public:
-#define CIMAGEGDIPFUNC(a,b,c,d)	typedef b (WINGDIPAPI* PFN##a) c;
-#include "CImageGDIPFunc.tbl"
-#undef CIMAGEGDIPFUNC
-	// DECLSPEC_IMPORT
-#define CIMAGEGDIPFUNC(a,b,c,d)	PFN##a m_##a;	
-#include "CImageGDIPFunc.tbl"
-#undef CIMAGEGDIPFUNC
-
-public:
+	bool m_bFailedLoad;
 	ULONG_PTR m_Token;
 };
 
 extern CImageGDIPInt g_gdiplus;
-
 #endif	// _INC_CImageGDIP_H

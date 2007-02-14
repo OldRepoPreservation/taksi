@@ -404,3 +404,7 @@ Add the option to hook the desktop or not. Partial fix to the GUI hook Exception
 0.774
 11/13/2006
 Attempt to address weird time lag when restarting recording.
+
+0.775
+Restore PNG format still frame capture with delay loading of gdiplus for Win2K support
+

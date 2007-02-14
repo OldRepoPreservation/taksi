@@ -8,8 +8,8 @@
 #define USE_DX	// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
 
-// NOTE: This causes a hang bug when closing Taksi before closing the app!
-// #define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+// This cuases us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
+#define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 
 // System includes always go first.
 #include <windows.h>

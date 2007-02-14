@@ -36,10 +36,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/section:.SHARED,rws"
-				AdditionalDependencies="vfw32.lib dxguid.lib winmm.lib dinput8.lib"
+				AdditionalOptions="/section:.SHARED,rws /DELAYLOAD:gdiplus.dll"
+				AdditionalDependencies="vfw32.lib dxguid.lib winmm.lib dinput8.lib gdiplus.lib delayimp.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/TaksiDll.dll"
+				Version="0.7.7.5"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/TaksiDll.pdb"
@@ -90,9 +91,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/section:.SHARED,rws"
-				AdditionalDependencies="vfw32.lib dxguid.lib  winmm.lib dinput8.lib"
+				AdditionalOptions="/section:.SHARED,rws /DELAYLOAD:gdiplus.dll"
+				AdditionalDependencies="vfw32.lib dxguid.lib winmm.lib dinput8.lib gdiplus.lib delayimp.lib"
 				OutputFile="$(OutDir)/TaksiDll.dll"
+				Version="0.7.7.5"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				GenerateMapFile="TRUE"

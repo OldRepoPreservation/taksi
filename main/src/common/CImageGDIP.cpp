@@ -19,18 +19,6 @@ static void CImageGDIP_DebugPoint( const char* pszName )
 #define CImageGDIP_DebugPoint(pszName)
 #endif
 
-// Create a set of stubs to make the calls to the dll.
-// Fix the weird obscured links. obscured through calls in LIB/H that call the DLL
-namespace Gdiplus
-{
-extern "C"
-{
-#define CIMAGEGDIPFUNC(a,b,c,d)	b WINGDIPAPI a c { CImageGDIP_DebugPoint(#a); return g_gdiplus.m_##a d ; } 
-#include "CImageGDIPFunc.tbl"
-#undef CIMAGEGDIPFUNC
-}
-}
-
 CImageGDIPInt::CImageGDIPInt() 
 	: m_Token(0)
 {
@@ -45,20 +33,15 @@ bool CImageGDIPInt::AttachGDIPInt()
 	//  if we have already linked to the API's, then just succeed...
 	if ( m_Token )
 		return true;
+	if ( m_bFailedLoad )
+		return false;
 
 	HRESULT hRes = LoadDll( _T("gdiplus.dll"));
 	if ( IS_ERROR(hRes))
+	{
+		m_bFailedLoad = true;
 		return false;
-
-#define CIMAGEGDIPFUNC(a,b,c,d)	\
-	m_##a = (PFN##a) GetProcAddress(#a);\
-	if ( m_##a == NULL )\
-	{\
-		DEBUG_ERR(( "Cant find GDIP '%s'" LOG_CR, #a ));\
-		return false;\
 	}
-#include "CImageGDIPFunc.tbl"
-#undef CIMAGEGDIPFUNC
 
 	m_Token = 1;	// temporary just to get past the debug code.
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -106,7 +89,7 @@ HRESULT CImageGDIPInt::GetEncoderClsid( const char* pszFormatExt, CLSID* pClsid 
 
 	UINT num = 0;          // number of image encoders
 	UINT size = 0;         // size of the image encoder array in bytes
-	Gdiplus::GdipGetImageEncodersSize(&num, &size);
+	Gdiplus::GetImageEncodersSize(&num, &size);
 	if(size == 0)
 	{
 		return HRESULT_FROM_WIN32(ERROR_SXS_UNKNOWN_ENCODING_GROUP);  // Failure
@@ -117,7 +100,7 @@ HRESULT CImageGDIPInt::GetEncoderClsid( const char* pszFormatExt, CLSID* pClsid 
 	{
 		return E_OUTOFMEMORY;  // Failure
 	}
-	GdipGetImageEncoders(num, size, pImageCodecInfo);
+	Gdiplus::GetImageEncoders(num, size, pImageCodecInfo);
 
 	for(UINT j = 0; j < num; ++j)
 	{
