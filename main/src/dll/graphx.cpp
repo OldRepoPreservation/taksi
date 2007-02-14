@@ -13,14 +13,15 @@
 static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 {
 	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
-	if ( ! g_gdiplus.m_Token )
+	// Cant use this in Win2K!
+	if ( ! g_gdiplus.AttachGDIPInt())
 	{
-		g_gdiplus.AttachGDIPInt();
-		if ( ! g_gdiplus.m_Token )
-			return S_FALSE;
+		return S_FALSE;
 	}
 	if ( sg_Config.m_szImageFormatExt[0] == '\0' )
+	{
 		return S_FALSE;
+	}
 
 	int iLenStr = g_Proc.MakeFileName( pszFileName, sg_Config.m_szImageFormatExt );
 
@@ -119,6 +120,7 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 	if ( hRes != S_OK )
 #endif
 	{
+		// default to BMP format.
 		g_Proc.MakeFileName( szFileName, _T("bmp"));
 		hRes = frame.SaveAsBMP(szFileName);
 	}

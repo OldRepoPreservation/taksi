@@ -150,7 +150,7 @@ void CTaksiConfigData::InitConfig()
 	m_bGDIDesktop = false;
 	m_bUseOverheadCompensation = false;
 
-	lstrcpy( m_szImageFormatExt, _T("png") );	// jpeg
+	lstrcpy( m_szImageFormatExt, _T("png") );	// vs png,jpeg or bmp
 	m_bShowIndicator = true;
 	m_ptMasterWindow.x = 0;
 	m_ptMasterWindow.y = 0;
