@@ -48,8 +48,7 @@ struct AVI_FILE_HEADER
 #if 0
 	FOURCC fccList_A;				// "LIST"
 	DWORD  dwSizeList_A;
-
-
+	WAVEFORMAT
 #endif
 
 #define AVI_MOVILIST_OFFSET 0x800
