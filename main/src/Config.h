@@ -32,7 +32,7 @@ enum TAKSI_API_TYPE
 	TAKSI_API_NONE = 0,
 	TAKSI_API_GDI,	// prefer all other modes over this.
 	TAKSI_API_OGL,	// a static linked dll, so can get a false positive.
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	TAKSI_API_DX8,
 	TAKSI_API_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
 #endif
@@ -105,7 +105,7 @@ public:
 	bool   m_bVideoHalfSize;			// full vs half sized video frames.
 
 	int m_iAudioDevice;	// audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
-	CWaveFormat m_AudioCodec;
+	CWaveFormat m_AudioFormat;
 
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
 	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook

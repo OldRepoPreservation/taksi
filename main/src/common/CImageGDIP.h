@@ -12,7 +12,7 @@
 
 class LIBSPEC CImageGDIPInt : public CDllFile
 {
-	// Run time binding to the gdiplus.dll.
+	// binding to the gdiplus.dll.
 	// Use /DELAYLOAD:gdiplus.dll for win2k !!
 public:
 	CImageGDIPInt();

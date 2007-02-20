@@ -62,7 +62,7 @@ public:
 	bool m_bGotFrameInfo;		// GetFrameInfo() called. set to false to re-read the info. PresentFrameBegin success.
 };
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 
 interface IDirect3DDevice8;
 struct CTaksiDX8 : public CTaksiGraphX
@@ -144,7 +144,7 @@ public:
 };
 extern CTaksiDX9 g_DX9;
 
-#endif // USE_DX
+#endif // USE_DIRECTX
 
 struct CTaksiOGL : public CTaksiGraphX
 {

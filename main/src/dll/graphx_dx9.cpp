@@ -6,7 +6,7 @@
 #include "TaksiDll.h"
 #include "graphx.h"
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 #include <d3d9types.h>
 #include <d3d9.h>
 

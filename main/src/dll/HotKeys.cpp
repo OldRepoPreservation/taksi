@@ -9,7 +9,7 @@
 CTaksiHotKeys g_HotKeys;		// what does the user want to do?
 CTaksiKeyboard g_UserKeyboard;		// keyboard hook handle. if i cant hook DI. Just for this process.
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -24,7 +24,7 @@ static IRefPtr<IDirectInputDevice8> s_lpDIDevice;
 
 //**************************************************************************************
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 
 CTaksiDI::CTaksiDI()
 	: m_bSetup(false)
@@ -294,7 +294,7 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 	m_bAttachedHotKeys = true;	// keyboard configuration done
 	DEBUG_MSG(( "CTaksiProcess::AttachHotKeysToApp" LOG_CR ));
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	if (sg_Config.m_bUseDirectInput)
 	{
 		if ( g_UserDI.SetupDirectInput() == S_OK )
@@ -321,7 +321,7 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 
 void CTaksiHotKeys::DetachHotKeys()
 {
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	// release DirectInput objects 
 	g_UserDI.CloseDirectInput();
 #endif

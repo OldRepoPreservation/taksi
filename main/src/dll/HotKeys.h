@@ -7,7 +7,7 @@
 #pragma once
 #endif
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 struct CTaksiDI : public CDllFile
 {
 	// Direct input keys.
@@ -27,7 +27,7 @@ private:
 	bool m_abHotKey[TAKSI_HOTKEY_QTY];
 };
 extern CTaksiDI g_UserDI;
-#endif // USE_DX
+#endif // USE_DIRECTX
 
 struct CTaksiKeyboard
 {

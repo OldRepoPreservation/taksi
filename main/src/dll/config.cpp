@@ -131,7 +131,8 @@ void CTaksiConfigData::InitConfig()
 	m_bVideoCodecMsg = false;
 	m_bVideoHalfSize = true;
 
-	m_AudioCodec.InitFormatEmpty();
+	m_AudioFormat.InitFormatEmpty();
+	// m_ACM.Init();
 	m_iAudioDevice = WAVE_DEVICE_NONE;
 
 	m_wHotKey[TAKSI_HOTKEY_ConfigOpen]=0x0;
@@ -170,7 +171,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	m_bVideoCodecMsg = config.m_bVideoCodecMsg;
 
 	m_iAudioDevice = config.m_iAudioDevice;	// audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
-	m_AudioCodec.SetFormat( config.m_AudioCodec );
+	m_AudioFormat.SetFormat( config.m_AudioFormat );
 
 	memcpy( m_wHotKey, config.m_wHotKey, sizeof(m_wHotKey));
 	m_bUseDirectInput = config.m_bUseDirectInput;
@@ -395,7 +396,7 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		return m_VideoCodec.GetStr(pszValue, iSizeMax);
 	case TAKSI_CFGPROP_AudioCodecInfo:
-		return Mem_ConvertToString( pszValue, iSizeMax, (BYTE*) m_AudioCodec.get_WF(), m_AudioCodec.get_FormatSize());
+		return Mem_ConvertToString( pszValue, iSizeMax, (BYTE*) m_AudioFormat.get_WF(), m_AudioFormat.get_FormatSize());
 	case TAKSI_CFGPROP_AudioDevice:
 		return _snprintf(pszValue, iSizeMax, "%d", m_iAudioDevice );
 	case TAKSI_CFGPROP_ShowIndicator:
@@ -498,7 +499,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 			ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
 			return false;
 		}
-		if ( ! m_AudioCodec.SetFormatBytes( bTmp, iSize ))
+		if ( ! m_AudioFormat.SetFormatBytes( bTmp, iSize ))
 		{
 			//ASSERT(0);
 			return false;

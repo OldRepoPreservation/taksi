@@ -8,81 +8,81 @@
 #include "CLogBase.h"
 #include <windowsx.h>
 
-CWaveACMInt::CWaveACMInt()
-	: m_acmGetVersion(NULL)
+#pragma comment( lib, "MsAcm32.lib" )
+
+CWaveACMInit::CWaveACMInit()
+	: CSingleton<CWaveACMInit>(this)
+	, m_bGetVersion(false)
+{
+	ASSERT( ! IsACMAttached());
+}
+
+CWaveACMInit::~CWaveACMInit()
 {
 }
 
-CWaveACMInt::~CWaveACMInt()
-{
-}
-
-bool CWaveACMInt::AttachACMInt()
+bool CWaveACMInit::StartupACM()
 {
 	//  if we have already linked to the API's, then just succeed...
-	if ( m_acmGetVersion != NULL )
+	if ( IsACMAttached())
 		return true;
 
 	HRESULT hRes = LoadDll( _T("MsAcm32.DLL"));
 	if ( IS_ERROR(hRes))
 		return false;
 
-#define CWAVEACMFUNC(a,b,c)	\
-	m_##a = (PFN##a) GetProcAddress(#a);\
-	if ( m_##a == NULL )\
-	{\
-		DEBUG_ERR(( "Cant find ACM '%s'" LOG_CR, #a ));\
-		return false;\
-	}
-#include "CWaveACMFunc.tbl"
-#undef CWAVEACMFUNC
-
 	//
 	//  if the version of the ACM is *NOT* V2.00 or greater, then
 	//  all other API's are unavailable--so don't waste time trying
 	//  to link to them.
 	//
-	DWORD dwVersion = m_acmGetVersion();
-	if ( HIWORD(dwVersion) < 0x0200 )
+	DWORD dwVersion = acmGetVersion();
+	if ( HIWORD(dwVersion) < 0x0200 ) // 0x5000000
 	{
-		// Close();
-		return (false);
+		ShutdownACM();
+		return(false);
 	}
 
+	m_bGetVersion = true;
+	ASSERT( IsACMAttached());
 	return true;
 }
 
-void CWaveACMInt::DetachACMInt()
+void CWaveACMInit::ShutdownACM()
 {
-	if ( m_acmGetVersion == NULL )
+	if ( ! IsACMAttached())
 		return;
 	FreeDll();
-	m_acmGetVersion = NULL;
+	m_bGetVersion = false;
+	ASSERT( !IsACMAttached());
 }
 
-int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle, DWORD dwEnum )
+int CWaveACMInit::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle, DWORD dwEnum )
 {
 	// RETURN: IDCANCEL, IDOK
 	// dwEnum = ACM_FORMATENUMF_CONVERT
+	// 
 
-	if ( !AttachACMInt())
+	if ( !StartupACM())
+	{
+		return IDIGNORE;
+	}
+
+	ACMFORMATCHOOSE fmtc;
+	ZeroMemory( &fmtc, sizeof(fmtc));
+
+	DWORD dwMaxSize = 0;
+	MMRESULT mmRes = acmMetrics( NULL, ACM_METRIC_MAX_SIZE_FORMAT, &dwMaxSize );
+	if ( mmRes )
 	{
 		return IDRETRY;
 	}
 
-	static TCHAR szName[256];
-	szName[0] = '\0';
-
-	ACMFORMATCHOOSE fmtc;
-	ZeroMemory( &fmtc, sizeof( fmtc ));
-
-	DWORD dwMaxSize = 0;
-	if ( m_acmMetrics( NULL, ACM_METRIC_MAX_SIZE_FORMAT, &dwMaxSize ))
-		return IDRETRY;
-
 	LPWAVEFORMATEX lpForm = (LPWAVEFORMATEX) GlobalAllocPtr( GHND, dwMaxSize + sizeof( WAVEFORMATEX ));
 	if ( lpForm == NULL )
+	{
 		return IDRETRY;
+	}
 
 	int iSizeCur = Form.get_FormatSize();
 	if ( dwMaxSize < (DWORD) iSizeCur )
@@ -91,12 +91,15 @@ int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle,
 		return IDRETRY;
 	}
 
-	hmemcpy( lpForm, Form.get_WF(), iSizeCur );
+	memcpy( lpForm, Form.get_WF(), iSizeCur );
 	if ( lpForm->wFormatTag == WAVE_FORMAT_PCM )
 	{
 		// Last part (cbSize) is optional. because we know it is 0
 		lpForm->cbSize = 0;
 	}
+
+	static TCHAR szName[256]; // static necessary ??? 
+	szName[0] = '\0';
 
 	fmtc.cbStruct = sizeof( fmtc );
 	fmtc.fdwStyle = ACMFORMATCHOOSE_STYLEF_INITTOWFXSTRUCT | ACMFORMATCHOOSE_STYLEF_SHOWHELP;
@@ -120,7 +123,7 @@ int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle,
 		fmtc.pwfxEnum = NULL;
 	}
 
-	MMRESULT mmRes = m_acmFormatChooseA( &fmtc );
+	mmRes = acmFormatChoose( &fmtc );
 	if ( ! mmRes )
 	{
 		// Copy results to Form.
@@ -129,11 +132,10 @@ int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle,
 
 	GlobalFreePtr( lpForm );
 
-	if ( mmRes == ACMERR_CANCELED ) 
-		return( IDCANCEL );
-
 	if ( mmRes )
 	{
+		if ( mmRes == ACMERR_CANCELED ) 
+			return( IDCANCEL );
 		DEBUG_ERR(( "acmFORMATCHOOSE %d" LOG_CR, mmRes ));
 		return IDRETRY;
 	}
@@ -141,30 +143,88 @@ int CWaveACMInt::FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle,
 	return IDOK;
 }
 
-MMRESULT CWaveACMInt::GetFormatDetails( const WAVEFORMATEX FAR* pForm, ACMFORMATTAGDETAILS& details )
+MMRESULT CWaveACMInit::GetFormatDetails( const WAVEFORMATEX FAR* pForm, ACMFORMATTAGDETAILS& details )
 {
 	ZeroMemory( &details, sizeof(details));
-	details.cbStruct = sizeof(details);
 	if ( pForm == NULL )
 	{
 		return 0;
 	}
-	if ( !AttachACMInt())
+	if ( !StartupACM())
 	{
 		return ACMERR_NOTPOSSIBLE;
 	}
+	details.cbStruct = sizeof(details);
 	details.dwFormatTag = pForm->wFormatTag;
-	MMRESULT res = m_acmFormatTagDetailsA( NULL, &details, ACM_FORMATTAGDETAILSF_FORMATTAG );
-	return res;
+	MMRESULT mmRes = acmFormatTagDetails( NULL, &details, ACM_FORMATTAGDETAILSF_FORMATTAG );
+	return mmRes;
 }
 
 //*****************************************************
 
 CWaveACMStream::CWaveACMStream()
 	: m_hStream(NULL)
+	, m_hResStop(S_OK)
+	, m_iBuffers(0)
 {
 }
 
 CWaveACMStream::~CWaveACMStream()
 {
 }
+
+MMRESULT CWaveACMStream::StreamOpen()
+{
+	if ( ! CWaveACMInit::I().StartupACM())
+	{
+		return E_FAIL;
+	}
+	if ( m_hStream != NULL )
+	{
+		ASSERT(m_hStream==NULL);
+		return E_FAIL;	// MUST close this properly!
+		// StreamClose();
+	}
+	MMRESULT mmRes = acmStreamOpen(
+		&m_hStream, NULL,
+		m_SrcForm, m_DstForm, NULL,
+		0L, 0L,
+		ACM_STREAMOPENF_NONREALTIME );
+	if ( mmRes != S_OK )
+	{
+		return( mmRes );
+	}
+	m_iBuffers = 0;			// Total outstanding buffers. (For async mode only)
+	m_hResStop = S_OK;		// Stop feeding. ERROR_CANCELLED
+	return S_OK;
+}
+
+void CWaveACMStream::StreamClose()
+{
+	if ( m_hStream == NULL )
+		return;
+	if ( ! CWaveACMInit::I().IsACMAttached())
+	{
+		return;
+	}
+	acmStreamClose( m_hStream, 0 );
+	m_hStream = NULL;
+}
+
+//***************************************************
+
+#ifdef _DEBUG
+
+bool GRAYAPI CWaveACMStream::UnitTest() // static
+{
+	if ( ! CWaveACMInit::I().StartupACM())
+		return false;
+
+	CWaveACMStream test;
+	test.m_SrcForm.SetFormatPCM();
+	test.m_DstForm.SetFormatPCM();
+
+	return true;
+}
+
+#endif

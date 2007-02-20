@@ -5,7 +5,7 @@
 #include "../stdafx.h"
 #include "Taksi.h"
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 #include <d3d9types.h>
 #include <d3d9.h>
 
@@ -78,4 +78,4 @@ bool Test_DirectX9( HWND hWnd )
 	return true;
 }
 
-#endif // USE_DX
+#endif // USE_DIRECTX

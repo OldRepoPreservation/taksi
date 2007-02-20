@@ -5,7 +5,7 @@
 #include "../stdafx.h"
 #include "Taksi.h"
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 #include <d3d8types.h>
 #include <d3d8.h>
 
@@ -82,4 +82,4 @@ bool Test_DirectX8( HWND hWnd )
 	return true;
 }
 
-#endif // USE_DX
+#endif // USE_DIRECTX

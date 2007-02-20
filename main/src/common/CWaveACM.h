@@ -13,48 +13,70 @@
 
 #ifdef _WIN32
 #include "CWaveFormat.h"
+#include "CSingleton.h"
 #include "CDll.h"
 
 // Forward declares.
 #include <mmreg.h>
 #include <msacm.h>
 
-class LIBSPEC CWaveACMInt : public CDllFile
-{
-	// Run time binding to the MsAcm32.DLL.
-public:
-	CWaveACMInt();
-	~CWaveACMInt();
-
-	bool AttachACMInt();
-	void DetachACMInt();
-
-	int FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle, DWORD dwEnum );
-	MMRESULT GetFormatDetails( const WAVEFORMATEX FAR* pForm, ACMFORMATTAGDETAILS& details );
-
-public:
-#define CWAVEACMFUNC(a,b,c)	typedef b (__stdcall* PFN##a) c;
-#include "CWaveACMFunc.tbl"
-#undef CWAVEACMFUNC
-	// DECLSPEC_IMPORT
-#define CWAVEACMFUNC(a,b,c)	PFN##a m_##a;	
-#include "CWaveACMFunc.tbl"
-#undef CWAVEACMFUNC
-};
+#ifndef acmFormatTagDetails
+#define acmFormatTagDetails acmFormatTagDetailsA
+#endif // acmFormatTagDetails
 
 class LIBSPEC CWaveACMStream
 {
 	// A conversion state for convert from one format to another.
+	// Keep track of a single conversion stream process.
 	// acmStreamOpen() session
 public:
 	CWaveACMStream();
 	~CWaveACMStream();
 
+	MMRESULT StreamOpen();
+	void StreamClose();
+
+#ifdef _DEBUG
+	static bool GRAYAPI UnitTest();
+#endif
+
 public:
-	//
-	// A compression conversion device was opened.
-	//
-	HACMSTREAM	m_hStream; // stream handle
+	CWaveFormat m_SrcForm;
+	CWaveFormat m_DstForm;
+
+	HACMSTREAM	m_hStream;		// stream handle to compression conversion device
+
+	// Async ACM Compression conversion.
+	// Progress in the stream.
+	WAV_BLOCKS m_SrcIndex;
+	WAV_BLOCKS m_DstIndex;
+	int     m_iBuffers;			// Total outstanding buffers. (For async mode only)
+	HRESULT m_hResStop;			// Stop feeding. ERROR_CANCELLED
+};
+
+class LIBSPEC CWaveACMInit
+	: public CSingleton<CWaveACMInit>
+	, public CDllFile
+{
+	// Run time binding to the MsAcm32.DLL.
+	// Use /DELAYLOAD:MsAcm32.dll for win2k ??
+public:
+	CWaveACMInit();
+	~CWaveACMInit();
+
+	bool IsACMAttached() const
+	{
+		return( m_bGetVersion );
+	}
+
+	bool StartupACM();
+	void ShutdownACM();
+
+	int FormatDlg( HWND hwnd, CWaveFormat& Form, const TCHAR* pszTitle, DWORD dwEnum );
+	MMRESULT GetFormatDetails( const WAVEFORMATEX FAR* pForm, ACMFORMATTAGDETAILS& details );
+
+private:
+	bool m_bGetVersion;	// Found the proper version?
 };
 
 #endif	// _WIN32

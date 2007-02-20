@@ -36,7 +36,7 @@ static CTaksiGraphX* const s_GraphxModes[ TAKSI_API_QTY ] =
 	NULL,	// TAKSI_API_NONE
 	&g_GDI,	// TAKSI_API_GDI // lowest priority, since all apps do GDI
 	&g_OGL,	// TAKSI_API_OGL
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	&g_DX8,	// TAKSI_API_DX8
 	&g_DX9,	// TAKSI_API_DX9 // almost no apps load this unless they are going to use it.
 #endif
@@ -106,10 +106,24 @@ void CTaksiProcStats::InitProcStats()
 	m_dwProcessId = 0;
 	m_szProcessFile[0] = '\0';
 	m_szLastError[0] = '\0';
+
 	m_hWndCap = NULL;
+	m_SizeWnd.cx = 0;
+	m_SizeWnd.cy = 0;
 	m_eGraphXAPI = TAKSI_API_NONE;
+
 	m_eState = TAKSI_INDICATE_Hooked;		// assume we are looking for focus
+	m_fFrameRate = 0;			// measured frame rate. recording or not.
+	m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
+
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
+}
+
+void CTaksiProcStats::ResetProcStats()
+{
+	m_szLastError[0] = '\0';
+	m_fFrameRate = 0;			// measured frame rate. recording or not.
+	m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
 }
 
 void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
@@ -346,7 +360,7 @@ bool CTaksiShared::InitShared()
 	m_dwHotKeyMask = 0;
 	m_bRecordPause = false;
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	m_nDX8_Present = 0; // offset from start of DLL to the interface element i want.
 	m_nDX8_Reset = 0;
 	m_nDX9_Present = 0;

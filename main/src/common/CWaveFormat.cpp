@@ -159,6 +159,19 @@ bool CWaveFormat::SetFormat( const WAVEFORMATEX FAR* pForm )
 	return( true );
 }
 
+bool CWaveFormat::SetFormatPCM( WORD nChannels, DWORD nSamplesPerSec, WORD wBitsPerSample )
+{
+	WAVEFORMATEX format;
+	ZeroMemory( &format, sizeof(format));
+    format.wFormatTag = WAVE_FORMAT_PCM;        /* format type */
+    format.nChannels = nChannels;         /* number of channels (i.e. mono, stereo...) */
+    format.nSamplesPerSec = nSamplesPerSec;    /* sample rate */
+    format.nBlockAlign = nChannels * wBitsPerSample / 8;       /* block size of data */
+    format.nAvgBytesPerSec = nSamplesPerSec * format.nBlockAlign;   /* for buffer estimation */
+    format.wBitsPerSample = wBitsPerSample;    /* Number of bits per sample of mono data */
+	return SetFormat( &format );
+}
+
 void CWaveFormat::ReCalc( void )
 {
 	//@------------------------------------------------------------------------

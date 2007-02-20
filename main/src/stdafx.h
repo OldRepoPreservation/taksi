@@ -5,11 +5,12 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif
-#define USE_DX	// remove this to compile if u dont have the DirectX SDK
+#define USE_DIRECTX			// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
 
 // This cuases us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
-#define USE_GDIP	// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+#define USE_GDIP		// use Gdiplus::Bitmap to save images as PNG (or JPEG)
+#define USE_AUDIO
 
 // System includes always go first.
 #include <windows.h>
@@ -63,7 +64,7 @@ extern LIBSPEC CTaksiLogFile g_Log;
 
 #define TAKSI_MASTER_CLASSNAME _T("TaksiMaster")
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 enum TAKSI_INTF_TYPE
 {
 	// DX interface entry offsets.
@@ -107,6 +108,7 @@ struct LIBSPEC CTaksiProcStats
 
 public:
 	void InitProcStats();
+	void ResetProcStats();
 	void CopyProcStats( const CTaksiProcStats& stats );
 	void UpdateProcStat( TAKSI_PROCSTAT_TYPE eProp )
 	{
@@ -199,7 +201,7 @@ public:
 	bool m_bRecordPause;			// paused video record by command.
 	int m_iMasterUpdateCount;		// how many WM_APP_UPDATE messages unprocessed.
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	// keep Direct3D-related pointers, tested just once for all.
 	// DX8
 	UINT_PTR m_nDX8_Present; // offset from start of DLL to the interface element i want.
