@@ -54,6 +54,7 @@ public:
 
 	bool SetFormatBytes( const BYTE* pFormData, int iSize );
 	bool SetFormat( const WAVEFORMATEX FAR* pForm );
+	bool SetFormatPCM( WORD nChannels=1, DWORD nSamplesPerSec=11025, WORD wBitsPerSample=8 );
 
 	bool IsValidFormat() const;
 	bool IsValidBasic() const

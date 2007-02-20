@@ -4,13 +4,15 @@
 //
 #include "../stdafx.h"
 #include "TaksiDll.h"
+#include "../common/CWaveDevice.h"
 
 CTaksiFrameRate g_FrameRate;	// measure current video frame rate.
 CAVIFile g_AVIFile;				// current video file we are recording.
 CAVIThread g_AVIThread;			// put all compression on a back thread. Q raw data to be processed.
 
-//CWaveACMInt g_ACM;			// compress audio stream.
-//CWaveRecorder g_AudioInput;	// Raw PCM audio input. (loopback from output)
+#ifdef USE_AUDIO
+CWaveRecorder g_AudioInput;	// Raw PCM audio input. (loopback from output)
+#endif
 
 //**************************************************************************************
 
@@ -158,8 +160,11 @@ DWORD CAVIThread::ThreadRun()
 			}
 		}
 
+#ifdef USE_AUDIO
 		// Audio data ?
 		// g_AVIFile.WriteAudioFrame(xxx);
+
+#endif
 
 		// we are done.
 		m_dwTotalFramesProcessed++;
@@ -245,23 +250,33 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 		ASSERT(0);
 		return NULL;
 	}
+
 	return pFrame;	// ready
 }
 
 void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready to compress/write
 {
 	// New data is ready so wake up the thread.
-	// ASSUME: WaitForNextFrame() was just called.
+	// ARGS:
+	//  pFrame = m_aFrames[ m_iFrameFree ]
+	//  dwFrameDups = Multiple time frames have gone by.
+	// ASSUME: 
+	//  WaitForNextFrame() was just called.
+
 	if ( m_nThreadId == 0 )
 		return;
+
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
 	ASSERT(dwFrameDups>0);
 	ASSERT(pFrame);
-	ASSERT( pFrame->m_dwFrameDups == 0 ); 
 	ASSERT( pFrame->IsValidFrame());
-	pFrame->m_dwFrameDups = dwFrameDups;
-	m_iFrameFree = ( m_iFrameFree + 1 ) % AVI_FRAME_QTY;	// its ready.
+	ASSERT( pFrame->m_dwFrameDups == 0 ); 
+	ASSERT( pFrame == &m_aFrames[ m_iFrameFree ] );
+
+	pFrame->m_dwFrameDups = dwFrameDups;	// indicate this pFrame is ready to go.
+	m_iFrameFree = ( m_iFrameFree + 1 ) % AVI_FRAME_QTY;	// its full and ready to process.
 	m_EventDataDone.ResetEvent();	// manual reset.
+
 	ASSERT( m_iFrameCount.m_lValue < AVI_FRAME_QTY );
 	if ( m_iFrameCount.Inc() == 1 )
 	{

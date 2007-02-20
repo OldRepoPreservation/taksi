@@ -641,7 +641,7 @@ CAVIFile::CAVIFile()
 	, m_dwTotalFrames(0)
 {
 	m_VideoCodec.InitCodec();
-	m_AudioCodec.InitFormatEmpty();
+	m_AudioFormat.InitFormatEmpty();
 }
 
 CAVIFile::~CAVIFile() 
@@ -773,11 +773,11 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 
 	if ( pAudioCodec )
 	{
-		m_AudioCodec.SetFormat( *pAudioCodec );
+		m_AudioFormat.SetFormat( *pAudioCodec );
 	}
 	else
 	{
-		m_AudioCodec.SetFormat( NULL );
+		m_AudioFormat.SetFormat( NULL );
 	}
 
 	// prepare BITMAPINFO for compressor
@@ -1058,7 +1058,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 	return dwBytesWrittenTotal;	// ASSUME not negative -> error
 }
 
-HRESULT CAVIFile::WriteAudioFrame( const BYTE* pWaveData )
+HRESULT CAVIFile::WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength )
 {
 	// TODO ???
 	return 0;

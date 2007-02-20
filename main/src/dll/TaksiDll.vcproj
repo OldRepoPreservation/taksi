@@ -264,6 +264,9 @@
 				RelativePath="..\common\CRefPtr.h">
 			</File>
 			<File
+				RelativePath="..\common\CSingleton.h">
+			</File>
+			<File
 				RelativePath="..\common\CThreadLockedLong.h">
 			</File>
 			<File
@@ -274,9 +277,6 @@
 			</File>
 			<File
 				RelativePath="..\common\CWaveACM.h">
-			</File>
-			<File
-				RelativePath="..\common\CWaveACMFunc.tbl">
 			</File>
 			<File
 				RelativePath="..\common\CWaveDevice.cpp">

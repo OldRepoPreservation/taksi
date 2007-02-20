@@ -177,12 +177,17 @@ void CTaksiGraphX::RecordAVI_Reset()
 
 HRESULT CTaksiGraphX::RecordAVI_Start()
 {
+	// Start a ne wAVI file record. With a new name that has a time stamp.
 	sg_Shared.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
 	{
 		return S_OK;
 	}
+
+	g_Proc.m_Stats.ResetProcStats();
+	g_Proc.UpdateStat(TAKSI_PROCSTAT_DataRecorded);
+	g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
 
 	TCHAR szFileName[_MAX_PATH];
 	g_Proc.MakeFileName( szFileName, _T("avi"));
@@ -273,14 +278,15 @@ void CTaksiGraphX::RecordAVI_Stop()
 
 bool CTaksiGraphX::RecordAVI_Frame()
 {
-	// We are actively recording the AVI. a frame is ready.
+	// We are actively recording the AVI. a frame is ready if we want it.
 	ASSERT( g_AVIFile.IsOpen());
 	if ( sg_Shared.m_bRecordPause )	// just skip.
 		return true;
 
 	// determine whether this frame needs to be grabbed when recording. or just skipped.
+	// dwFrameDups = multiple time frame shave gone by. compensate for this.
 	DWORD dwFrameDups = g_FrameRate.CheckFrameRate();
-	if ( dwFrameDups <= 0)	// i want this frame?
+	if ( dwFrameDups <= 0)	// i want this frame? or too soon to record a new frame?
 		return true;
 
 	CAVIFrame* pFrame = g_AVIThread.WaitForNextFrame();	// dont get new frame til i finish the last one.
@@ -416,7 +422,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		// determine how we are going to handle keyboard hot-keys:
 		g_HotKeys.AttachHotKeysToApp();
 	}
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	// Process DirectInput input. polled.
 	if ( g_UserDI.m_bSetup)
 	{

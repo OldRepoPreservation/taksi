@@ -71,7 +71,7 @@ void CheckVideoCodec( HWND hWnd, const ICINFO& info )
 		iRet = DlgHelp( hWnd, MAKEINTRESOURCE(IDS_HELP_CODEC_CRAM));
 		break;
 #if 0
-		// MPEG4 may slow frames per sec.
+		// MPEG4 may slow frames per sec. high CPU usage.
 #endif
 	default:
 		return;
@@ -144,7 +144,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 		return -1;
 	}
 
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 	Test_DirectX8(g_GUI.m_hWnd);		// Get method offsets of IDirect3DDevice8 vtable
 	Test_DirectX9(g_GUI.m_hWnd);		// Get method offsets of IDirect3DDevice9 vtable
 #endif

@@ -12,6 +12,7 @@
 #include <vfw.h>	// COMPVARS
 #include "CNTHandle.h"
 #include "CWaveFormat.h"
+#include "CWaveACM.h"
 
 struct CVideoFrameForm
 {
@@ -174,8 +175,10 @@ public:
 	HRESULT OpenAVIFile( const TCHAR* pszFileName );
 	HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec );
 
-	HRESULT WriteAudioFrame( const BYTE* pWaveData );
-	HRESULT WriteVideoFrame( CVideoFrame& frame, int iTimes );
+	// compress the raw data and store it.
+	HRESULT WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength );
+	HRESULT WriteVideoFrame( CVideoFrame& frame, int iTimesDupe );
+
 	void CloseAVI();
 
 #ifdef _DEBUG
@@ -202,7 +205,8 @@ private:
 	CVideoCodec m_VideoCodec;	// What video compression params did we choose?
 	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.
 
-	CWaveFormat m_AudioCodec;
+	CWaveFormat m_AudioFormat;
+	CWaveACMStream m_ACM;			// compress audio stream.
 };
 
 extern HRESULT Check_GetLastError( HRESULT hDefault = E_FAIL );

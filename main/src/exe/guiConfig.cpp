@@ -15,7 +15,6 @@
 #define UPDATE_CHECK(i,v)			SendMessage(m_hControl##i, BM_SETCHECK, (v)? BST_CHECKED : BST_UNCHECKED, 0 )
 
 CGuiConfig g_GUIConfig;
-CWaveACMInt g_ACM;
 
 CGuiConfig::CGuiConfig()
 	: m_bDataUpdating(false)
@@ -182,7 +181,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		_T(""),
 		_T("GDI"),		// TAKSI_API_GDI
 		_T("OpenGL"),	// TAKSI_API_OGL
-#ifdef USE_DX
+#ifdef USE_DIRECTX
 		_T("DirectX8"), // TAKSI_API_DX8
 		_T("DirectX9"), // TAKSI_API_DX9
 #endif
@@ -274,7 +273,7 @@ bool CGuiConfig::UpdateAudioCodec( const CWaveFormat& codec )
 {
 	// ACM dialog to list formats and codecs
 	ACMFORMATTAGDETAILS details;
-	MMRESULT mmRet = g_ACM.GetFormatDetails( codec, details );
+	MMRESULT mmRet = CWaveACMInit::I().GetFormatDetails( codec, details );
 	if ( mmRet || details.szFormatTag[0] == '\0' )
 	{
 		SetWindowText( m_hControlAudioCodec, _T("<NONE>"));
@@ -306,7 +305,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	UpdateVideoCodec( config.m_VideoCodec, false );
 	UPDATE_CHECK(VideoHalfSize,config.m_bVideoHalfSize);
 
-	UpdateAudioCodec( config.m_AudioCodec );
+	UpdateAudioCodec( config.m_AudioFormat );
 	UpdateAudioDevices( config.m_iAudioDevice );
 
 	// hot keys
@@ -525,14 +524,14 @@ void CGuiConfig::OnCommandVideoCodecButton()
 
 void CGuiConfig::OnCommandAudioCodecButton()
 {
-	int iRet = g_ACM.FormatDlg( m_hWnd, g_Config.m_AudioCodec,
+	int iRet = CWaveACMInit::I().FormatDlg( m_hWnd, g_Config.m_AudioFormat,
 		_T("Choose Audio Format"), 0 );
 	if (iRet!=IDOK)
 	{
 		return;
 	}
 	// Really changed??
-	UpdateAudioCodec( g_Config.m_AudioCodec );
+	UpdateAudioCodec( g_Config.m_AudioFormat );
 	OnChanges();
 }
 
@@ -833,9 +832,7 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 
 	case IDC_C_StatsClear:
-		sg_ProcStats.m_szLastError[0] = '\0';
-		sg_ProcStats.m_fFrameRate = 0;			// measured frame rate. recording or not.
-		sg_ProcStats.m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
+		sg_ProcStats.ResetProcStats();
 		UpdateProcStats( sg_ProcStats,
 			(1<<TAKSI_PROCSTAT_LastError) |
 			(1<<TAKSI_PROCSTAT_FrameRate) |
