@@ -976,6 +976,7 @@ void CAVIFile::CloseAVI()
 
 HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 {
+	// compress and write a single frame.
 	// ARGS:
 	//  nTimes = FrameDups = duplicate this frame a few times. to make up for missed frames.
 	// RETURN:
