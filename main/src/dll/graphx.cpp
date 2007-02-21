@@ -31,7 +31,7 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 		HRESULT hRes = g_gdiplus.GetEncoderClsid( sg_Config.m_szImageFormatExt, &encoderClsid);
 		if ( FAILED(hRes))
 		{
-			LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ GetEncoderClsid FAILED 0x%x" LOG_CR, hRes ));
+			LOG_MSG(( "CTaksiGraphXBase::MakeScreenShot GDI+ GetEncoderClsid FAILED 0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
 	}
@@ -41,7 +41,7 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 	Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromBITMAPINFO(&bmi,frame.m_pPixels);
 	if ( pBitmap == NULL )
 	{
-		LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ FromBITMAPINFO FAILED" LOG_CR ));
+		LOG_MSG(( "CTaksiGraphXBase::MakeScreenShot GDI+ FromBITMAPINFO FAILED" LOG_CR ));
 		return CONVERT10_E_STG_DIB_TO_BITMAP;
 	}
 
@@ -68,7 +68,7 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 		{
 			hRes = E_FAIL;
 		}
-		LOG_MSG(( "CTaksiGraphX::MakeScreenShot GDI+ err=0x%x" LOG_CR, hRes ));
+		LOG_MSG(( "CTaksiGraphXBase::MakeScreenShot GDI+ err=0x%x" LOG_CR, hRes ));
 	}
 	else
 	{
@@ -81,8 +81,9 @@ static HRESULT MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& frame )
 #endif
 
 // D3DCOLOR format is high to low, Alpha, Blue, Green, Red
-const DWORD CTaksiGraphX::sm_IndColors[TAKSI_INDICATE_QTY] = 
+const DWORD CTaksiGraphXBase::sm_IndColors[TAKSI_INDICATE_QTY] = 
 {
+	// RGB() sort of
 	0xff88fe00,	// TAKSI_INDICATE_Ready = green
 	0xff4488fe,	// TAKSI_INDICATE_Hooked = Blue,
 	0xfffe4400,	// TAKSI_INDICATE_Recording = red.
@@ -91,7 +92,7 @@ const DWORD CTaksiGraphX::sm_IndColors[TAKSI_INDICATE_QTY] =
 
 //**************************************************************** 
 
-HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
+HRESULT CTaksiGraphXBase::MakeScreenShot( bool bHalfSize )
 {
 	// make custom screen shot
 	CLOCK_START(a);
@@ -147,7 +148,7 @@ HRESULT CTaksiGraphX::MakeScreenShot( bool bHalfSize )
 
 //*****************************************
 
-void CTaksiGraphX::RecordAVI_Reset()
+void CTaksiGraphXBase::RecordAVI_Reset()
 {
 	// There was a reset of the video device API
 	// Could be the window is changing size etc.
@@ -157,7 +158,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 	// and set the flag so that the next Present() will restart it.
 	if ( g_AVIFile.IsOpen())
 	{
-		LOG_MSG(( "CTaksiGraphX::RecordAVI_Reset" LOG_CR));
+		LOG_MSG(( "CTaksiGraphXBase::RecordAVI_Reset" LOG_CR));
 		g_AVIThread.WaitForAllFrames();
 		g_AVIFile.CloseAVI();
 		if ( ! sg_Shared.m_bRecordPause )
@@ -175,7 +176,7 @@ void CTaksiGraphX::RecordAVI_Reset()
 	m_bGotFrameInfo = false;	// must get it again.
 }
 
-HRESULT CTaksiGraphX::RecordAVI_Start()
+HRESULT CTaksiGraphXBase::RecordAVI_Start()
 {
 	// Start a ne wAVI file record. With a new name that has a time stamp.
 	sg_Shared.m_bRecordPause = false;
@@ -192,7 +193,7 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	TCHAR szFileName[_MAX_PATH];
 	g_Proc.MakeFileName( szFileName, _T("avi"));
 
-	DEBUG_MSG(( "CTaksiGraphX::RecordAVI_Start (%s)." LOG_CR, szFileName ));
+	DEBUG_MSG(( "CTaksiGraphXBase::RecordAVI_Start (%s)." LOG_CR, szFileName ));
 
 	if ( g_Proc.m_Stats.m_SizeWnd.cx <= 8 || g_Proc.m_Stats.m_SizeWnd.cy <= 8 )
 	{
@@ -260,12 +261,12 @@ HRESULT CTaksiGraphX::RecordAVI_Start()
 	return S_OK;
 }
 
-void CTaksiGraphX::RecordAVI_Stop()
+void CTaksiGraphXBase::RecordAVI_Stop()
 {
 	if ( ! g_AVIFile.IsOpen())
 		return;
 
-	DEBUG_MSG(( "CTaksiGraphX:RecordAVI_Stop" LOG_CR));
+	DEBUG_MSG(( "CTaksiGraphXBase:RecordAVI_Stop" LOG_CR));
 	g_AVIThread.WaitForAllFrames();
 	g_AVIFile.CloseAVI();
 
@@ -276,7 +277,7 @@ void CTaksiGraphX::RecordAVI_Stop()
 	sg_Shared.UpdateMaster();
 }
 
-bool CTaksiGraphX::RecordAVI_Frame()
+bool CTaksiGraphXBase::RecordAVI_Frame()
 {
 	// We are actively recording the AVI. a frame is ready if we want it.
 	ASSERT( g_AVIFile.IsOpen());
@@ -292,7 +293,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 	CAVIFrame* pFrame = g_AVIThread.WaitForNextFrame();	// dont get new frame til i finish the last one.
 	if (pFrame==NULL)
 	{
-		LOG_WARN(("CTaksiGraphX::RecordAVI_Frame() FAILED" LOG_CR ));
+		LOG_WARN(("CTaksiGraphXBase::RecordAVI_Frame() FAILED" LOG_CR ));
 		return false;
 	}
 
@@ -317,7 +318,7 @@ bool CTaksiGraphX::RecordAVI_Frame()
 
 //********************************************************
 
-void CTaksiGraphX::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
+void CTaksiGraphXBase::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 {
 	// Open AVI file
 	switch (eHotKey)
@@ -363,7 +364,7 @@ void CTaksiGraphX::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	}
 }
 
-void CTaksiGraphX::PresentFrameBegin( bool bChange )
+void CTaksiGraphXBase::PresentFrameBegin( bool bChange )
 {
 	// We have hooked the present function of the graphics mode.
 	// Called for each frame as it is about to be drawn.
@@ -377,7 +378,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 		// Success!! we hooked a process! make this the prime process.
 		if ( ! g_Proc.IsProcPrime())
 		{
-			LOG_MSG(( "PresentFrameBegin: New Prime Focus." LOG_CR));
+			LOG_MSG(( "PresentFrameBegin: New Prime Focus PID=%d." LOG_CR, g_Proc.m_Stats.m_dwProcessId ));
 			sg_ProcStats.CopyProcStats( g_Proc.m_Stats );
 			sg_Shared.HookCBT_Uninstall(); // thread safe?
 		}
@@ -481,7 +482,7 @@ void CTaksiGraphX::PresentFrameBegin( bool bChange )
 	}
 }
 
-void CTaksiGraphX::PresentFrameEnd()
+void CTaksiGraphXBase::PresentFrameEnd()
 {
 	// check unhook flag
 	if ( sg_Shared.m_bMasterExiting || g_Proc.m_bStopGraphXAPI )
@@ -502,7 +503,7 @@ void CTaksiGraphX::PresentFrameEnd()
 	}
 }
 
-HRESULT CTaksiGraphX::AttachGraphXAPI()
+HRESULT CTaksiGraphXBase::AttachGraphXAPI()
 {
 	// DLL_PROCESS_ATTACH
 	// Check the DLL that would support this graphics mode.
@@ -528,6 +529,11 @@ HRESULT CTaksiGraphX::AttachGraphXAPI()
 	{
 		m_bHookedFunctions = false;	
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
+	}
+	if ( hRes == S_FALSE )
+	{
+		ASSERT(m_bHookedFunctions);
+		return S_OK;
 	}
 
 	m_bHookedFunctions = true;	

@@ -111,7 +111,7 @@ HRESULT CTaksiOGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	s_glShadeModel(GL_FLAT);
 
 	// set appropriate color for the indicator
-	// CTaksiGraphX::sm_IndColors
+	// CTaksiGraphXBase::sm_IndColors
 	switch (eIndicate)
 	{
 	case TAKSI_INDICATE_Recording:
