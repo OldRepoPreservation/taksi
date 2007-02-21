@@ -57,7 +57,7 @@ private:
 
 public:
 #define BTN_QTY TAKSI_HOTKEY_QTY
-	CWndGDI m_Bitmap[ ( IDB_RecordPause_2 - IDB_ConfigOpen_1 ) + 1 ];
+	CWndGDI m_Bitmap[ ( IDB_HookModeToggle_3 - IDB_ConfigOpen_1 ) + 1 ];
 	CWndToolTip m_ToolTips;
 	UINT_PTR m_uTimerStat;
 

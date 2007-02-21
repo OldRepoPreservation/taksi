@@ -4,7 +4,7 @@
 #include "../stdafx.h"
 #include <stddef.h> // offsetof
 #include "TaksiDll.h"
-#include "graphx.h"
+#include "GAPI_Base.h"
 #include "HotKeys.h"
 
 #ifdef USE_GDIP
@@ -31,15 +31,15 @@ HINSTANCE g_hInst = NULL;		// Handle for the dll for the current process.
 CTaksiProcess g_Proc;			// information about the process i am attached to.
 CTaksiLogFile g_Log;			// Log file for each process. seperate
 
-static CTaksiGraphXBase* const s_GraphxModes[ TAKSI_API_QTY ] = 
+static CTaksiGAPIBase* const s_aGAPIs[ TAKSI_GAPI_QTY ] = 
 {
-	NULL,	// TAKSI_API_NONE
-	NULL,	// TAKSI_API_DESKTOP // lowest priority, 
-	&g_GDI,	// TAKSI_API_GDI // lowest priority, since all apps do GDI
-	&g_OGL,	// TAKSI_API_OGL
+	NULL,	// TAKSI_GAPI_NONE
+	NULL,	// TAKSI_GAPI_DESKTOP // lowest priority, 
+	&g_GDI,	// TAKSI_GAPI_GDI // lowest priority, since all apps do GDI
+	&g_OGL,	// TAKSI_GAPI_OGL
 #ifdef USE_DIRECTX
-	&g_DX8,	// TAKSI_API_DX8
-	&g_DX9,	// TAKSI_API_DX9 // almost no apps load this unless they are going to use it.
+	&g_DX8,	// TAKSI_GAPI_DX8
+	&g_DX9,	// TAKSI_GAPI_DX9 // almost no apps load this unless they are going to use it.
 #endif
 };
 
@@ -111,9 +111,9 @@ void CTaksiProcStats::InitProcStats()
 	m_hWndCap = NULL;
 	m_SizeWnd.cx = 0;
 	m_SizeWnd.cy = 0;
-	m_eGraphXAPI = TAKSI_API_NONE;
+	m_eGAPI = TAKSI_GAPI_NONE;
 
-	m_eState = TAKSI_INDICATE_Hooked;		// assume we are looking for focus
+	m_eState = TAKSI_INDICATE_Hooking;		// assume we are looking for focus
 	m_fFrameRate = 0;			// measured frame rate. recording or not.
 	m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
 
@@ -149,14 +149,14 @@ LRESULT CALLBACK CTaksiShared::HookCBTProc(int nCode, WPARAM wParam, LPARAM lPar
 	case HCBT_SETFOCUS:
 		// Set the DLL implants on whoever gets the focus/activation!
 		// ASSUME DLL_PROCESS_ATTACH was called.
-		// TAKSI_INDICATE_Hooked
+		// TAKSI_INDICATE_Hooking
 		// wParam = NULL. can be null if losing focus ? (NULL not used for desktop in this case)
-		if ( g_Proc.m_bIsProcessSpecial )
+		if ( g_Proc.m_bIsProcessIgnored )
 			break;
 		LOG_MSG(( "HookCBTProc: nCode=0x%x, wParam=0x%x" LOG_CR, (DWORD)nCode, wParam ));
 		if ( wParam == NULL )	// ignore this!
 			break;
-		if ( g_Proc.AttachGraphXAPIs( (HWND) wParam ) == S_OK )
+		if ( g_Proc.AttachGAPIs( (HWND) wParam ) == S_OK )
 		{
 			g_Proc.CheckProcessCustom();	// determine frame capturing algorithm 
 		}
@@ -236,13 +236,13 @@ HRESULT CTaksiShared::LogMessage( const TCHAR* pszPrefix )
 		return S_OK;
 
 	TCHAR szMsg[ _MAX_PATH + 64 ];
-	int iLenMsg = _sntprintf( szMsg, COUNTOF(szMsg)-1, _T("%s:%s"), 
+	int iLenMsg = _sntprintf( szMsg, COUNTOF(szMsg)-1, 
+		_T("%s:%s"), 
 		pszPrefix, g_Proc.m_szProcessTitleNoExt ); 
 
 	// determine logfile full path
 	TCHAR szLogFile[_MAX_PATH];	// DLL common, NOT for each process. LOG_NAME_DLL
-	lstrcpy( szLogFile, m_szIniDir );
-	lstrcat( szLogFile, LOG_NAME_DLL);
+	Str_MakeFilePath( szLogFile, COUNTOF(szLogFile), m_szIniDir, LOG_NAME_DLL );
 
 	CNTHandle File( ::CreateFile( szLogFile,       // file to open/create 
 		GENERIC_WRITE,                // open for writing 
@@ -274,7 +274,7 @@ void CTaksiShared::UpdateConfigCustom()
 void CTaksiShared::SendReHookMessage()
 {
 	// My window went away, i must rehook to get a new window.
-	// ASSUME: i was the current hook. then we probably weant to re-hook some other app.
+	// ASSUME: i was the current hook. then we probably want to re-hook some other app.
 	// if .exe is still running, tell it to re-install the CBT hook
 
 	if ( m_bMasterExiting )
@@ -414,7 +414,7 @@ void CTaksiProcess::UpdateStat( TAKSI_PROCSTAT_TYPE eProp )
 int CTaksiProcess::MakeFileName( TCHAR* pszFileName, const TCHAR* pszExt )
 {
 	// pszExt = "avi" or "bmp"
-	// ASSUME sizeof(pszFileName) = _MAX_PATH
+	// ASSUME sizeof(pszFileName) >= _MAX_PATH
 
 	SYSTEMTIME time;
 	::GetLocalTime(&time);
@@ -438,12 +438,11 @@ bool CTaksiProcess::CheckProcessMaster() const
 	return( ! lstrcmpi( m_szProcessTitleNoExt, _T("taksi")));
 }
 
-bool CTaksiProcess::CheckProcessSpecial() const
+bool CTaksiProcess::CheckProcessIgnored() const
 {
 	// This functions should be called when DLL is mapped into an application
 	// to check if this is one of the special apps, that we shouldn't do any
 	// graphics API hooking.
-	// sets m_bIsProcessSpecial
 
 	if ( CheckProcessMaster())
 		return true;
@@ -461,16 +460,6 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	for ( int i=0; i<COUNTOF(sm_SpecialNames); i++ )
 	{
 		if (!lstrcmpi( m_szProcessTitleNoExt, sm_SpecialNames[i] ))
-			return true;
-	}
-
-	// Check if it's Windows Explorer. We don't want to hook it either.
-	if ( ! sg_Config.m_abUseAPI[TAKSI_API_DESKTOP] )
-	{
-		TCHAR szExplorer[_MAX_PATH];
-		::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
-		lstrcat(szExplorer, _T("\\explorer.exe"));
-		if (!lstrcmpi( m_Stats.m_szProcessPath, szExplorer))
 			return true;
 	}
 
@@ -500,9 +489,26 @@ void CTaksiProcess::CheckProcessCustom()
 		m_pCustomConfig = NULL;
 	}
 
-	m_bIsProcessSpecial = CheckProcessSpecial();
-	if ( m_bIsProcessSpecial )
+	// Ignored process.
+	m_bIsProcessIgnored = CheckProcessIgnored();
+	if ( m_bIsProcessIgnored )
 	{
+		return;
+	}
+
+	// Desktop process?
+	TCHAR szExplorer[_MAX_PATH];
+	UINT uLen = ::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
+	if ( uLen )
+	{
+		ASSERT( uLen < COUNTOF(szExplorer));
+		lstrcpyn( szExplorer+uLen, _T("\\explorer.exe"), COUNTOF(szExplorer) - uLen );
+		m_bIsProcessDesktop = !lstrcmpi( m_Stats.m_szProcessPath, szExplorer);
+	}
+	if ( m_bIsProcessDesktop && ! sg_Config.m_abUseGAPI[TAKSI_GAPI_DESKTOP] )
+	{
+		// Check if it's Windows Explorer. We don't want to hook it either.
+		m_bIsProcessIgnored = true;
 		return;
 	}
 
@@ -522,8 +528,8 @@ void CTaksiProcess::CheckProcessCustom()
 				pCfgMatch->m_fFrameRate, pCfgMatch->m_fFrameWeight ));
 
 			// ignore this app?
-			m_bIsProcessSpecial = ( pCfgMatch->m_fFrameRate <= 0 || pCfgMatch->m_fFrameWeight <= 0 );
-			if ( m_bIsProcessSpecial )
+			m_bIsProcessIgnored = ( pCfgMatch->m_fFrameRate <= 0 || pCfgMatch->m_fFrameWeight <= 0 );
+			if ( m_bIsProcessIgnored )
 			{
 				LOG_MSG(( "FindCustomConfig: 0 framerate" LOG_CR));
 				return;
@@ -545,35 +551,35 @@ void CTaksiProcess::CheckProcessCustom()
 	LOG_MSG(( "CheckProcessCustom: No custom config match." LOG_CR ));
 }
 
-bool CTaksiProcess::StartGraphXAPI( TAKSI_API_TYPE eAPI )
+bool CTaksiProcess::StartGAPI( TAKSI_GAPI_TYPE eGAPI )
 {
 	// PresentFrameBegin() was called for this API.
 	// This API/mode has successfully attached
 
-	if ( m_Stats.m_eGraphXAPI == eAPI )	// its already the primary API
+	if ( m_Stats.m_eGAPI == eGAPI )	// its already the primary eGAPI
 	{
 		return true;
 	}
-	if ( eAPI < m_Stats.m_eGraphXAPI )	// lower priority than the current API.
+	if ( eGAPI < m_Stats.m_eGAPI )	// lower priority than the current eGAPI.
 	{
 		return false;
 	}
-	ASSERT( eAPI > TAKSI_API_NONE && eAPI < TAKSI_API_QTY );
+	ASSERT( eGAPI > TAKSI_GAPI_NONE && eGAPI < TAKSI_GAPI_QTY );
 
 	// Unhook any lower priority types.
-	for ( int i=m_Stats.m_eGraphXAPI; i<eAPI; i++ )
+	for ( int i=m_Stats.m_eGAPI; i<eGAPI; i++ )
 	{
-		if ( s_GraphxModes[i] == NULL )
+		if ( s_aGAPIs[i] == NULL )
 			continue;
-		s_GraphxModes[i]->FreeDll();
+		s_aGAPIs[i]->FreeDll();
 	}
 
-	m_Stats.m_eGraphXAPI = eAPI;
-	UpdateStat( TAKSI_PROCSTAT_GraphXAPI );
+	m_Stats.m_eGAPI = eGAPI;
+	UpdateStat( TAKSI_PROCSTAT_GAPI );
 	return true;
 }
 
-HRESULT CTaksiProcess::AttachGraphXAPIs( HWND hWnd )
+HRESULT CTaksiProcess::AttachGAPIs( HWND hWnd )
 {
 	// see if any of supported graphics API DLLs are already loaded. (and can be hooked)
 	// ARGS:
@@ -586,7 +592,7 @@ HRESULT CTaksiProcess::AttachGraphXAPIs( HWND hWnd )
 	// TODO:
 	//  Graphics modes should usurp GDI
 
-	if (m_bIsProcessSpecial)	// Dont hook special apps like My EXE or Explorer.
+	if ( m_bIsProcessIgnored )	// Dont hook special apps like My EXE or Explorer.
 		return S_FALSE;
 	if ( hWnd == NULL )	// losing focus i guess. ignore that.
 		return S_FALSE;
@@ -599,19 +605,19 @@ HRESULT CTaksiProcess::AttachGraphXAPIs( HWND hWnd )
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
 	// NOTE: We can only use ONE!
-	LOG_MSG(( "ATTACHGRAPHXMODEW: hWnd=0x%x" LOG_CR, m_hWndHookTry ));
+	LOG_MSG(( "AttachGAPIs: hWnd=0x%x" LOG_CR, m_hWndHookTry ));
 
 	HRESULT hRes = S_FALSE;
-	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_GAPI_NONE+1; i<COUNTOF(s_aGAPIs); i++ )
 	{
-		if ( s_GraphxModes[i] == NULL )
+		if ( s_aGAPIs[i] == NULL )
 			continue;
-		hRes = s_GraphxModes[i]->AttachGraphXAPI();
+		hRes = s_aGAPIs[i]->AttachGAPI();
 	}
 	return hRes;
 }
 
-void CTaksiProcess::StopGraphXAPIs()
+void CTaksiProcess::StopGAPIs()
 {
 	// this can be called in the PresentFrameEnd
 	g_AVIThread.StopAVIThread();	// kill my work thread, i'm done
@@ -620,21 +626,21 @@ void CTaksiProcess::StopGraphXAPIs()
 	m_hWndHookTry = NULL;	// Not trying to do anything anymore.
 }
 
-void CTaksiProcess::DetachGraphXAPIs()
+void CTaksiProcess::DetachGAPIs()
 {
 	// we are unloading or some other app now has the main focus/hook.
-	StopGraphXAPIs();
+	StopGAPIs();
 
 	// give graphics module a chance to clean up.
-	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
+	for ( int i=TAKSI_GAPI_NONE+1; i<COUNTOF(s_aGAPIs); i++ )
 	{
-		if ( s_GraphxModes[i] == NULL )
+		if ( s_aGAPIs[i] == NULL )
 			continue;
-		s_GraphxModes[i]->FreeDll();
+		s_aGAPIs[i]->FreeDll();
 	}
 
-	m_Stats.m_eGraphXAPI = TAKSI_API_NONE;
-	UpdateStat( TAKSI_PROCSTAT_GraphXAPI );
+	m_Stats.m_eGAPI = TAKSI_GAPI_NONE;
+	UpdateStat( TAKSI_PROCSTAT_GAPI );
 }
 
 bool CTaksiProcess::OnDllProcessAttach()
@@ -671,7 +677,7 @@ bool CTaksiProcess::OnDllProcessAttach()
 		lstrcpy( m_szProcessTitleNoExt, pszTitle );
 	}
 
-	bool bProcMaster = m_bIsProcessSpecial = CheckProcessMaster();
+	bool bProcMaster = m_bIsProcessIgnored = CheckProcessMaster();
 	if ( bProcMaster )
 	{
 		// First time here!
@@ -707,12 +713,12 @@ bool CTaksiProcess::OnDllProcessAttach()
 	// save handle to process' heap
 	m_hHeap = ::GetProcessHeap();
 
-	// do not hook on selected applications. set m_bIsProcessSpecial
+	// do not hook on selected applications. set m_bIsProcessIgnored
 	if ( ! bProcMaster )
 	{
 		// (such as: myself, Explorer.EXE)
 		CheckProcessCustom();	// determine frame capturing algorithm 
-		if ( m_bIsProcessSpecial && ! bProcMaster )
+		if ( m_bIsProcessIgnored && ! bProcMaster )
 		{
 			LOG_MSG(( "Special process ignored." LOG_CR ));
 			return true;
@@ -749,10 +755,10 @@ bool CTaksiProcess::OnDllProcessAttach()
 		DEBUG_TRACE(( "sg_Config.m_bDebugLog=%d" LOG_CR, sg_Config.m_bDebugLog));
 		DEBUG_TRACE(( "sg_Config.m_bUseDirectInput=%d" LOG_CR, sg_Config.m_bUseDirectInput));
 		DEBUG_TRACE(( "sg_Shared.m_hHookCBT=%d" LOG_CR, (UINT_PTR)sg_Shared.m_hHookCBT));
-		// DEBUG_TRACE(( "sg_Config.m_bUseGDI=%d" LOG_CR, sg_Config.m_abUseAPI[TAKSI_API_GDI]));
+		// DEBUG_TRACE(( "sg_Config.m_bUseGDI=%d" LOG_CR, sg_Config.m_abUseGAPI[TAKSI_GAPI_GDI]));
 	}
 
-	// ASSUME HookCBTProc will call AttachGraphXAPIs later
+	// ASSUME HookCBTProc will call AttachGAPIs later
 	return true;
 }
 
@@ -761,7 +767,7 @@ bool CTaksiProcess::OnDllProcessDetach()
 	// DLL_PROCESS_DETACH
 	LOG_MSG(( "DLL_PROCESS_DETACH (num=%d)" LOG_CR, sg_Shared.m_iProcessCount ));
 
-	DetachGraphXAPIs();
+	DetachGAPIs();
 
 	// uninstall keyboard hook. was just for this process anyhow.
 	g_UserKeyboard.UninstallHookKeys();

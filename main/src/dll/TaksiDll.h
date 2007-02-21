@@ -131,8 +131,9 @@ public:
 	CTaksiProcess()
 		: m_dwConfigChangeCount(0)
 		, m_pCustomConfig(NULL)
-		, m_bIsProcessSpecial(false)
-		, m_bStopGraphXAPI(false)
+		, m_bIsProcessIgnored(false)
+		, m_bIsProcessDesktop(false)
+		, m_bStopGAPIs(false)
 	{
 		m_Stats.InitProcStats();
 		m_Stats.m_dwProcessId = ::GetCurrentProcessId();
@@ -146,13 +147,13 @@ public:
 	}
 
 	bool CheckProcessMaster() const;
-	bool CheckProcessSpecial() const;
+	bool CheckProcessIgnored() const;
 	void CheckProcessCustom();
 
-	void StopGraphXAPIs();
-	void DetachGraphXAPIs();
-	HRESULT AttachGraphXAPIs( HWND hWnd );
-	bool StartGraphXAPI( TAKSI_API_TYPE eMode );
+	void StopGAPIs();
+	void DetachGAPIs();
+	HRESULT AttachGAPIs( HWND hWnd );
+	bool StartGAPI( TAKSI_GAPI_TYPE eMode );
 
 	bool OnDllProcessAttach();
 	bool OnDllProcessDetach();
@@ -171,8 +172,9 @@ public:
 	HWND m_hWndHookTry;				// The last window we tried to hook 
 
 	// if set to true, then CBT should not take any action at all.
-	bool m_bIsProcessSpecial;		// Is Master TAKSI.EXE or special app.
-	bool m_bStopGraphXAPI;			// I'm not the main app anymore. unhook the graphics mode.
+	bool m_bIsProcessDesktop;
+	bool m_bIsProcessIgnored;		// Is Master TAKSI.EXE or special app.
+	bool m_bStopGAPIs;				// I'm not the main app anymore. unhook the graphics modes.
 };
 extern CTaksiProcess g_Proc;
 

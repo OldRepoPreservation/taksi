@@ -6,7 +6,6 @@
 #include "resource.h"
 #include "guiConfig.h"
 #include <windowsx.h>
-#include <tchar.h>
 #include <commctrl.h>	// HKM_GETHOTKEY
 #include "../common/CFileDirDlg.h"
 #include "../common/CWaveDevice.h"
@@ -174,24 +173,24 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%d x %d"), stats.m_SizeWnd.cx, stats.m_SizeWnd.cy  );
 		SetWindowText( m_hControlStatFormat, szTmp );
 	}
-	if ( dwMask & (1<<TAKSI_PROCSTAT_GraphXAPI))
+	if ( dwMask & (1<<TAKSI_PROCSTAT_GAPI))
 	{
-		const TCHAR* sm_szNames[TAKSI_API_QTY+1] = 
+		const TCHAR* sm_szNames[TAKSI_GAPI_QTY+1] = 
 		{
 		_T(""),
 		_T("Desktop"),
-		_T("GDI"),		// TAKSI_API_GDI
-		_T("OpenGL"),	// TAKSI_API_OGL
+		_T("GDI"),		// TAKSI_GAPI_GDI
+		_T("OpenGL"),	// TAKSI_GAPI_OGL
 #ifdef USE_DIRECTX
-		_T("DirectX8"), // TAKSI_API_DX8
-		_T("DirectX9"), // TAKSI_API_DX9
+		_T("DirectX8"), // TAKSI_GAPI_DX8
+		_T("DirectX9"), // TAKSI_GAPI_DX9
 #endif
 		_T(""),
 		};
-		int i = stats.m_eGraphXAPI;
+		int i = stats.m_eGAPI;
 		if ( i < 0 || i >= COUNTOF(sm_szNames))
 			i = COUNTOF(sm_szNames)-1;
-		SetWindowText( m_hControlStatGraphXAPI, sm_szNames[i] );
+		SetWindowText( m_hControlStatGAPI, sm_szNames[i] );
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_State))
 	{
@@ -325,11 +324,11 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	// Display options
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
 
-	UPDATE_CHECK(GDIDesktop,config.m_abUseAPI[TAKSI_API_DESKTOP]);
-	UPDATE_CHECK(UseGDI,config.m_abUseAPI[TAKSI_API_GDI]);
-	UPDATE_CHECK(UseOGL,config.m_abUseAPI[TAKSI_API_OGL]);
-	UPDATE_CHECK(UseDX8,config.m_abUseAPI[TAKSI_API_DX8]);
-	UPDATE_CHECK(UseDX9,config.m_abUseAPI[TAKSI_API_DX9]);
+	UPDATE_CHECK(GDIDesktop,config.m_abUseGAPI[TAKSI_GAPI_DESKTOP]);
+	UPDATE_CHECK(UseGDI,config.m_abUseGAPI[TAKSI_GAPI_GDI]);
+	UPDATE_CHECK(UseOGL,config.m_abUseGAPI[TAKSI_GAPI_OGL]);
+	UPDATE_CHECK(UseDX8,config.m_abUseGAPI[TAKSI_GAPI_DX8]);
+	UPDATE_CHECK(UseDX9,config.m_abUseGAPI[TAKSI_GAPI_DX9]);
 
 	m_bDataUpdating = false;
 }
@@ -666,19 +665,19 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 
 	case IDC_C_GDIDesktop:
-		sg_Config.m_abUseAPI[TAKSI_API_DESKTOP] = g_Config.m_abUseAPI[TAKSI_API_DESKTOP] = OnCommandCheck( m_hControlGDIDesktop );
+		sg_Config.m_abUseGAPI[TAKSI_GAPI_DESKTOP] = g_Config.m_abUseGAPI[TAKSI_GAPI_DESKTOP] = OnCommandCheck( m_hControlGDIDesktop );
 		return true;
 	case IDC_C_UseGDI:
-		sg_Config.m_abUseAPI[TAKSI_API_GDI] = g_Config.m_abUseAPI[TAKSI_API_GDI] = OnCommandCheck( m_hControlUseGDI );
+		sg_Config.m_abUseGAPI[TAKSI_GAPI_GDI] = g_Config.m_abUseGAPI[TAKSI_GAPI_GDI] = OnCommandCheck( m_hControlUseGDI );
 		return true;
 	case IDC_C_UseOGL:
-		sg_Config.m_abUseAPI[TAKSI_API_OGL] = g_Config.m_abUseAPI[TAKSI_API_OGL] = OnCommandCheck( m_hControlUseOGL );
+		sg_Config.m_abUseGAPI[TAKSI_GAPI_OGL] = g_Config.m_abUseGAPI[TAKSI_GAPI_OGL] = OnCommandCheck( m_hControlUseOGL );
 		return true;
 	case IDC_C_UseDX8:
-		sg_Config.m_abUseAPI[TAKSI_API_DX8] = g_Config.m_abUseAPI[TAKSI_API_DX8] = OnCommandCheck( m_hControlUseDX8 );
+		sg_Config.m_abUseGAPI[TAKSI_GAPI_DX8] = g_Config.m_abUseGAPI[TAKSI_GAPI_DX8] = OnCommandCheck( m_hControlUseDX8 );
 		return true;
 	case IDC_C_UseDX9:
-		sg_Config.m_abUseAPI[TAKSI_API_DX9] = g_Config.m_abUseAPI[TAKSI_API_DX9] = OnCommandCheck( m_hControlUseDX9 );
+		sg_Config.m_abUseGAPI[TAKSI_GAPI_DX9] = g_Config.m_abUseGAPI[TAKSI_GAPI_DX9] = OnCommandCheck( m_hControlUseDX9 );
 		return true;
 
 	case IDC_C_CaptureDirectory:

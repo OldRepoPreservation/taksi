@@ -84,8 +84,9 @@ enum TAKSI_INDICATE_TYPE
 {
 	// Indicate my current state to the viewer
 	// Color a square to indicate my mode.
-	TAKSI_INDICATE_Ready = 0,
-	TAKSI_INDICATE_Hooked,	// CBT is hooked. (looking for new app to load)
+	TAKSI_INDICATE_Idle = 0,	// No app ready and not looking.
+	TAKSI_INDICATE_Hooking,		// CBT is hooked. (looking for new app to load)
+	TAKSI_INDICATE_Ready,		// current app focus is ready to record?
 	TAKSI_INDICATE_Recording,	// actively recording right now
 	TAKSI_INDICATE_RecordPaused,	
 	//TAKSI_INDICATE_Error,		// sit in error state til cleared ??
@@ -143,7 +144,7 @@ public:
 
 	HWND m_hWndCap;	// the window the graphics is in
 	SIZE m_SizeWnd;	// the window/backbuffer size. (pixels)
-	TAKSI_API_TYPE m_eGraphXAPI;
+	TAKSI_GAPI_TYPE m_eGAPI;
 
 	TAKSI_INDICATE_TYPE m_eState;	// What are we doing with the process?
 	float m_fFrameRate;			// measured frame rate. recording or not.

@@ -4,7 +4,6 @@
 #include "../stdafx.h"
 #include "TaksiDll.h"
 #include <ctype.h>	// isspace()
-#include <tchar.h>
 #include "../common/CWaveDevice.h"
 
 #ifndef __PLACEMENT_NEW_INLINE
@@ -55,6 +54,13 @@ static int Str_SetQuoted( char* pszDest, int iLenMax, const TCHAR* pszSrc )
 #else
 	return _snprintf(pszDest, iLenMax, "\"%s\"", pszSrc);
 #endif
+}
+
+int Str_MakeFilePath( TCHAR* pszPath, int iMaxCount, const TCHAR* pszDir, const TCHAR* pszName )
+{
+	return _sntprintf( pszPath, iMaxCount-1, 
+		_T("%s%s"), 
+		pszDir, pszName );
 }
 
 //*****************************************************
@@ -146,7 +152,8 @@ void CTaksiConfigData::InitConfig()
 	m_bUseDirectInput = true;
 	m_bUseKeyboard = true;
 
-	memset( m_abUseAPI, true, sizeof(m_abUseAPI));	// set all to true.
+	memset( m_abUseGAPI, true, sizeof(m_abUseGAPI));	// set all to true.
+	m_abUseGAPI[TAKSI_GAPI_DESKTOP] = false;
 	m_bGDIFrame = true;
 	m_bUseOverheadCompensation = false;
 
@@ -176,7 +183,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	m_bUseDirectInput = config.m_bUseDirectInput;
 	m_bUseKeyboard = config.m_bUseKeyboard;
 
-	memcpy( m_abUseAPI, config.m_abUseAPI, sizeof(m_abUseAPI));	// hook GDI mode at all?
+	memcpy( m_abUseGAPI, config.m_abUseGAPI, sizeof(m_abUseGAPI));	// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
 	m_bUseOverheadCompensation = config.m_bUseOverheadCompensation;
 
@@ -405,15 +412,15 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIFrame));
 
 	case TAKSI_CFGPROP_GDIDesktop:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DESKTOP]));
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_DESKTOP]));
 	case TAKSI_CFGPROP_UseGDI:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_GDI]));
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_GDI]));
 	case TAKSI_CFGPROP_UseOGL:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_OGL]));
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_OGL]));
 	case TAKSI_CFGPROP_UseDX8:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DX8]));
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_DX8]));
 	case TAKSI_CFGPROP_UseDX9:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DX9]));
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_DX9]));
 
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bUseOverheadCompensation));
@@ -514,19 +521,19 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		m_bGDIFrame = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_GDIDesktop:
-		m_abUseAPI[TAKSI_API_DESKTOP] = GetStrBool(pszValue);
+		m_abUseGAPI[TAKSI_GAPI_DESKTOP] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseGDI:
-		m_abUseAPI[TAKSI_API_GDI] = GetStrBool(pszValue);
+		m_abUseGAPI[TAKSI_GAPI_GDI] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseOGL:
-		m_abUseAPI[TAKSI_API_OGL] = GetStrBool(pszValue);
+		m_abUseGAPI[TAKSI_GAPI_OGL] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseDX8:
-		m_abUseAPI[TAKSI_API_DX8] = GetStrBool(pszValue);
+		m_abUseGAPI[TAKSI_GAPI_DX8] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseDX9:
-		m_abUseAPI[TAKSI_API_DX9] = GetStrBool(pszValue);
+		m_abUseGAPI[TAKSI_GAPI_DX9] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		m_bUseOverheadCompensation = GetStrBool(pszValue);
@@ -555,8 +562,8 @@ bool CTaksiConfig::ReadIniFile()
 	// Returns true if successful.
 
 	TCHAR szIniFileName[_MAX_PATH];
-	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
-	lstrcat(szIniFileName, _T(TAKSI_INI_FILE));
+	Str_MakeFilePath( szIniFileName, COUNTOF(szIniFileName), 
+		sg_Shared.m_szIniDir, _T(TAKSI_INI_FILE) );
 
 #ifdef _UNICODE
 	// convert from UNICODE. fopen() is multibyte only.
@@ -647,8 +654,8 @@ bool CTaksiConfig::WriteIniFile()
 	DWORD nSizeOld = 0;
 
 	TCHAR szIniFileName[_MAX_PATH];
-	lstrcpy(szIniFileName, sg_Shared.m_szIniDir );
-	lstrcat(szIniFileName, _T(TAKSI_INI_FILE));
+	Str_MakeFilePath( szIniFileName, COUNTOF(szIniFileName), 
+		sg_Shared.m_szIniDir, _T(TAKSI_INI_FILE) );
 
 	// first read all lines
 	CNTHandle FileOld( ::CreateFile( szIniFileName, 

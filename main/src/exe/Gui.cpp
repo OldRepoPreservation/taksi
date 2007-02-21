@@ -4,7 +4,6 @@
 //
 #include "../stdafx.h"
 #include <richedit.h>	// NM_RCLICK
-#include <tchar.h>
 #include "Taksi.h"
 #include "resource.h"
 #include "guiConfig.h"
@@ -72,9 +71,9 @@ bool CGui::UpdateWindowTitle()
 
 	switch (sg_ProcStats.m_eState)
 	{
-	case TAKSI_INDICATE_Hooked:
+	case TAKSI_INDICATE_Hooking:
 		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen,
-			_T(" (Hook)") );
+			_T(" (Hooking)") );
 		break;
 	case TAKSI_INDICATE_Recording:
 		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
@@ -104,6 +103,8 @@ int CGui::GetButtonState( TAKSI_HOTKEY_TYPE eKey ) const
 	case TAKSI_HOTKEY_HookModeToggle:
 		if ( sg_Shared.IsHookCBT())
 			return IDB_HookModeToggle_2;
+		if ( sg_ProcStats.m_hWndCap == NULL )
+			return IDB_HookModeToggle_3;
 		return( IDB_HookModeToggle_1 );
 
 	case TAKSI_HOTKEY_IndicatorToggle:
