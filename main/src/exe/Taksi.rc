@@ -222,8 +222,7 @@ BEGIN
                     ES_READONLY
     LTEXT           "MB",IDC_STATIC,167,84,35,8
     PUSHBUTTON      "C",IDC_C_StatsClear,250,83,12,12
-    EDITTEXT        IDC_C_StatGraphXAPI,217,65,45,14,ES_AUTOHSCROLL | 
-                    ES_READONLY
+    EDITTEXT        IDC_C_StatGAPI,217,65,45,14,ES_AUTOHSCROLL | ES_READONLY
 END
 
 IDD_About DIALOGEX 0, 0, 214, 97
@@ -343,6 +342,7 @@ IDB_SmallScreenshot_G   BITMAP                  "res/BtnSmallScreenshotG.bmp"
 IDB_HookModeToggle_2    BITMAP                  "res/BtnHookMode2.bmp"
 IDB_IndicatorToggle_2   BITMAP                  "res/BtnIndic2.bmp"
 IDB_RecordPause_2       BITMAP                  "res/BtnRecordPause2.bmp"
+IDB_HookModeToggle_3    BITMAP                  "res/BtnHookMode3.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

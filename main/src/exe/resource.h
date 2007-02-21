@@ -35,6 +35,7 @@
 #define IDB_HookModeToggle_2            213
 #define IDB_IndicatorToggle_2           214
 #define IDB_RecordPause_2               215
+#define IDB_HookModeToggle_3            216
 #define IDC_ABOUT_1                     1001
 #define IDC_ABOUT_4                     1004
 #define IDC_ABOUT_5                     1005
@@ -76,7 +77,7 @@
 #define IDC_C_StatFrameRate             1063
 #define IDC_C_StatDataRecorded          1064
 #define IDC_C_StatFormat                1065
-#define IDC_C_StatGraphXAPI             1066
+#define IDC_C_StatGAPI                  1066
 #define IDC_C_StatsClear                1067
 #define IDC_C_UseOverheadCompensation   1071
 #define IDC_C_GDIDesktop                1072

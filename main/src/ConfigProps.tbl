@@ -9,16 +9,16 @@ ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end wit
 ConfigProp(DebugLog,				m_bDebugLog,	"Debug Log kept?")
 
 #ifdef USE_DIRECTX
-ConfigProp(UseDX8,					m_abUseAPI[TAKSI_API_DX8],	"hook DirectX8 API or not?")
-ConfigProp(UseDX9,					m_abUseAPI[TAKSI_API_DX9],	"hook DirectX9 API or not?")
+ConfigProp(UseDX8,					m_abUseGAPI[TAKSI_GAPI_DX8],	"hook DirectX8 API or not?")
+ConfigProp(UseDX9,					m_abUseGAPI[TAKSI_GAPI_DX9],	"hook DirectX9 API or not?")
 #endif
 
-ConfigProp(UseGDI,					m_abUseAPI[TAKSI_API_GDI],	"hook GDI API or not?")
-ConfigProp(UseOGL,					m_abUseAPI[TAKSI_API_OGL],	"hook OpenGL API or not?")
+ConfigProp(UseGDI,					m_abUseGAPI[TAKSI_GAPI_GDI],	"hook GDI API or not?")
+ConfigProp(UseOGL,					m_abUseGAPI[TAKSI_GAPI_OGL],	"hook OpenGL API or not?")
 
 ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name with this")
 
-ConfigProp(GDIDesktop,				m_abUseAPI[TAKSI_API_DESKTOP], "Allow hooking of the GDI Desktop")
+ConfigProp(GDIDesktop,				m_abUseGAPI[TAKSI_GAPI_DESKTOP], "Allow hooking of the GDI Desktop")
 ConfigProp(GDIFrame,				m_bGDIFrame,		"Record the GDI frame or just the client area")
 
 ConfigProp(ImageFormatExt,			m_szImageFormatExt,	"The image format for screen shots (png,bmp,jpeg)")

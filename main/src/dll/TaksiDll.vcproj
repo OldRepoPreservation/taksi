@@ -139,22 +139,22 @@
 				RelativePath=".\config.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx.cpp">
+				RelativePath=".\GAPI_Base.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx_dx8.cpp">
+				RelativePath=".\GAPI_dx8.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx_dx9.cpp">
+				RelativePath=".\GAPI_dx9.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx_gdi.cpp">
+				RelativePath=".\GAPI_gdi.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx_ogl.cpp">
+				RelativePath=".\GAPI_ogl.cpp">
 			</File>
 			<File
-				RelativePath=".\graphx_ogl.tbl">
+				RelativePath=".\GAPI_ogl.tbl">
 			</File>
 			<File
 				RelativePath=".\HotKeys.cpp">
@@ -184,7 +184,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\graphx.h">
+				RelativePath=".\GAPI_Base.h">
 			</File>
 			<File
 				RelativePath=".\HotKeys.h">

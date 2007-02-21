@@ -26,19 +26,21 @@ enum TAKSI_CUSTOM_TYPE
 	TAKSI_CUSTOM_QTY,
 };
 
-enum TAKSI_API_TYPE
+enum TAKSI_GAPI_TYPE
 {
 	// enumerate the available modes we support.
-	TAKSI_API_NONE = 0,
-	TAKSI_API_DESKTOP,	// HWND_DESKTOP
-	TAKSI_API_GDI,	// prefer all other modes over this.
-	TAKSI_API_OGL,	// a static linked dll, so can get a false positive.
+	TAKSI_GAPI_NONE = 0,
+	TAKSI_GAPI_DESKTOP,	// HWND_DESKTOP
+	TAKSI_GAPI_GDI,	// prefer all other modes over this.
+	TAKSI_GAPI_OGL,	// a static linked dll, so can get a false positive.
 #ifdef USE_DIRECTX
-	TAKSI_API_DX8,
-	TAKSI_API_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
+	TAKSI_GAPI_DX8,
+	TAKSI_GAPI_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
 #endif
-	TAKSI_API_QTY,
+	TAKSI_GAPI_QTY,
 };
+
+extern LIBSPEC int Str_MakeFilePath( TCHAR* pszPath, int iMaxCount, const TCHAR* pszDir, const TCHAR* pszName );
 
 struct LIBSPEC CTaksiConfigCustom : public CIniObject
 {
@@ -114,7 +116,7 @@ public:
 
 	bool   m_bUseOverheadCompensation;	// for computing the frame rate
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
-	bool   m_abUseAPI[TAKSI_API_QTY];	// Use this API? true by default
+	bool   m_abUseGAPI[TAKSI_GAPI_QTY];	// Use this API? true by default
 
 	// CAN NOT be set from CGuiConfig directly
 	TCHAR  m_szImageFormatExt[16];	// the screen shot format tag. JPEG = "image/jpeg", PNG = "image/png"
