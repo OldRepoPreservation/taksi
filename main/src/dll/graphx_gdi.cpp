@@ -82,6 +82,7 @@ HWND CTaksiGDI::GetFrameInfo( SIZE& rSize ) // virtual
 		::ClientToScreen(m_hWnd,((LPPOINT)&m_WndRect)+0);
 		::ClientToScreen(m_hWnd,((LPPOINT)&m_WndRect)+1);
 	}
+
 	rSize.cx = m_WndRect.right - m_WndRect.left;
 	rSize.cy = m_WndRect.bottom - m_WndRect.top;
 	return m_hWnd;
@@ -127,11 +128,14 @@ HRESULT CTaksiGDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	// Create hBitmap for temporary use.
 	CWndDC ScreenDC;
 	if ( ! ScreenDC.GetDC( NULL ))
+	{
 		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+	}
 	CWndDC MemDC;
 	if ( ! MemDC.CreateCompatibleDC( ScreenDC ))
+	{
 		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
-
+	}
 	CWndGDI Bitmap( ScreenDC.CreateCompatibleBitmap( frame.m_Size.cx, frame.m_Size.cy ));
 	if ( Bitmap.m_hObject == NULL )
 	{

@@ -30,6 +30,7 @@ enum TAKSI_API_TYPE
 {
 	// enumerate the available modes we support.
 	TAKSI_API_NONE = 0,
+	TAKSI_API_DESKTOP,	// HWND_DESKTOP
 	TAKSI_API_GDI,	// prefer all other modes over this.
 	TAKSI_API_OGL,	// a static linked dll, so can get a false positive.
 #ifdef USE_DIRECTX
@@ -113,7 +114,6 @@ public:
 
 	bool   m_bUseOverheadCompensation;	// for computing the frame rate
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
-	bool   m_bGDIDesktop;		// record the full GDI desktop or not?
 	bool   m_abUseAPI[TAKSI_API_QTY];	// Use this API? true by default
 
 	// CAN NOT be set from CGuiConfig directly

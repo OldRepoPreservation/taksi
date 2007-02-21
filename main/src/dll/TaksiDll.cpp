@@ -31,9 +31,10 @@ HINSTANCE g_hInst = NULL;		// Handle for the dll for the current process.
 CTaksiProcess g_Proc;			// information about the process i am attached to.
 CTaksiLogFile g_Log;			// Log file for each process. seperate
 
-static CTaksiGraphX* const s_GraphxModes[ TAKSI_API_QTY ] = 
+static CTaksiGraphXBase* const s_GraphxModes[ TAKSI_API_QTY ] = 
 {
 	NULL,	// TAKSI_API_NONE
+	NULL,	// TAKSI_API_DESKTOP // lowest priority, 
 	&g_GDI,	// TAKSI_API_GDI // lowest priority, since all apps do GDI
 	&g_OGL,	// TAKSI_API_OGL
 #ifdef USE_DIRECTX
@@ -104,7 +105,7 @@ const WORD CTaksiProcStats::sm_Props[ TAKSI_PROCSTAT_QTY ][2] = // offset,size
 void CTaksiProcStats::InitProcStats()
 {
 	m_dwProcessId = 0;
-	m_szProcessFile[0] = '\0';
+	m_szProcessPath[0] = '\0';
 	m_szLastError[0] = '\0';
 
 	m_hWndCap = NULL;
@@ -464,12 +465,12 @@ bool CTaksiProcess::CheckProcessSpecial() const
 	}
 
 	// Check if it's Windows Explorer. We don't want to hook it either.
-	if ( ! sg_Config.m_bGDIDesktop )
+	if ( ! sg_Config.m_abUseAPI[TAKSI_API_DESKTOP] )
 	{
 		TCHAR szExplorer[_MAX_PATH];
 		::GetWindowsDirectory( szExplorer, sizeof(szExplorer));
 		lstrcat(szExplorer, _T("\\explorer.exe"));
-		if (!lstrcmpi( m_Stats.m_szProcessFile, szExplorer))
+		if (!lstrcmpi( m_Stats.m_szProcessPath, szExplorer))
 			return true;
 	}
 
@@ -514,7 +515,7 @@ void CTaksiProcess::CheckProcessCustom()
 	CTaksiConfig config;
 	if ( config.ReadIniFile()) 
 	{
-		CTaksiConfigCustom* pCfgMatch = config.CustomConfig_FindPattern(m_Stats.m_szProcessFile);
+		CTaksiConfigCustom* pCfgMatch = config.CustomConfig_FindPattern(m_Stats.m_szProcessPath);
 		if ( pCfgMatch )
 		{
 			LOG_MSG(( "Using custom FrameRate=%g FPS, FrameWeight=%0.4f" LOG_CR, 
@@ -598,11 +599,13 @@ HRESULT CTaksiProcess::AttachGraphXAPIs( HWND hWnd )
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
 	// NOTE: We can only use ONE!
-	LOG_MSG(( "ATTACHGRAPHXMODEW: 0x%x" LOG_CR, m_hWndHookTry ));
+	LOG_MSG(( "ATTACHGRAPHXMODEW: hWnd=0x%x" LOG_CR, m_hWndHookTry ));
 
 	HRESULT hRes = S_FALSE;
 	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
+		if ( s_GraphxModes[i] == NULL )
+			continue;
 		hRes = s_GraphxModes[i]->AttachGraphXAPI();
 	}
 	return hRes;
@@ -625,6 +628,8 @@ void CTaksiProcess::DetachGraphXAPIs()
 	// give graphics module a chance to clean up.
 	for ( int i=TAKSI_API_NONE+1; i<COUNTOF(s_GraphxModes); i++ )
 	{
+		if ( s_GraphxModes[i] == NULL )
+			continue;
 		s_GraphxModes[i]->FreeDll();
 	}
 
@@ -640,17 +645,17 @@ bool CTaksiProcess::OnDllProcessAttach()
 	// NOTE: HookCBTProc is probably already active and could be called at any time!
 
 	// Get Name of the process the DLL is attaching to
-	if ( ! ::GetModuleFileName(NULL, m_Stats.m_szProcessFile, sizeof(m_Stats.m_szProcessFile)))
+	if ( ! ::GetModuleFileName(NULL, m_Stats.m_szProcessPath, sizeof(m_Stats.m_szProcessPath)))
 	{
-		m_Stats.m_szProcessFile[0] = '\0';
+		m_Stats.m_szProcessPath[0] = '\0';
 	}
 	else
 	{
-		_tcslwr(m_Stats.m_szProcessFile);
+		_tcslwr(m_Stats.m_szProcessPath);
 	}
 
 	// determine process full path 
-	const TCHAR* pszTitle = GetFileTitlePtr(m_Stats.m_szProcessFile);
+	const TCHAR* pszTitle = GetFileTitlePtr(m_Stats.m_szProcessPath);
 	ASSERT(pszTitle);
 
 	// save short filename without ".exe" extension.

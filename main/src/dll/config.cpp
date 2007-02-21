@@ -146,9 +146,8 @@ void CTaksiConfigData::InitConfig()
 	m_bUseDirectInput = true;
 	m_bUseKeyboard = true;
 
-	memset( m_abUseAPI, 0xFF, sizeof(m_abUseAPI));
+	memset( m_abUseAPI, true, sizeof(m_abUseAPI));	// set all to true.
 	m_bGDIFrame = true;
-	m_bGDIDesktop = false;
 	m_bUseOverheadCompensation = false;
 
 	lstrcpy( m_szImageFormatExt, _T("png") );	// vs png,jpeg or bmp
@@ -179,7 +178,6 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 
 	memcpy( m_abUseAPI, config.m_abUseAPI, sizeof(m_abUseAPI));	// hook GDI mode at all?
 	m_bGDIFrame = config.m_bGDIFrame;	// record the frame of GDI windows or not ?
-	m_bGDIDesktop = config.m_bGDIDesktop;
 	m_bUseOverheadCompensation = config.m_bUseOverheadCompensation;
 
 	// CAN NOT be set from CGuiConfig directly
@@ -405,9 +403,9 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, "%d,%d", m_ptMasterWindow.x, m_ptMasterWindow.y );
 	case TAKSI_CFGPROP_GDIFrame:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIFrame));
-	case TAKSI_CFGPROP_GDIDesktop:
-		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIDesktop));
 
+	case TAKSI_CFGPROP_GDIDesktop:
+		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_DESKTOP]));
 	case TAKSI_CFGPROP_UseGDI:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseAPI[TAKSI_API_GDI]));
 	case TAKSI_CFGPROP_UseOGL:
@@ -516,7 +514,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		m_bGDIFrame = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_GDIDesktop:
-		m_bGDIDesktop = GetStrBool(pszValue);
+		m_abUseAPI[TAKSI_API_DESKTOP] = GetStrBool(pszValue);
 		break;
 	case TAKSI_CFGPROP_UseGDI:
 		m_abUseAPI[TAKSI_API_GDI] = GetStrBool(pszValue);

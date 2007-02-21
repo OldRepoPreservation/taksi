@@ -105,9 +105,9 @@ void CGuiConfig::Custom_Read()
 bool CGuiConfig::Custom_ReadHook( CTaksiConfigCustom* pCfg )
 {
 	ASSERT(pCfg);
-	if ( sg_ProcStats.m_szProcessFile[0] == '\0' )
+	if ( sg_ProcStats.m_szProcessPath[0] == '\0' )
 		return false;
-	lstrcpyn( pCfg->m_szPattern, GetFileTitlePtr(sg_ProcStats.m_szProcessFile),
+	lstrcpyn( pCfg->m_szPattern, GetFileTitlePtr(sg_ProcStats.m_szProcessPath),
 		COUNTOF(pCfg->m_szPattern));
 
 	pCfg->m_fFrameWeight = 0;
@@ -118,7 +118,7 @@ bool CGuiConfig::Custom_ReadHook( CTaksiConfigCustom* pCfg )
 bool CGuiConfig::Custom_ReadHook()
 {
 	// Use the current hooked app as the default if there is one.
-	if ( sg_ProcStats.m_szProcessFile[0] == '\0' )
+	if ( sg_ProcStats.m_szProcessPath[0] == '\0' )
 		return false;
 	TCHAR szTitle[ _MAX_PATH ];
 	int iLen = GetWindowText( sg_ProcStats.m_hWndCap, szTitle, COUNTOF(szTitle));
@@ -163,7 +163,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 
 	if ( dwMask & (1<<TAKSI_PROCSTAT_ProcessFile))
 	{
-		SetWindowText( m_hControlStatProcessName, stats.m_szProcessFile );
+		SetWindowText( m_hControlStatProcessName, stats.m_szProcessPath );
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_LastError))
 	{
@@ -179,6 +179,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		const TCHAR* sm_szNames[TAKSI_API_QTY+1] = 
 		{
 		_T(""),
+		_T("Desktop"),
 		_T("GDI"),		// TAKSI_API_GDI
 		_T("OpenGL"),	// TAKSI_API_OGL
 #ifdef USE_DIRECTX
@@ -322,9 +323,9 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	Custom_Init(config.m_pCustomList);
 
 	// Display options
-	UPDATE_CHECK(GDIDesktop,config.m_bGDIDesktop);
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
 
+	UPDATE_CHECK(GDIDesktop,config.m_abUseAPI[TAKSI_API_DESKTOP]);
 	UPDATE_CHECK(UseGDI,config.m_abUseAPI[TAKSI_API_GDI]);
 	UPDATE_CHECK(UseOGL,config.m_abUseAPI[TAKSI_API_OGL]);
 	UPDATE_CHECK(UseDX8,config.m_abUseAPI[TAKSI_API_DX8]);
@@ -602,7 +603,7 @@ bool CGuiConfig::OnTimer( UINT idTimer )
 
 	if ( m_iTabCur == 3 )
 	{
-		EnableWindow( m_hControlCustomUseCurrent, sg_ProcStats.m_szProcessFile[0] != '\0' );
+		EnableWindow( m_hControlCustomUseCurrent, sg_ProcStats.m_szProcessPath[0] != '\0' );
 		return true;
 	}
 	if ( m_iTabCur == 5 )
@@ -660,13 +661,13 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_GDIFrame:
 		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
 		return true;
-	case IDC_C_GDIDesktop:
-		sg_Config.m_bGDIDesktop = g_Config.m_bGDIDesktop = OnCommandCheck( m_hControlGDIDesktop );
-		return true;
 	case IDC_C_UseOverheadCompensation:
 		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );
 		return true;
 
+	case IDC_C_GDIDesktop:
+		sg_Config.m_abUseAPI[TAKSI_API_DESKTOP] = g_Config.m_abUseAPI[TAKSI_API_DESKTOP] = OnCommandCheck( m_hControlGDIDesktop );
+		return true;
 	case IDC_C_UseGDI:
 		sg_Config.m_abUseAPI[TAKSI_API_GDI] = g_Config.m_abUseAPI[TAKSI_API_GDI] = OnCommandCheck( m_hControlUseGDI );
 		return true;

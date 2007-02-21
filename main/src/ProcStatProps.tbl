@@ -2,7 +2,7 @@
 // ProcStatProps.tbl
 //
 ProcStatProp(ProcessId,			m_dwProcessId,		0,	"Process id")
-ProcStatProp(ProcessFile,		m_szProcessFile,	0,	"szProcessFile")
+ProcStatProp(ProcessFile,		m_szProcessPath,	0,	"szProcessFile")
 ProcStatProp(LastError,			m_szLastError,		0,	"szLastError")
 ProcStatProp(Wnd,				m_hWndCap,			0,	"hWnd")
 ProcStatProp(SizeWnd,			m_SizeWnd,			0,	"SizeWnd")

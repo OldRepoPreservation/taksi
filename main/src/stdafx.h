@@ -136,7 +136,7 @@ public:
 
 public:
 	DWORD m_dwProcessId;		// What process is this?
-	TCHAR m_szProcessFile[ _MAX_PATH ];	// What is the file name/path for the current process.
+	TCHAR m_szProcessPath[ _MAX_PATH ];	// What is the file path for the current process. (lower case)
 
 	// dynamic info.
 	TCHAR m_szLastError[ _MAX_PATH ];	// last error message (if action failed)

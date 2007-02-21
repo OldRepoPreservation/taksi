@@ -9,12 +9,12 @@
 #define INDICATOR_Width 16
 #define INDICATOR_Height 16
 
-struct CTaksiGraphX : public CDllFile
+struct CTaksiGraphXBase : public CDllFile
 {
 	// a generic graphics mode base class.
 	// Base for: CTaksiDX8, CTaksiDX9, CTaksiGDI etc,
 public:
-	CTaksiGraphX()
+	CTaksiGraphXBase()
 		: m_bHookedFunctions(false)
 		, m_bGotFrameInfo(false)
 	{
@@ -33,13 +33,17 @@ protected:
 	{
 		// ONLY CALLED FROM AttachGraphXAPI()
 		ASSERT( IsValidDll());
-		DEBUG_MSG(( "CTaksiGraphX::HookFunctions done." LOG_CR ));
+		if ( m_bHookedFunctions )
+		{
+			return S_FALSE;
+		}
+		DEBUG_MSG(( "CTaksiGraphXBase::HookFunctions done." LOG_CR ));
 		m_bHookedFunctions = true;
 		return S_OK;
 	}
 	virtual void UnhookFunctions()
 	{
-		DEBUG_MSG(( "CTaksiGraphX::UnhookFunctions" LOG_CR ));
+		DEBUG_MSG(( "CTaksiGraphXBase::UnhookFunctions" LOG_CR ));
 		m_bHookedFunctions = false;
 	}
 
@@ -65,7 +69,7 @@ public:
 #ifdef USE_DIRECTX
 
 interface IDirect3DDevice8;
-struct CTaksiDX8 : public CTaksiGraphX
+struct CTaksiDX8 : public CTaksiGraphXBase
 {
 	// TAKSIMODE_DX8
 public:
@@ -105,7 +109,7 @@ public:
 extern CTaksiDX8 g_DX8;
 
 interface IDirect3DDevice9;
-struct CTaksiDX9 : public CTaksiGraphX
+struct CTaksiDX9 : public CTaksiGraphXBase
 {
 	// TAKSIMODE_DX9
 public:
@@ -146,7 +150,7 @@ extern CTaksiDX9 g_DX9;
 
 #endif // USE_DIRECTX
 
-struct CTaksiOGL : public CTaksiGraphX
+struct CTaksiOGL : public CTaksiGraphXBase
 {
 	// TAKSIMODE_OGL
 public:
@@ -183,7 +187,7 @@ public:
 };
 extern CTaksiOGL g_OGL;
 
-struct CTaksiGDI : public CTaksiGraphX
+struct CTaksiGDI : public CTaksiGraphXBase
 {
 	// TAKSIMODE_GDI
 public:

@@ -62,7 +62,7 @@ bool CGui::UpdateWindowTitle()
 	const TCHAR* pszHookApp = NULL;
 	if ( sg_ProcStats.m_dwProcessId )
 	{
-		pszHookApp = ::GetFileTitlePtr( sg_ProcStats.m_szProcessFile );
+		pszHookApp = ::GetFileTitlePtr( sg_ProcStats.m_szProcessPath );
 	}
 
 	TCHAR szTitle[ _MAX_PATH ];
