@@ -8,7 +8,7 @@
 
 CTaksiGAPI_GDI g_GDI;
 
-#define IDT_TIMER 0x1234	// HOPE - this wont conflict with an existing timer for the app!
+#define IDT_TIMER 0xF23E	// HOPE - this wont conflict with an existing timer for the app!
 
 //*****************************************
 
@@ -321,7 +321,7 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 
 	if ( g_Proc.m_bIsProcessDesktop )
 	{
-		// I cant really hook the desktop for some reason!! but all processes can access it!
+		// I cant really hook the desktop for some reason!! tho all processes can access it!
 	}
 
 	// SubClass the window.
@@ -361,12 +361,16 @@ void CTaksiGAPI_GDI::UnhookFunctions()
 
 	// test if this is stacked?
 	ASSERT( m_WndProcOld != NULL );	// hooked?!
-	if ( GetWindowLongPtr( m_hWnd, GWL_WNDPROC ) == (LONG_PTR) WndProcHook )
+	WNDPROC _WndProcCur = GetWindowLongPtr( m_hWnd, GWL_WNDPROC );
+	ASSERT( _WndProcCur != NULL );
+	if ( _WndProcCur == (LONG_PTR) WndProcHook )
 	{
 		SetWindowLongPtr( m_hWnd, GWL_WNDPROC, (LONG_PTR) m_WndProcOld );
 	}
 	else
 	{
+		// Someone re-hooked the API! We are screwed!
+		ASSERT( _WndProcCur == (LONG_PTR) WndProcHook );
 		DEBUG_ERR(( "CTaksiGAPI_GDI::UnhookFunctions FAILED Unhook!" ));
 	}
 	m_WndProcOld = NULL;
