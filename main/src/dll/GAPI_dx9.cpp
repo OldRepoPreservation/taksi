@@ -205,7 +205,7 @@ HRESULT CTaksiGAPI_DX9::InvalidateDeviceObjects()
 		m_iRefCountMe--;
 	}
 
-	if ( iRefCountPrev != m_iRefCountMe )
+	if ( iRefCountPrev != m_iRefCountMe ) // some work was done.
 	{
 		DEBUG_MSG(( "CTaksiGAPI_DX9:InvalidateDeviceObjects: done." LOG_CR));
 	}
@@ -816,6 +816,7 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Reset(
 	IDirect3DDevice9* pDevice, LPVOID params )
 {
 	// New Reset function
+	// m_nDX9_Reset
 	// put back saved code fragment
 	g_DX9.m_Hook_Reset.SwapOld(s_D3D9_Reset);
 
@@ -842,6 +843,7 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Present(
 	IDirect3DDevice9* pDevice, const RECT* src, const RECT* dest, HWND hWnd, LPVOID unused)
 {
 	// New Present function 
+	// m_nDX9_Present
 	g_DX9.m_Hook_Present.SwapOld(s_D3D9_Present);
 
 	DEBUG_TRACE(( "--------------------------------" LOG_CR ));
