@@ -125,8 +125,8 @@ extern CAVIThread g_AVIThread;
 struct CTaksiProcess
 {
 	// Info about the Process this DLL is bound to.
-	// The current application owning a graphics device.
-	// What am i doing to the process?
+	// ASSUME The current application is attached to a graphics API.
+	// What am i doing to the process? anthing?
 public:
 	CTaksiProcess()
 		: m_dwConfigChangeCount(0)
@@ -137,7 +137,6 @@ public:
 	{
 		m_Stats.InitProcStats();
 		m_Stats.m_dwProcessId = ::GetCurrentProcessId();
-		m_Stats.m_szLastError[0] = '\0';
 	}
 
 	bool IsProcPrime() const

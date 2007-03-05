@@ -435,6 +435,7 @@ bool CTaksiProcess::CheckProcessMaster() const
 {
 	// the master EXE process ?
 	// TAKSI.EXE has special status!
+	// ASSUME m_bIsProcessIgnored
 	return( ! lstrcmpi( m_szProcessTitleNoExt, _T("taksi")));
 }
 
@@ -443,9 +444,12 @@ bool CTaksiProcess::CheckProcessIgnored() const
 	// This functions should be called when DLL is mapped into an application
 	// to check if this is one of the special apps, that we shouldn't do any
 	// graphics API hooking.
+	// sets m_bIsProcessIgnored
 
 	if ( CheckProcessMaster())
+	{
 		return true;
+	}
 
 	static const TCHAR* sm_SpecialNames[] = 
 	{
