@@ -408,3 +408,7 @@ Attempt to address weird time lag when restarting recording.
 0.775
 Restore PNG format still frame capture with delay loading of gdiplus for Win2K support
 
+0.777
+3/1/2007
+Build files for MSVC 8 (Visual Studio 2005)
+Renaming of all the Graphics API code to GAPI_*
