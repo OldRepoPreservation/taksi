@@ -1,36 +1,14 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TaksiInstaller", "TaksiInstaller\TaksiInstaller8.vdproj", "{D9A51286-FCCB-4969-927D-B725A1FDE0DE}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaksiDll", "dll\TaksiDll8.vcproj", "{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaksiExe", "exe\Taksi8.vcproj", "{820F2560-D0E6-4A3B-86FA-2DD5107256BC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2} = {A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}
 	EndProjectSection
 EndProject
-Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug = Debug
-		Release = Release
-	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{D9A51286-FCCB-4969-927D-B725A1FDE0DE}.Debug8.ActiveCfg = Debug8
-		{D9A51286-FCCB-4969-927D-B725A1FDE0DE}.Release8.ActiveCfg = Release8
-		{D9A51286-FCCB-4969-927D-B725A1FDE0DE}.Release8.Build.0 = Release8
-		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Debug8.ActiveCfg = Debug8|Win32
-		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Debug8.Build.0 = Debug8|Win32
-		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Release8.ActiveCfg = Release8|Win32
-		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Release8.Build.0 = Release8|Win32
-		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Debug8.ActiveCfg = Debug8|Win32
-		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Debug8.Build.0 = Debug8|Win32
-		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8.ActiveCfg = Release8|Win32
-		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8.Build.0 = Release8|Win32
-	EndGlobalSection
-	GlobalSection(SolutionItems) = postSolution
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3ED621C0-A5AC-4A39-9A02-5BE8E28478B5}"
+	ProjectSection(SolutionItems) = preProject
 		..\BUILD.txt = ..\BUILD.txt
 		TaksiInstaller\desktop.ini = TaksiInstaller\desktop.ini
 		Makefile = Makefile
@@ -40,9 +18,30 @@ Global
 		..\doc\TaksiManual.txt = ..\doc\TaksiManual.txt
 		..\doc\TaksiPic.jpg = ..\doc\TaksiPic.jpg
 		..\doc\TaksiTasks.txt = ..\doc\TaksiTasks.txt
+	EndProjectSection
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TaksiInstaller", "TaksiInstaller\TaksiInstaller8.vdproj", "{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug8|Win32 = Debug8|Win32
+		Release8|Win32 = Release8|Win32
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Debug8|Win32.ActiveCfg = Debug8|Win32
+		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Debug8|Win32.Build.0 = Debug8|Win32
+		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Release8|Win32.ActiveCfg = Release8|Win32
+		{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}.Release8|Win32.Build.0 = Release8|Win32
+		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Debug8|Win32.ActiveCfg = Debug8|Win32
+		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Debug8|Win32.Build.0 = Debug8|Win32
+		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8|Win32.ActiveCfg = Release8|Win32
+		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8|Win32.Build.0 = Release8|Win32
+		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug8|Win32.ActiveCfg = Debug8
+		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug8|Win32.Build.0 = Debug8
+		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release8|Win32.ActiveCfg = Release8
+		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release8|Win32.Build.0 = Release8
 	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

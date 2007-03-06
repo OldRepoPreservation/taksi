@@ -1,123 +1,185 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="TaksiExe"
 	ProjectGUID="{820F2560-D0E6-4A3B-86FA-2DD5107256BC}"
 	RootNamespace="TaksiExe"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug8|Win32"
-			OutputDirectory="../Debug8"
-			IntermediateDirectory="../Debug8"
+			OutputDirectory="../$(ConfigurationName)"
+			IntermediateDirectory="../$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="2">
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForWindowsApplication="TRUE"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
-				StringPooling="TRUE"
-				MinimalRebuild="TRUE"
-				ExceptionHandling="TRUE"
+				StringPooling="true"
+				MinimalRebuild="true"
+				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="TRUE"
-				UsePrecompiledHeader="3"
+				BufferSecurityCheck="true"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="../stdafx.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/Taksi.exe"
 				Version="0.7.7.5"
 				LinkIncremental="2"
-				GenerateDebugInformation="TRUE"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/Taksi.pdb"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release8|Win32"
-			OutputDirectory="../Release8"
-			IntermediateDirectory="../Release8"
+			OutputDirectory="../$(ConfigurationName)"
+			IntermediateDirectory="../$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="2">
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				EnableIntrinsicFunctions="TRUE"
-				OptimizeForWindowsApplication="TRUE"
+				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				StringPooling="TRUE"
-				ExceptionHandling="TRUE"
+				StringPooling="true"
+				ExceptionHandling="1"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="../stdafx.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib dinput8.lib winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/Taksi.exe"
 				Version="0.7.7.5"
 				LinkIncremental="1"
-				GenerateDebugInformation="TRUE"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -126,185 +188,241 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\Gui.cpp">
+				RelativePath=".\Gui.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\guiConfig.cpp">
+				RelativePath=".\guiConfig.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\GuiConfigControls.tbl">
+				RelativePath=".\GuiConfigControls.tbl"
+				>
 			</File>
 			<File
-				RelativePath=".\Taksi.cpp">
+				RelativePath=".\Taksi.cpp"
+				>
 				<FileConfiguration
-					Name="Debug8|Win32">
+					Name="Debug8|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="../stdafx.h"/>
+						PrecompiledHeaderThrough="../stdafx.h"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release8|Win32">
+					Name="Release8|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Taksi.rc">
+				RelativePath=".\Taksi.rc"
+				>
 			</File>
 			<File
-				RelativePath=".\TaksiVer.rch">
+				RelativePath=".\TaksiVer.rch"
+				>
 			</File>
 			<File
-				RelativePath=".\Test_dx8.cpp">
+				RelativePath=".\Test_dx8.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Test_dx9.cpp">
+				RelativePath=".\Test_dx9.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\guiConfig.h">
+				RelativePath=".\guiConfig.h"
+				>
 			</File>
 			<File
-				RelativePath=".\resource.h">
+				RelativePath=".\resource.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Taksi.h">
+				RelativePath=".\Taksi.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 			<File
-				RelativePath=".\res\BtnConfig.bmp">
+				RelativePath=".\res\BtnConfig.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnHookMode.bmp">
+				RelativePath=".\res\BtnHookMode.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnHookMode2.bmp">
+				RelativePath=".\res\BtnHookMode2.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnHookMode3.bmp">
+				RelativePath=".\res\BtnHookMode3.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnIndic.bmp">
+				RelativePath=".\res\BtnIndic.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnIndic2.bmp">
+				RelativePath=".\res\BtnIndic2.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordBegin.bmp">
+				RelativePath=".\res\BtnRecordBegin.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordBeginG.bmp">
+				RelativePath=".\res\BtnRecordBeginG.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordPause.bmp">
+				RelativePath=".\res\BtnRecordPause.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordPause2.bmp">
+				RelativePath=".\res\BtnRecordPause2.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordPauseG.bmp">
+				RelativePath=".\res\BtnRecordPauseG.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordStop.bmp">
+				RelativePath=".\res\BtnRecordStop.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnRecordStopG.bmp">
+				RelativePath=".\res\BtnRecordStopG.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnScreenshot.bmp">
+				RelativePath=".\res\BtnScreenshot.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnScreenshotG.bmp">
+				RelativePath=".\res\BtnScreenshotG.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnSmallScreenshot.bmp">
+				RelativePath=".\res\BtnSmallScreenshot.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\BtnSmallScreenshotG.bmp">
+				RelativePath=".\res\BtnSmallScreenshotG.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\res\Taksi.ico">
+				RelativePath=".\res\Taksi.ico"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Shared"
-			Filter="">
+			>
 			<File
-				RelativePath="..\Config.h">
+				RelativePath="..\Config.h"
+				>
 			</File>
 			<File
-				RelativePath="..\ConfigProps.tbl">
+				RelativePath="..\ConfigProps.tbl"
+				>
 			</File>
 			<File
-				RelativePath="..\stdafx.h">
+				RelativePath="..\stdafx.h"
+				>
 			</File>
 			<File
-				RelativePath="..\TaksiVersion.h">
+				RelativePath="..\TaksiVersion.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Common"
-			Filter="">
+			>
 			<File
-				RelativePath="..\common\CDll.h">
+				RelativePath="..\common\CDll.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CFileDirDlg.cpp">
+				RelativePath="..\common\CFileDirDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CFileDirDlg.h">
+				RelativePath="..\common\CFileDirDlg.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CHookJump.h">
+				RelativePath="..\common\CHookJump.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CIniObject.h">
+				RelativePath="..\common\CIniObject.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CLogBase.h">
+				RelativePath="..\common\CLogBase.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CNTHandle.h">
+				RelativePath="..\common\CNTHandle.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\Common.h">
+				RelativePath="..\common\Common.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CRefPtr.h">
+				RelativePath="..\common\CRefPtr.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CWaveACM.h">
+				RelativePath="..\common\CWaveACM.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CWaveDevice.h">
+				RelativePath="..\common\CWaveDevice.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CWindow.h">
+				RelativePath="..\common\CWindow.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CWndToolTip.cpp">
+				RelativePath="..\common\CWndToolTip.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\common\CWndToolTip.h">
+				RelativePath="..\common\CWndToolTip.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\IRefPtr.h">
+				RelativePath="..\common\IRefPtr.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\taksi.ini">
+			RelativePath=".\taksi.ini"
+			>
 		</File>
 	</Files>
 	<Globals>

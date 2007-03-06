@@ -31,6 +31,7 @@ bool CTaksiFrameRate::InitFreqUnits()
 		m_dwFreqUnits = 0;
 		return false;	// this cant work!
 	}
+	ASSERT( freq.HighPart == 0 );
 	m_dwFreqUnits = freq.LowPart;
 	InitStart();
 	return true;
