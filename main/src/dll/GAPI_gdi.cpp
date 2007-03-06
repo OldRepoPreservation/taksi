@@ -361,7 +361,7 @@ void CTaksiGAPI_GDI::UnhookFunctions()
 
 	// test if this is stacked?
 	ASSERT( m_WndProcOld != NULL );	// hooked?!
-	WNDPROC _WndProcCur = GetWindowLongPtr( m_hWnd, GWL_WNDPROC );
+	LONG_PTR _WndProcCur = GetWindowLongPtr( m_hWnd, GWL_WNDPROC );
 	ASSERT( _WndProcCur != NULL );
 	if ( _WndProcCur == (LONG_PTR) WndProcHook )
 	{

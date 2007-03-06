@@ -27,10 +27,10 @@ const char* CTaksiConfig::sm_Props[TAKSI_CFGPROP_QTY+1] =
 static bool Str_GetQuoted( TCHAR* pszDest, int iLenMax, const char* pszSrc )
 {
 	// NOTE: Quoted string might contain UTF8 chars? so might have protected '"' ??
-	char* pszStartQuote = strchr(pszSrc, '\"');
+	char* pszStartQuote = strchr( const_cast<char*>(pszSrc), '\"');
 	if (pszStartQuote == NULL) 
 		return false;
-	char* pszEndQuote = strchr(pszStartQuote + 1, '\"');
+	char* pszEndQuote = strchr( pszStartQuote + 1, '\"' );
 	if (pszEndQuote == NULL)
 		return false;
 	int iLen = (int)( pszEndQuote - pszStartQuote ) - 1;
