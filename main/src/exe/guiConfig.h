@@ -1,8 +1,8 @@
 //
 // guiConfig.h
 //
-#ifndef _INC_guiConfig
-#define _INC_guiConfig
+#ifndef _INC_guiConfig_H
+#define _INC_guiConfig_H
 #if _MSC_VER > 1000
 #pragma once
 #endif
@@ -130,4 +130,4 @@ public:
 };
 extern CGuiConfig g_GUIConfig;
 
-#endif
+#endif // _INC_guiConfig_H

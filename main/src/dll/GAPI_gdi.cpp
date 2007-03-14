@@ -11,6 +11,11 @@ CTaksiGAPI_GDI g_GDI;
 #define IDT_TIMER 0xF23E	// HOPE - this wont conflict with an existing timer for the app!
 
 //*****************************************
+bool CTaksiGAPI_GDI::IsDesktop() // static
+{
+	// Only the master can record the HWND_DEKSTOP 
+	return g_Proc.CheckProcessMaster();
+}
 
 HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 {
@@ -19,7 +24,7 @@ HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	m_dwTimeLastDrawIndicator = GetTickCount();
 
-	if ( m_hWnd == NULL )
+	if ( m_hWnd == HWND_DESKTOP && ! IsDesktop())
 		return HRESULT_FROM_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 	if ( eIndicate < 0 || eIndicate >= TAKSI_INDICATE_QTY )
 		return HRESULT_FROM_WIN32(ERROR_UNKNOWN_FEATURE);
@@ -27,7 +32,9 @@ HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	CWndDC dc;
 	// NOTE: I cant tell if the window is being overlapped?
 	if ( ! dc.GetDCEx( m_hWnd, DCX_WINDOW|DCX_PARENTCLIP )) // DCX_CLIPSIBLINGS
+	{
 		return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_DC_NOT_FOUND));
+	}
 
 	// eIndicate = color.
 	const BYTE* pColorDX = (const BYTE*) &sm_IndColors[eIndicate];
@@ -64,8 +71,9 @@ HWND CTaksiGAPI_GDI::GetFrameInfo( SIZE& rSize ) // virtual
 	// Find the primary window for the process.
 	// Whole screen ??
 
-	if ( m_hWnd == NULL )	// should not happen. should already be set by m_hWndHookTry
+	if ( m_hWnd == HWND_DESKTOP && ! IsDesktop())
 	{
+		// should not happen. should already be set by m_hWndHookTry
 		return NULL;
 	}
 	if ( sg_Config.m_bGDIFrame )
@@ -124,6 +132,7 @@ void CTaksiGAPI_GDI::DrawMouse( HDC hMemDC, bool bHalfSize )
 HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 {
 	// Grab the whole window (or just the client area)
+	ASSERT( ! g_Proc.m_bIsProcessDesktop );
 
 	// Create hBitmap for temporary use.
 	CWndDC ScreenDC;
@@ -211,6 +220,7 @@ LRESULT CTaksiGAPI_GDI::OnTick( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 {
 	// Periodically get a WM_TIMER at frame rate.
 	// or whenever there is a repaint. (dont grab repaint faster than rate ?)
+	ASSERT( ! g_Proc.m_bIsProcessDesktop );
 	if (m_iReentrant)
 	{
 		DEBUG_ERR(( "CTaksiGAPI_GDI::WM_TIMER reentrant!" LOG_CR ));
@@ -249,6 +259,7 @@ LRESULT CALLBACK CTaksiGAPI_GDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wPara
 {
 	ASSERT(g_GDI.m_WndProcOld);
 	ASSERT(g_GDI.m_hWnd);
+	ASSERT( ! g_Proc.m_bIsProcessDesktop );
 
 	switch ( uMsg )
 	{
@@ -259,7 +270,7 @@ LRESULT CALLBACK CTaksiGAPI_GDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wPara
 		WNDPROC WndProcOld = g_GDI.m_WndProcOld;
 		g_GDI.UnhookFunctions();
 		LRESULT lRes = ::CallWindowProc( WndProcOld, hWnd, uMsg, wParam, lParam );
-		g_GDI.m_hWnd = NULL;
+		g_GDI.m_hWnd = HWND_DESKTOP;
 		g_GDI.m_bGotFrameInfo = false;
 		g_GDI.m_iReentrant--;
 		DEBUG_MSG(( "CTaksiGAPI_GDI::WM_DESTROY 0%x" LOG_CR, hWnd ));
@@ -294,18 +305,26 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 {
 	// we should capture WM_PAINT + periodic
 	// ONLY CALLED FROM AttachGAPI()
+	// RETURN:
+	//  S_FALSE = wont hook but not an error.
 
 	ASSERT( IsValidDll());
+	if ( IsDesktop())
+	{
+		// I cant really hook the desktop for some reason!! let the master handle that.
+		return __super::HookFunctions();
+	}
 	if ( g_Proc.m_hWndHookTry == NULL )
 	{
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
-	if ( m_hWnd != NULL )	// must find the window first. m_hWndHookTry
+	if ( m_hWnd != HWND_DESKTOP )	// must find the window first. m_hWndHookTry
 	{
 		// already hooked some window.
+		ASSERT(m_bHookedFunctions);
 		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGAPIs()
 		{
-			return S_FALSE;
+			return S_FALSE;	// already set.
 		}
 		// unhook previous? change of focus?
 		UnhookFunctions();
@@ -313,15 +332,10 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 
 	m_hWnd = g_Proc.m_hWndHookTry;	// this was set by AttachGAPIs()
 	m_hWnd = GetFrameInfo( g_Proc.m_Stats.m_SizeWnd );
-	if ( m_hWnd == NULL )
+	if ( m_hWnd == HWND_DESKTOP )
 	{
 		DEBUG_ERR(( "CTaksiGAPI_GDI::HookFunctions GetFrameInfo=NULL" LOG_CR ));
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
-	}
-
-	if ( g_Proc.m_bIsProcessDesktop )
-	{
-		// I cant really hook the desktop for some reason!! tho all processes can access it!
 	}
 
 	// SubClass the window.
@@ -341,7 +355,7 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 	if ( m_uTimerId == 0 )
 	{
 		DEBUG_ERR(( "CTaksiGAPI_GDI::HookFunctions SetTimer=NULL" LOG_CR ));
-		m_hWnd = NULL;
+		m_hWnd = HWND_DESKTOP;
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
@@ -350,8 +364,15 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 
 void CTaksiGAPI_GDI::UnhookFunctions()
 {
-	if ( m_hWnd == NULL )	// not hooked!
+	if ( IsDesktop())
+	{
+		__super::UnhookFunctions();
+		return;	// cant actually hook the desktop.
+	}
+	if ( m_hWnd == HWND_DESKTOP )	// not hooked!
+	{
 		return;
+	}
 	// Release the timer.
 	if ( m_uTimerId )
 	{
@@ -378,7 +399,7 @@ void CTaksiGAPI_GDI::UnhookFunctions()
 	// repaint just the indicator part ???
 	RECT rect = { INDICATOR_X, INDICATOR_Y, INDICATOR_X+INDICATOR_Width, INDICATOR_Y+INDICATOR_Height };
 	::InvalidateRect(m_hWnd,NULL,false);	// repaint just to be safe.
-	m_hWnd = NULL;
+	m_hWnd = HWND_DESKTOP;
 
 	__super::UnhookFunctions();
 }

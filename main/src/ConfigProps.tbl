@@ -1,6 +1,7 @@
 //
 // ConfigProps.tbl
 // for CTaksiConfig
+// Shared with DLL and EXE
 
 ConfigProp(AudioCodecInfo,			m_AudioCodec,	"Audio format / codec")
 ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")

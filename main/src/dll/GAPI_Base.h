@@ -77,7 +77,7 @@ public:
 interface IDirect3DDevice8;
 struct CTaksiGAPI_DX8 : public CTaksiGAPIBase
 {
-	// TAKSIMODE_DX8
+	// TAKSI_GAPI_DX8
 public:
 	CTaksiGAPI_DX8();
 	~CTaksiGAPI_DX8();
@@ -117,7 +117,7 @@ extern CTaksiGAPI_DX8 g_DX8;
 interface IDirect3DDevice9;
 struct CTaksiGAPI_DX9 : public CTaksiGAPIBase
 {
-	// TAKSIMODE_DX9
+	// TAKSI_GAPI_DX9
 public:
 	CTaksiGAPI_DX9();
 	~CTaksiGAPI_DX9();
@@ -158,7 +158,7 @@ extern CTaksiGAPI_DX9 g_DX9;
 
 struct CTaksiGAPI_OGL : public CTaksiGAPIBase
 {
-	// TAKSIMODE_OGL
+	// TAKSI_GAPI_OGL
 public:
 	CTaksiGAPI_OGL() 
 		: m_bTestTextureCaps(false)
@@ -195,21 +195,25 @@ extern CTaksiGAPI_OGL g_OGL;
 
 struct CTaksiGAPI_GDI : public CTaksiGAPIBase
 {
-	// TAKSIMODE_GDI
+	// TAKSI_GAPI_DESKTOP HWND_DESKTOP
+	// TAKSI_GAPI_GDI
 public:
 	CTaksiGAPI_GDI()
-		: m_hWnd(NULL)
+		: m_hWnd(HWND_DESKTOP)
 		, m_WndProcOld(NULL)
 		, m_iReentrant(0)
 	{
 	}
 	
+	static bool IsDesktop();
 	virtual const TCHAR* get_DLLName() const
 	{
 		return TEXT("user32.dll");
 	}
 	virtual TAKSI_GAPI_TYPE get_GAPIType() const
 	{
+		if ( IsDesktop())
+			return TAKSI_GAPI_DESKTOP;
 		return TAKSI_GAPI_GDI;
 	}
 
