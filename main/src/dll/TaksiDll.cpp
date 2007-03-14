@@ -228,12 +228,25 @@ void CTaksiShared::UpdateMaster()
 	}
 }
 
+void CTaksiShared::OnMasterTick()
+{
+	// The Master EXE must supply a Tick to make the TAKSIMODE_DESKTOP work.
+	// Must tick at the rate of the recording.
+
+	ASSERT( m_hMasterWnd );
+	ASSERT( g_Proc.m_bIsProcessIgnored );
+	ASSERT( g_Proc.CheckProcessMaster());
+
+}
+
 HRESULT CTaksiShared::LogMessage( const TCHAR* pszPrefix )
 {
 	// Log a common shared message for the dll, not the process.
 	// LOG_NAME_DLL
-	if ( ! sg_Config.m_bDebugLog)
+	if ( ! sg_Config.m_bDebugLog )
+	{
 		return S_OK;
+	}
 
 	TCHAR szMsg[ _MAX_PATH + 64 ];
 	int iLenMsg = _sntprintf( szMsg, COUNTOF(szMsg)-1, 
@@ -509,9 +522,10 @@ void CTaksiProcess::CheckProcessCustom()
 		lstrcpyn( szExplorer+uLen, _T("\\explorer.exe"), COUNTOF(szExplorer) - uLen );
 		m_bIsProcessDesktop = !lstrcmpi( m_Stats.m_szProcessPath, szExplorer);
 	}
-	if ( m_bIsProcessDesktop && ! sg_Config.m_abUseGAPI[TAKSI_GAPI_DESKTOP] )
+	if ( m_bIsProcessDesktop )
 	{
 		// Check if it's Windows Explorer. We don't want to hook it either.
+		// sg_Config.m_abUseGAPI[TAKSI_GAPI_DESKTOP]
 		m_bIsProcessIgnored = true;
 		return;
 	}

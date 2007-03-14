@@ -1,8 +1,13 @@
 //
 // Config.h
 // for CTaksiConfig
+// Shared with DLL and EXE
 //
+#ifndef _INC_Config_H
+#define _INC_Config_H
+#if _MSC_VER > 1000
 #pragma once
+#endif
 
 enum TAKSI_HOTKEY_TYPE
 {
@@ -31,11 +36,11 @@ enum TAKSI_GAPI_TYPE
 	// enumerate the available modes we support.
 	TAKSI_GAPI_NONE = 0,
 	TAKSI_GAPI_DESKTOP,	// HWND_DESKTOP
-	TAKSI_GAPI_GDI,	// prefer all other modes over this.
-	TAKSI_GAPI_OGL,	// a static linked dll, so can get a false positive.
+	TAKSI_GAPI_GDI,		// prefer all other modes over this.
+	TAKSI_GAPI_OGL,		// a static linked dll, so can get a false positive.
 #ifdef USE_DIRECTX
 	TAKSI_GAPI_DX8,
-	TAKSI_GAPI_DX9,	// highest priority, always pick DX9 (over others) if it is supported.
+	TAKSI_GAPI_DX9,		// highest priority, always pick DX9 (over others) if it is supported.
 #endif
 	TAKSI_GAPI_QTY,
 };
@@ -76,7 +81,7 @@ public:
 enum TAKSI_CFGPROP_TYPE
 {
 	// enum the tags that can go in the config file.
-#define ConfigProp(a,b,c) TAKSI_CFGPROP_##a,
+#define ConfigProp(a,b,c)	TAKSI_CFGPROP_##a,
 #include "ConfigProps.tbl"
 #undef ConfigProp
 	TAKSI_CFGPROP_QTY,
@@ -92,8 +97,8 @@ struct LIBSPEC CTaksiConfigData
 	void InitConfig();
 	void CopyConfig( const CTaksiConfigData& config );
 
-	bool SetHotKey(TAKSI_HOTKEY_TYPE eHotKey, WORD vKey);
-	WORD GetHotKey(TAKSI_HOTKEY_TYPE eHotKey) const;
+	bool SetHotKey( TAKSI_HOTKEY_TYPE eHotKey, WORD vKey);
+	WORD GetHotKey( TAKSI_HOTKEY_TYPE eHotKey ) const;
 
 	HRESULT FixCaptureDir();
 
@@ -107,11 +112,11 @@ public:
 	CVideoCodec m_VideoCodec;			// Video Compression scheme selected
 	bool   m_bVideoHalfSize;			// full vs half sized video frames.
 
-	int m_iAudioDevice;	// audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
+	int m_iAudioDevice;	// Audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
 	CWaveFormat m_AudioFormat;
 
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
-	bool   m_bUseDirectInput;	// use direct input for key presses. else just keyboard hook
+	bool   m_bUseDirectInput;	// Use direct input for key presses. else just keyboard hook
 	bool   m_bUseKeyboard;		// Use WM_KEY hotkeys.
 
 	bool   m_bUseOverheadCompensation;	// for computing the frame rate
@@ -131,8 +136,8 @@ extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set vi
 struct LIBSPEC CTaksiConfig : public CIniObject, public CTaksiConfigData
 {
 	// Params read from the INI file.
-#define TAKSI_INI_FILE "taksi.ini"
-#define TAKSI_SECTION "TAKSI"
+#define TAKSI_INI_FILE	"taksi.ini"
+#define TAKSI_SECTION	"TAKSI"
 public:
 	CTaksiConfig();
 	~CTaksiConfig();
@@ -141,8 +146,8 @@ public:
 	bool WriteIniFile();
 
 	CTaksiConfigCustom* CustomConfig_FindAppId( const TCHAR* pszAppId ) const;
-	CTaksiConfigCustom* CustomConfig_Lookup( const TCHAR* pszAppId,bool bCreate=true);
-	void CustomConfig_DeleteAppId( const TCHAR* pszAppId);
+	CTaksiConfigCustom* CustomConfig_Lookup( const TCHAR* pszAppId, bool bCreate=true );
+	void CustomConfig_DeleteAppId( const TCHAR* pszAppId );
 
 	CTaksiConfigCustom* CustomConfig_FindPattern( const TCHAR* pszProcessfile ) const;
 
@@ -166,3 +171,5 @@ public:
 	// NOTE: NOT interprocess shared memory. so each dll instance must re-read from INI ??
 	CTaksiConfigCustom* m_pCustomList;	// linked list. 
 };
+
+#endif // _INC_Config_H

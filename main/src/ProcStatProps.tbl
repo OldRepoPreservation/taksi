@@ -1,5 +1,6 @@
 //
 // ProcStatProps.tbl
+// Shared with DLL and EXE
 //
 ProcStatProp(ProcessId,			m_dwProcessId,		0,	"Process id")
 ProcStatProp(ProcessFile,		m_szProcessPath,	0,	"szProcessFile")
