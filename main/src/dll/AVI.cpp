@@ -11,7 +11,7 @@ CAVIFile g_AVIFile;				// current video file we are recording.
 CAVIThread g_AVIThread;			// put all compression on a back thread. Q raw data to be processed.
 
 #ifdef USE_AUDIO
-CWaveRecorder g_AudioInput;	// Raw PCM audio input. (loopback from output)
+CWaveRecorder g_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
 #endif
 
 //**************************************************************************************
@@ -137,6 +137,7 @@ CAVIThread::~CAVIThread()
 
 DWORD CAVIThread::ThreadRun()
 {
+	// A background thread to do the compression/writing.
 	// m_hThread
 	DEBUG_MSG(( "CAVIThread::ThreadRun() n=%d" LOG_CR, m_dwTotalFramesProcessed ));
 	goto do_wait;
@@ -147,11 +148,11 @@ DWORD CAVIThread::ThreadRun()
 		ASSERT( m_iFrameCount.m_lValue > 0 );
 		CAVIFrame* pFrame = &m_aFrames[ m_iFrameBusy ];
 		ASSERT(pFrame);
-		ASSERT(pFrame->IsValidFrame());
+		ASSERT(pFrame->m_Video.IsValidFrame());
 		ASSERT(pFrame->m_dwFrameDups);
 
 		// compress and write
-		HRESULT hRes = g_AVIFile.WriteVideoFrame( *pFrame, pFrame->m_dwFrameDups ); 
+		HRESULT hRes = g_AVIFile.WriteVideoFrame( pFrame->m_Video, pFrame->m_dwFrameDups ); 
 		if ( SUCCEEDED(hRes))
 		{
 			if ( hRes )
@@ -162,9 +163,11 @@ DWORD CAVIThread::ThreadRun()
 		}
 
 #ifdef USE_AUDIO
-		// Audio data ?
-		// g_AVIFile.WriteAudioFrame(xxx);
-
+		// Audio data?
+		if ( g_AVIFile.HasAudio() )
+		{
+			g_AVIFile.WriteAudioFrame( pFrame->m_Audio, pFrame->m_dwFrameDups );
+		}
 #endif
 
 		// we are done.
@@ -246,7 +249,7 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 	ASSERT( pFrame );
 	ASSERT( pFrame->m_dwFrameDups == 0 ); 
 	ASSERT( g_AVIFile.m_FrameForm.get_SizeBytes());
-	if ( ! pFrame->AllocForm( g_AVIFile.m_FrameForm ))
+	if ( ! pFrame->m_Video.AllocForm( g_AVIFile.m_FrameForm ))
 	{
 		ASSERT(0);
 		return NULL;
@@ -270,7 +273,7 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 	ASSERT( GetCurrentThreadId() != m_nThreadId );	// never call on myself!
 	ASSERT(dwFrameDups>0);
 	ASSERT(pFrame);
-	ASSERT( pFrame->IsValidFrame());
+	ASSERT( pFrame->m_Video.IsValidFrame());
 	ASSERT( pFrame->m_dwFrameDups == 0 ); 
 	ASSERT( pFrame == &m_aFrames[ m_iFrameFree ] );
 
@@ -319,7 +322,7 @@ HRESULT CAVIThread::StopAVIThread()
 HRESULT CAVIThread::StartAVIThread()
 {
 	// Create my resources.	
-	if ( m_nThreadId )	// already running
+	if ( m_nThreadId != NULL )	// already running
 		return S_FALSE;
 
 	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
@@ -352,3 +355,28 @@ do_erroret:
 	}
 	return S_OK;
 }
+
+#ifdef USE_AUDIO
+HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat )
+{
+	// Open the audio input device.
+	if ( iWaveDeviceId == WAVE_DEVICE_NONE )
+	{
+		return S_FALSE;
+	}
+
+	MMRESULT mmRes = g_AudioInput.put_DeviceID(iWaveDeviceId);
+	if ( mmRes != 0 )
+	{
+		return E_FAIL;
+	}
+
+	mmRes = g_AudioInput.Open( WaveFormat, 0, this, 0 );
+	if ( mmRes != 0 )
+	{
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+#endif

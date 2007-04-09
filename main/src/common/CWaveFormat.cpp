@@ -244,10 +244,14 @@ bool CWaveFormat::IsValidFormat( void ) const
 	//
 	if ( ! get_BlockSize() ||
 		! get_BytesPerSec())
+	{
 		return( false );
+	}
 
 	if ( m_iAllocSize <= sizeof(WAVEFORMATEX) + pFormX->cbSize )
+	{
 		return false;
+	}
 
 	return( true );
 }
