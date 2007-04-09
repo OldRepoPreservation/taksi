@@ -156,6 +156,8 @@ private:
 };
 
 struct AVI_FILE_HEADER;
+struct AVI_VIDEO_HEADER;
+struct AVI_AUDIO_HEADER;
 
 struct CAVIFile
 {
@@ -170,10 +172,18 @@ public:
 	{
 		return m_File.IsValidHandle();
 	}
+	bool HasVideo() const
+	{
+		return( true );
+	}
+	bool HasAudio() const
+	{
+		return( m_AudioFormat.IsValidFormat());
+	}
 
 	HRESULT OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
 	HRESULT OpenAVIFile( const TCHAR* pszFileName );
-	HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec );
+	//HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec );
 
 	// compress the raw data and store it.
 	HRESULT WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength );
@@ -187,7 +197,7 @@ public:
 
 private:
 	void InitBitmapIn( BITMAPINFO& biIn ) const;
-	int InitFileHeader( AVI_FILE_HEADER& afh );
+	int InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AVI_AUDIO_HEADER* pAudio );
 
 public:
 	CVideoFrameForm m_FrameForm;		// pixel format of each video frame.
@@ -206,7 +216,7 @@ private:
 	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.
 
 	CWaveFormat m_AudioFormat;
-	CWaveACMStream m_ACM;			// compress audio stream.
+	CWaveACMStream m_AudioCodec;	// compress audio stream.
 };
 
 extern HRESULT Check_GetLastError( HRESULT hDefault = E_FAIL );

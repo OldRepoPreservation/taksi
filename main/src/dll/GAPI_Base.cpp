@@ -179,6 +179,7 @@ void CTaksiGAPIBase::RecordAVI_Reset()
 HRESULT CTaksiGAPIBase::RecordAVI_Start()
 {
 	// Start a new AVI file record. With a new name that has a time stamp.
+
 	sg_Shared.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
@@ -219,7 +220,8 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 		fFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
 	}
 
-	HRESULT hRes = g_AVIFile.OpenAVICodec( FrameForm, fFrameRate, sg_Config.m_VideoCodec );
+	HRESULT hRes = g_AVIFile.OpenAVICodec( FrameForm, fFrameRate, 
+		sg_Config.m_VideoCodec, &sg_Config.m_AudioFormat );
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
@@ -229,7 +231,18 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 		LOG_WARN(("g_AVIFile.OpenAVIFile FAILED 0x%x." LOG_CR, hRes ));
 		return hRes;
 	}
-	
+
+#ifdef USE_AUDIO
+	// Open the audio input device.
+	if ( m_iAudioDevice != WAVE_DEVICE_NONE )
+	{
+		hRes = g_AVIThread.OpenAudioInputDevice( m_iAudioDevice, sg_Config.m_AudioFormat );
+		if ( FAILED(hRes))
+		{
+		}
+	}
+#endif
+
 	hRes = g_AVIFile.OpenAVIFile( szFileName );
 	if ( FAILED(hRes))
 	{
@@ -298,11 +311,11 @@ bool CTaksiGAPIBase::RecordAVI_Frame()
 	}
 
 	// NOTE: I cant safely use sg_Config.m_bVideoHalfSize in real time.
-	bool bVideoHalfSize = ( pFrame->m_Size.cx < ( g_Proc.m_Stats.m_SizeWnd.cx - 4 ));
+	bool bVideoHalfSize = ( pFrame->m_Video.m_Size.cx < ( g_Proc.m_Stats.m_SizeWnd.cx - 4 ));
 
 	CLOCK_START(b);
 	// get pixels from the backbuffer into the new buffer
-	HRESULT hRes = GetFrame( *pFrame, bVideoHalfSize );	// virtual
+	HRESULT hRes = GetFrame( pFrame->m_Video, bVideoHalfSize );	// virtual
 	if ( IS_ERROR(hRes))
 	{
 		m_bGotFrameInfo = false;	// must get it again.

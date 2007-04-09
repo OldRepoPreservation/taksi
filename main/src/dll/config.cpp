@@ -138,7 +138,6 @@ void CTaksiConfigData::InitConfig()
 	m_bVideoHalfSize = true;
 
 	m_AudioFormat.InitFormatEmpty();
-	// m_ACM.Init();
 	m_iAudioDevice = WAVE_DEVICE_NONE;
 
 	m_wHotKey[TAKSI_HOTKEY_ConfigOpen]=0x0;

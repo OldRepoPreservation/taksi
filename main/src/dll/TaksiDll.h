@@ -59,14 +59,19 @@ private:
 };
 extern CTaksiFrameRate g_FrameRate;
 
-struct CAVIFrame : public CVideoFrame
+struct CAVIFrame
 {
 	// an en-queueed frame to be processed.
+	// NOTE: Audio block size may not exactly match selected video frame rate. do the best we can.
 	CAVIFrame()
 		: m_dwFrameDups(0)
 	{
 	}
-	DWORD m_dwFrameDups;	// Dupe the current frame to catch up the frame rate. 0=unused
+	CVideoFrame m_Video;	// the raw (uncompressed) video frame.
+#ifdef USE_AUDIO
+	DWORD m_Audio;			// the raw PCM (uncompressed) audio data.
+#endif
+	DWORD m_dwFrameDups;	// Dupe the current frame to catch up the frame rate. 0=unused, 1=ideal use.
 };
 
 struct CAVIThread
@@ -75,6 +80,8 @@ struct CAVIThread
 public:
 	CAVIThread();
 	~CAVIThread();
+
+	HRESULT OpenAudioInputDevice( int iWaveDeviceId, CWaveFormat& WaveFormat );
 
 	HRESULT StartAVIThread();
 	HRESULT StopAVIThread();
