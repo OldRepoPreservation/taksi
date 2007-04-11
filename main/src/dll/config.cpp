@@ -399,7 +399,7 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 
 	case TAKSI_CFGPROP_VideoCodecInfo:
 		return m_VideoCodec.GetStr(pszValue, iSizeMax);
-	case TAKSI_CFGPROP_AudioCodecInfo:
+	case TAKSI_CFGPROP_AudioFormat:
 		return Mem_ConvertToString( pszValue, iSizeMax, (BYTE*) m_AudioFormat.get_WF(), m_AudioFormat.get_FormatSize());
 	case TAKSI_CFGPROP_AudioDevice:
 		return _snprintf(pszValue, iSizeMax, "%d", m_iAudioDevice );
@@ -493,7 +493,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		if ( ! m_VideoCodec.put_Str(pszValue))
 			return false;
 		break;
-	case TAKSI_CFGPROP_AudioCodecInfo:
+	case TAKSI_CFGPROP_AudioFormat:
 		{
 		BYTE bTmp[1024];
 		ZeroMemory( &bTmp, sizeof(bTmp));

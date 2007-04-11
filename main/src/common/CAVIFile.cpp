@@ -61,10 +61,10 @@ struct AVI_AUDIO_HEADER
 
 	FOURCC fccStrf;                 // "strf"
 	DWORD  dwSizeStrf;
-	WAVEFORMAT m_AudioFormat;
+	WAVEFORMATEX m_AudioFormat;		// Variable length!! m_AudioFormat.cbSize
 
 	FOURCC fccStrn;                 // "strn"
-	DWORD  dwSizeStrn;
+	DWORD  dwSizeStrn;				// sizeof("Audio Stream")
 	char m_Strn[13];				// "Audio Stream"
 	char m_StrnPadEven;
 };
@@ -658,7 +658,6 @@ CAVIFile::CAVIFile()
 {
 	m_VideoCodec.InitCodec();
 	m_AudioFormat.InitFormatEmpty();
-	// m_AudioCodec.Init();
 }
 
 CAVIFile::~CAVIFile() 
@@ -741,7 +740,7 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AV
 		pAudio->dwSizeStrh = sizeof(pAudio->m_StreamHeader);
 
 		pAudio->fccStrf = ckidSTREAMFORMAT; // "strf"
-		pAudio->dwSizeStrf = sizeof(pAudio->m_AudioFormat);
+		pAudio->dwSizeStrf = sizeof(pAudio->m_AudioFormat); // variable size.
 
 		pAudio->fccStrn = ckidSTREAMNAME; // "strn"
 		pAudio->dwSizeStrn = sizeof(pAudio->m_Strn);
@@ -805,12 +804,13 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AV
 
 		// fill in m_AudioFormat header
 		memcpy(&pAudio->m_AudioFormat, &m_AudioFormat, sizeof(m_AudioFormat));
+		// ??? Variable size !! m_AudioFormat.cbSize
 	}
 
 	return iPadFile;
 }
 
-HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
+HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioFormat )
 {
 	// NOTE:
 	//  FrameForm = could be modified to match a format i can use.
@@ -835,13 +835,12 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 
 	// Set the audio codec format desired.
 #ifdef USE_AUDIO
-	if ( pAudioCodec )
+	if ( pAudioFormat )
 	{
 		// Open the Audio compression codec. 
-		m_AudioFormat.SetFormat( *pAudioCodec );
+		m_AudioFormat.SetFormat( *pAudioFormat );
 		if ( HasAudio())
 		{
-			MMRESULT mmRes = m_AudioCodec.StreamOpen();
 		}
 	}
 	else
@@ -1033,9 +1032,9 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 }
 
 #if 0
-HRESULT CAVIFile::OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec )
+HRESULT CAVIFile::OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioFormat )
 {
-	HRESULT hRes = OpenAVICodec( FrameForm, fFrameRate, VideoCodec, pAudioCodec );
+	HRESULT hRes = OpenAVICodec( FrameForm, fFrameRate, VideoCodec, pAudioFormat );
 
 	hRes = OpenAVIFile( pszFileName );
 
@@ -1086,8 +1085,6 @@ void CAVIFile::CloseAVI()
 	}
 
 	m_Index.FlushIndexChunk(m_File);
-
-	m_AudioCodec.StreamClose();
 	m_VideoCodec.DestroyCodec();	// leave m_v.lpbiOut->bmiHeader.biCompression til now
 
 	// close file

@@ -81,7 +81,9 @@ public:
 	CAVIThread();
 	~CAVIThread();
 
+#ifdef USE_AUDIO
 	HRESULT OpenAudioInputDevice( int iWaveDeviceId, CWaveFormat& WaveFormat );
+#endif
 
 	HRESULT StartAVIThread();
 	HRESULT StopAVIThread();
@@ -104,6 +106,10 @@ public:
 private:
 	DWORD ThreadRun();
 	static DWORD __stdcall ThreadEntryProc( void* pThis );
+
+#ifdef USE_AUDIO
+	static void CALLBACK AudioInProc( HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 );
+#endif
 
 private:
 	CNTHandle m_hThread;
