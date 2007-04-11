@@ -113,7 +113,7 @@ public:
 	bool   m_bVideoHalfSize;			// full vs half sized video frames.
 
 	int m_iAudioDevice;	// Audio input device. WAVE_MAPPER = -1, WAVE_DEVICE_NONE = -2. CWaveRecorder
-	CWaveFormat m_AudioFormat;
+	CWaveFormat m_AudioFormat;	// Format i might want.
 
 	WORD   m_wHotKey[TAKSI_HOTKEY_QTY];	// Virtual keys + HOTKEYF_ALT for the HotKeys
 	bool   m_bUseDirectInput;	// Use direct input for key presses. else just keyboard hook

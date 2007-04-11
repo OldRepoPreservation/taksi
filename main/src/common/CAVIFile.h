@@ -183,7 +183,7 @@ public:
 
 	HRESULT OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
 	HRESULT OpenAVIFile( const TCHAR* pszFileName );
-	//HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioCodec );
+	//HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioFormat );
 
 	// compress the raw data and store it.
 	HRESULT WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength );
@@ -216,7 +216,6 @@ private:
 	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.
 
 	CWaveFormat m_AudioFormat;
-	CWaveACMStream m_AudioCodec;	// compress audio stream.
 };
 
 extern HRESULT Check_GetLastError( HRESULT hDefault = E_FAIL );

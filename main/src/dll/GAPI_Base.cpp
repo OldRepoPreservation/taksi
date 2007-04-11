@@ -234,12 +234,14 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 
 #ifdef USE_AUDIO
 	// Open the audio input device.
-	if ( m_iAudioDevice != WAVE_DEVICE_NONE )
+	hRes = g_AVIThread.OpenAudioInputDevice( m_iAudioDevice, sg_Config.m_AudioFormat );
+	if ( FAILED(hRes))
 	{
-		hRes = g_AVIThread.OpenAudioInputDevice( m_iAudioDevice, sg_Config.m_AudioFormat );
-		if ( FAILED(hRes))
-		{
-		}
+		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
+			_T("Cant open Audio device/codec. Error=0x%x."), hRes );
+		g_Proc.UpdateStat(TAKSI_PROCSTAT_LastError);
+		LOG_WARN(("g_AVIFile.OpenAVIFile device/codec FAILED 0x%x." LOG_CR, hRes ));
+		return hRes;
 	}
 #endif
 

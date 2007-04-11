@@ -3,7 +3,7 @@
 // for CTaksiConfig
 // Shared with DLL and EXE
 
-ConfigProp(AudioCodecInfo,			m_AudioCodec,	"Audio format / codec")
+ConfigProp(AudioFormat,				m_AudioFormat,	"Audio format for codec")
 ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")
 
 ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end with a backslash)")

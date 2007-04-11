@@ -295,7 +295,11 @@ HRESULT CAVIThread::StopAVIThread()
 		return S_FALSE;
 
 	DEBUG_TRACE(( "CAVIThread::StopAVIThread" LOG_CR ));
+
 	m_bStop	= true;
+#ifdef USE_AUDIO
+	g_AudioInput.Close();
+#endif
 	m_EventDataStart.SetEvent();	// wake up to exit.
 
 	// Wait for it !
@@ -357,10 +361,27 @@ do_erroret:
 }
 
 #ifdef USE_AUDIO
+
+void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
+{
+	// waveInProc()
+	// uMsg = MM_WIM_DATA etc.
+	// dwInstance = CAVIThread
+	// NOTE: this is called on an unknown thread!
+
+	CAVIThread* pThread = (CAVIThread*)dwInstance;
+	ASSERT(pThread);
+
+	if ( uMsg == MM_WIM_DATA )
+	{
+		// waveInAddBuffer is complete.
+	}
+}
+
 HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat )
 {
-	// Open the audio input device.
-	if ( iWaveDeviceId == WAVE_DEVICE_NONE )
+	// Open the audio input device. Codec is built in!
+	if ( iWaveDeviceId == WAVE_DEVICE_NONE )	// want no audio.
 	{
 		return S_FALSE;
 	}
@@ -371,9 +392,15 @@ HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWav
 		return E_FAIL;
 	}
 
-	mmRes = g_AudioInput.Open( WaveFormat, 0, this, 0 );
+	// NOTE: this engages the ACM for us under the hood.
+	mmRes = g_AudioInput.Open( WaveFormat, AudioInProc, (UINT_PTR) this, CALLBACK_FUNCTION|WAVE_MAPPED );
 	if ( mmRes != 0 )
 	{
+		// No codec for this? just do PCM and do the ACM manually? waveInOpen()
+		if ( mmRes == WAVERR_BADFORMAT )
+		{
+		}
+		// Device is busy?
 		return E_FAIL;
 	}
 
