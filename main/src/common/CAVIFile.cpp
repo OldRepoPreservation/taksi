@@ -1091,7 +1091,7 @@ void CAVIFile::CloseAVI()
 	m_File.CloseHandle();
 }
 
-HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
+HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 {
 	// compress and write a single frame.
 	// ARGS:
@@ -1109,7 +1109,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 	if ( nTimes <= 0 ) 
 		return 0;
 	ASSERT( ! memcmp( &frame, &m_FrameForm, sizeof(m_FrameForm)));
-	DEBUG_TRACE(("CAVIFile:WriteVideoFrame: called. writing frame %d time(s)" LOG_CR, nTimes ));
+	DEBUG_TRACE(("CAVIFile:WriteVideoBlocks: called. writing frame %d time(s)" LOG_CR, nTimes ));
 
 	bool bCompressed;
 	const void* pCompBuf;
@@ -1131,7 +1131,7 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 			// ??? since we know this is not changed, can i just write a blank frame?
 		}
 
-		DEBUG_TRACE(("CAVIFile:WriteVideoFrame: size=%d, bIsKey=%d" LOG_CR, nSizeComp, bIsKey ));
+		DEBUG_TRACE(("CAVIFile:WriteVideoBlocks: size=%d, bIsKey=%d" LOG_CR, nSizeComp, bIsKey ));
 
 		DWORD dwTags[2];
 		dwTags[0] = bCompressed ? MAKEFOURCC('0', '0', 'd', 'c') : MAKEFOURCC('0', '0', 'd', 'b');
@@ -1152,12 +1152,18 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 		if ( dwBytesWritten != sizeof(dwTags))
 		{
 			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
-			DEBUG_ERR(("CAVIFile:WriteVideoFrame:WriteFile FAIL=0x%x" LOG_CR, hRes ));
+			DEBUG_ERR(("CAVIFile:WriteVideoBlocks:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
 		dwBytesWrittenTotal += dwBytesWritten;
 
 		::WriteFile(m_File, pCompBuf, (DWORD) nSizeComp, &dwBytesWritten, NULL);
+		if ( dwBytesWritten != nSizeComp )
+		{
+			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			DEBUG_ERR(("CAVIFile:WriteVideoBlocks:WriteFile FAIL=0x%x" LOG_CR, hRes ));
+			return hRes;
+		}
 		dwBytesWrittenTotal += dwBytesWritten;
 
 		if ( nSizeComp & 1 ) // pad to even size.
@@ -1175,25 +1181,34 @@ HRESULT CAVIFile::WriteVideoFrame( CVideoFrame& frame, int nTimes )
 	return dwBytesWrittenTotal;	// ASSUME not negative -> error
 }
 
-HRESULT CAVIFile::WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength )
+HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 {
-	// Write out the audio blocks associated wit hthe video frames.
-	// TODO ???
+	// Write out the audio blocks associated with the video frames.
 	if ( ! m_File.IsValidHandle() || ! HasAudio()) 
 		return 0;
-#ifdef USE_AUDIO
+
+	DWORD dwTags[2];
+	dwTags[0] = MAKEFOURCC('0', '1', 'w', 'b');
+	dwTags[1] = dwLength;
 	
 	DWORD dwBytesWritten = 0;
-	::WriteFile(m_File, pWaveData, dwLength, &dwBytesWritten, NULL);
+	::WriteFile( m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(dwTags))
 	{
 		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
-		DEBUG_ERR(("CAVIFile:WriteAudioFrame:WriteFile FAIL=0x%x" LOG_CR, hRes ));
+		DEBUG_ERR(("CAVIFile:WriteAudioBlock:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
 
-#endif
-	return 0;
+	::WriteFile( m_File, pWaveData, dwLength, &dwBytesWritten, NULL);
+	if ( dwBytesWritten != dwLength )
+	{
+		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		DEBUG_ERR(("CAVIFile:WriteAudioBlock:WriteFile FAIL=0x%x" LOG_CR, hRes ));
+		return hRes;
+	}
+
+	return( dwLength + sizeof(dwTags));
 }
 
 #ifdef _DEBUG

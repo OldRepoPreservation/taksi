@@ -284,7 +284,7 @@ void CWaveRecorder::Close()
 	}
 }
 
-MMRESULT CWaveRecorder::Open( const CWaveFormat& format, DWORD dwCallback, DWORD dwInstanceData, DWORD fdwOpen )
+MMRESULT CWaveRecorder::Open( const CWaveFormat& format, UINT_PTR dwCallback, UINT_PTR dwInstanceData, DWORD fdwOpen )
 {
 	// fdwOpen = CALLBACK_WINDOW, WAVE_ALLOWSYNC, WAVE_MAPPED etc.
 	Close();
@@ -453,7 +453,7 @@ void CWavePlayer::Close()
 	}
 }
 
-MMRESULT CWavePlayer::Open( const CWaveFormat& format, DWORD dwCallback, DWORD dwInstanceData, DWORD fdwOpen )
+MMRESULT CWavePlayer::Open( const CWaveFormat& format, UINT_PTR dwCallback, UINT_PTR dwInstanceData, DWORD fdwOpen )
 {
 	// fdwOpen = CALLBACK_WINDOW, WAVE_ALLOWSYNC etc.
 	Close();	// kill any previous open first.

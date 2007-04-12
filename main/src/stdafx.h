@@ -12,7 +12,7 @@
 
 // This cuases us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
 #define USE_GDIP		// use Gdiplus::Bitmap to save images as PNG (or JPEG)
-// #define USE_AUDIO
+//#define USE_AUDIO
 
 // System includes always go first.
 #include <windows.h>

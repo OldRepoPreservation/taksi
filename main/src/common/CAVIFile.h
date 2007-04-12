@@ -186,8 +186,8 @@ public:
 	//HRESULT OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& VideoCodec, const CWaveFormat* pAudioFormat );
 
 	// compress the raw data and store it.
-	HRESULT WriteAudioFrame( const BYTE* pWaveData, DWORD dwLength );
-	HRESULT WriteVideoFrame( CVideoFrame& frame, int iTimesDupe );
+	HRESULT WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength );
+	HRESULT WriteVideoBlocks( CVideoFrame& frame, int iTimesDupe );
 
 	void CloseAVI();
 
