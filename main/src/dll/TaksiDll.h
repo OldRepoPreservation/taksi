@@ -9,6 +9,7 @@
 #endif
 
 #include "../common/CThreadLockedLong.h"
+#include "../common/CWaveDevice.h"
 
 extern CAVIFile g_AVIFile;
 
@@ -82,7 +83,7 @@ public:
 	~CAVIThread();
 
 #ifdef USE_AUDIO
-	HRESULT OpenAudioInputDevice( int iWaveDeviceId, CWaveFormat& WaveFormat );
+	HRESULT OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat );
 #endif
 
 	HRESULT StartAVIThread();
@@ -130,6 +131,11 @@ private:
 	CThreadLockedLong m_iFrameCount;	// how many busy frames are there? 
 
 	DWORD m_dwTotalFramesProcessed;
+
+#ifdef USE_AUDIO
+	CWaveRecorder m_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
+	CWaveHeaderBase m_AudioBuffers[4];	// keep these buffers for recording.
+#endif
 };
 extern CAVIThread g_AVIThread;
 

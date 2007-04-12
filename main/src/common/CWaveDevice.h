@@ -78,8 +78,9 @@ class LIBSPEC CWaveDevice : public CRefObjBase
 	// CRefObjBase = all WAVEHDR s that are WHDR_PREPARED for this device.
 	friend class CWaveHeaderBase;
 
-public:
+protected:
 	CWaveDevice( WAVE_DEVICEID_TYPE uDeviceID = WAVE_MAPPER );
+public:
 	~CWaveDevice();
 
 	static WAVE_DEVICEID_TYPE __stdcall FindDeviceByProductID( bool bInput, WAVE_PRODUCTID_TYPE dwPid );
@@ -120,7 +121,7 @@ public:
 		return m_iHeadersInQueue;
 	}
 
-	virtual MMRESULT Open( const CWaveFormat& format, DWORD dwCallback, DWORD dwInstanceData, DWORD fdwOpenFlags ) = 0;
+	virtual MMRESULT Open( const CWaveFormat& format, UINT_PTR dwCallback, UINT_PTR dwInstanceData, DWORD fdwOpenFlags ) = 0;
 	virtual void Close() = 0;
 
 	virtual MMRESULT Start() = 0;
@@ -170,7 +171,7 @@ public:
 	virtual MMRESULT put_DeviceID( WAVE_DEVICEID_TYPE uDeviceID );
 	virtual WAVE_DEVICEID_TYPE QueryDeviceID() const;
 
-	virtual MMRESULT Open( const CWaveFormat& format, DWORD dwCallback, DWORD dwInstanceData, DWORD fdwOpenFlags );
+	virtual MMRESULT Open( const CWaveFormat& format, UINT_PTR dwCallback, UINT_PTR dwInstanceData, DWORD fdwOpenFlags );
 	virtual void Close();
 
 	MMRESULT SetLowPri();	// background recorder.
@@ -211,7 +212,7 @@ public:
 	virtual MMRESULT put_DeviceID( WAVE_DEVICEID_TYPE uDeviceID );
 	virtual WAVE_DEVICEID_TYPE QueryDeviceID() const;
 
-	virtual MMRESULT Open( const CWaveFormat& format, DWORD dwCallback, DWORD dwInstanceData, DWORD fdwOpenFlags );
+	virtual MMRESULT Open( const CWaveFormat& format, UINT_PTR dwCallback, UINT_PTR dwInstanceData, DWORD fdwOpenFlags );
 	virtual void Close();
 
 	virtual MMRESULT GetPosition( MMTIME &Info ) const;

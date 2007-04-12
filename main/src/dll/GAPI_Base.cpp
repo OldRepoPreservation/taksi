@@ -234,7 +234,7 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 
 #ifdef USE_AUDIO
 	// Open the audio input device.
-	hRes = g_AVIThread.OpenAudioInputDevice( m_iAudioDevice, sg_Config.m_AudioFormat );
+	hRes = g_AVIThread.OpenAudioInputDevice( sg_Config.m_iAudioDevice, sg_Config.m_AudioFormat );
 	if ( FAILED(hRes))
 	{
 		_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 

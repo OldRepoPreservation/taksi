@@ -4,15 +4,10 @@
 //
 #include "../stdafx.h"
 #include "TaksiDll.h"
-#include "../common/CWaveDevice.h"
 
 CTaksiFrameRate g_FrameRate;	// measure current video frame rate.
 CAVIFile g_AVIFile;				// current video file we are recording.
 CAVIThread g_AVIThread;			// put all compression on a back thread. Q raw data to be processed.
-
-#ifdef USE_AUDIO
-CWaveRecorder g_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
-#endif
 
 //**************************************************************************************
 
@@ -151,8 +146,8 @@ DWORD CAVIThread::ThreadRun()
 		ASSERT(pFrame->m_Video.IsValidFrame());
 		ASSERT(pFrame->m_dwFrameDups);
 
-		// compress and write
-		HRESULT hRes = g_AVIFile.WriteVideoFrame( pFrame->m_Video, pFrame->m_dwFrameDups ); 
+		// compress and write video frame(s)
+		HRESULT hRes = g_AVIFile.WriteVideoBlocks( pFrame->m_Video, pFrame->m_dwFrameDups ); 
 		if ( SUCCEEDED(hRes))
 		{
 			if ( hRes )
@@ -164,9 +159,10 @@ DWORD CAVIThread::ThreadRun()
 
 #ifdef USE_AUDIO
 		// Audio data?
-		if ( g_AVIFile.HasAudio() )
+		if ( g_AVIFile.HasAudio())
 		{
-			g_AVIFile.WriteAudioFrame( pFrame->m_Audio, pFrame->m_dwFrameDups );
+			// Write all the audio data available.
+			g_AVIFile.WriteAudioBlock( pFrame->m_Audio, pFrame->m_dwFrameDups );
 		}
 #endif
 
@@ -202,6 +198,8 @@ DWORD __stdcall CAVIThread::ThreadEntryProc( void* pThis ) // static
 	ASSERT(pThis);
 	return ((CAVIThread*)pThis)->ThreadRun();
 }
+
+//*****************************************************************
 
 void CAVIThread::WaitForAllFrames()
 {
@@ -288,6 +286,71 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 	}
 }
 
+//*****************************************************************
+
+#ifdef USE_AUDIO
+
+void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
+{
+	// waveInProc()
+	// uMsg = MM_WIM_DATA etc.
+	// dwInstance = CAVIThread
+	// NOTE: this is called on an unknown thread!
+
+	CAVIThread* pThread = (CAVIThread*)dwInstance;
+	ASSERT(pThread);
+
+	if ( uMsg == MM_WIM_DATA )
+	{
+		// waveInAddBuffer is complete. recycle and/or move to next
+	}
+}
+
+HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat )
+{
+	// Open the audio input device. Codec is built in!
+	if ( iWaveDeviceId == WAVE_DEVICE_NONE )	// want no audio.
+	{
+		return S_FALSE;
+	}
+	if ( ! WaveFormat.IsValidFormat())
+	{
+		return S_FALSE;
+	}
+
+	MMRESULT mmRes = m_AudioInput.put_DeviceID(iWaveDeviceId);
+	if ( mmRes != 0 )
+	{
+		return E_FAIL;
+	}
+
+	// NOTE: this engages the ACM for us under the hood.
+	mmRes = m_AudioInput.Open( WaveFormat, (UINT_PTR) AudioInProc, (UINT_PTR) this, CALLBACK_FUNCTION|WAVE_MAPPED );
+	if ( mmRes != 0 )
+	{
+		// No codec for this? just do PCM and do the ACM manually? waveInOpen()
+		if ( mmRes == WAVERR_BADFORMAT )
+		{
+		}
+		// Device is busy?
+		return E_FAIL;
+	}
+
+	// Queue up Max of N seconds of audio.
+	// Compute a buffer size. approximate max per frame. honor blockAlign min
+	DWORD dwBufferSize = 0;
+	for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
+	{
+		m_AudioBuffers[j].AttachData(NULL,dwBufferSize);
+	}
+
+	return S_OK;
+}
+
+#endif // USE_AUDIO
+
+//*****************************************************************
+
 HRESULT CAVIThread::StopAVIThread()
 {
 	// Destroy the thread. might be better to just let it sit ?
@@ -297,9 +360,6 @@ HRESULT CAVIThread::StopAVIThread()
 	DEBUG_TRACE(( "CAVIThread::StopAVIThread" LOG_CR ));
 
 	m_bStop	= true;
-#ifdef USE_AUDIO
-	g_AudioInput.Close();
-#endif
 	m_EventDataStart.SetEvent();	// wake up to exit.
 
 	// Wait for it !
@@ -319,6 +379,15 @@ HRESULT CAVIThread::StopAVIThread()
 		}
 	}
 
+#ifdef USE_AUDIO
+	// Close the audio last.
+	m_AudioInput.Close();
+	for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
+	{
+		m_AudioBuffers[j].DetachData();
+	}
+#endif
+
 	m_hThread.CloseHandle();
 	return hRes;
 }
@@ -327,7 +396,9 @@ HRESULT CAVIThread::StartAVIThread()
 {
 	// Create my resources.	
 	if ( m_nThreadId != NULL )	// already running
+	{
 		return S_FALSE;
+	}
 
 	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
 	m_bStop	= false;
@@ -357,53 +428,12 @@ do_erroret:
 		LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
-	return S_OK;
-}
 
 #ifdef USE_AUDIO
-
-void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
-{
-	// waveInProc()
-	// uMsg = MM_WIM_DATA etc.
-	// dwInstance = CAVIThread
-	// NOTE: this is called on an unknown thread!
-
-	CAVIThread* pThread = (CAVIThread*)dwInstance;
-	ASSERT(pThread);
-
-	if ( uMsg == MM_WIM_DATA )
+	if ( m_AudioInput.get_Handle())
 	{
-		// waveInAddBuffer is complete.
+		m_AudioInput.Start();	// start active recording.
 	}
-}
-
-HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat )
-{
-	// Open the audio input device. Codec is built in!
-	if ( iWaveDeviceId == WAVE_DEVICE_NONE )	// want no audio.
-	{
-		return S_FALSE;
-	}
-
-	MMRESULT mmRes = g_AudioInput.put_DeviceID(iWaveDeviceId);
-	if ( mmRes != 0 )
-	{
-		return E_FAIL;
-	}
-
-	// NOTE: this engages the ACM for us under the hood.
-	mmRes = g_AudioInput.Open( WaveFormat, AudioInProc, (UINT_PTR) this, CALLBACK_FUNCTION|WAVE_MAPPED );
-	if ( mmRes != 0 )
-	{
-		// No codec for this? just do PCM and do the ACM manually? waveInOpen()
-		if ( mmRes == WAVERR_BADFORMAT )
-		{
-		}
-		// Device is busy?
-		return E_FAIL;
-	}
-
+#endif
 	return S_OK;
 }
-#endif
