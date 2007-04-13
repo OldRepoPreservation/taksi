@@ -70,7 +70,8 @@ struct CAVIFrame
 	}
 	CVideoFrame m_Video;	// the raw (uncompressed) video frame.
 #ifdef USE_AUDIO
-	DWORD m_Audio;			// the raw PCM (uncompressed) audio data.
+	DWORD m_AudioStart;		// start of the audio stream
+	DWORD m_AudioStop;		// end of the audio stream for these frames.
 #endif
 	DWORD m_dwFrameDups;	// Dupe the current frame to catch up the frame rate. 0=unused, 1=ideal use.
 };

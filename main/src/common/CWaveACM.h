@@ -48,8 +48,8 @@ public:
 
 	// Async ACM Compression conversion.
 	// Progress in the stream.
-	WAV_BLOCKS m_SrcIndex;
-	WAV_BLOCKS m_DstIndex;
+	WAVE_BLOCKS_t m_SrcIndex;
+	WAVE_BLOCKS_t m_DstIndex;
 	int     m_iBuffers;			// Total outstanding buffers. (For async mode only)
 	HRESULT m_hResStop;			// Stop feeding. ERROR_CANCELLED
 };
