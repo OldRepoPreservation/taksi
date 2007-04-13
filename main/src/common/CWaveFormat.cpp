@@ -44,7 +44,7 @@ bool CWaveFormat::IsSameAs( const WAVEFORMATEX FAR* pForm ) const
 	return( ! memcmp( get_WF(), pForm, iSize ));
 }
 
-DWORD CWaveFormat::CvtBlocksToSamples( WAV_BLOCKS index ) const
+DWORD CWaveFormat::CvtBlocksToSamples( WAVE_BLOCKS_t index ) const
 {
 	//@------------------------------------------------------------------------
 	// PURPOSE:
@@ -67,7 +67,7 @@ DWORD CWaveFormat::CvtBlocksToSamples( WAV_BLOCKS index ) const
 	return( val );
 }
 
-DWORD CWaveFormat::CvtBlocksTomSec( WAV_BLOCKS index ) const
+DWORD CWaveFormat::CvtBlocksTomSec( WAVE_BLOCKS_t index ) const
 {
 	//
 	// Avoid overflow use: __int64
@@ -75,15 +75,15 @@ DWORD CWaveFormat::CvtBlocksTomSec( WAV_BLOCKS index ) const
 	return((DWORD)(((__int64) index * get_BlockSize() * 1000 ) / get_BytesPerSec()));
 }
 
-WAV_BLOCKS CWaveFormat::CvtSamplesToBlocks( DWORD dwSamples ) const
+WAVE_BLOCKS_t CWaveFormat::CvtSamplesToBlocks( DWORD dwSamples ) const
 {
 	if ( IsPCM()) 
-		return((WAV_BLOCKS) dwSamples );
+		return((WAVE_BLOCKS_t) dwSamples );
 	dwSamples *= get_BytesPerSec();
 	return( dwSamples / ( get_BlockSize() * get_SamplesPerSec()));
 }
 
-WAV_BLOCKS CWaveFormat::CvtmSecToBlocks( DWORD mSec ) const
+WAVE_BLOCKS_t CWaveFormat::CvtmSecToBlocks( DWORD mSec ) const
 {
 	mSec *= get_BytesPerSec();
 	mSec += get_BlockSize() * 50U;   // rounding.
@@ -256,7 +256,7 @@ bool CWaveFormat::IsValidFormat( void ) const
 	return( true );
 }
 
-WAV_BLOCKS CWaveFormat::CvtSrcToDstSize( WAV_BLOCKS SrcSize, const WAVEFORMATEX * pDstForm ) const
+WAVE_BLOCKS_t CWaveFormat::CvtSrcToDstSize( WAVE_BLOCKS_t SrcSize, const WAVEFORMATEX * pDstForm ) const
 {
 	//@------------------------------------------------------------------------
 	// PURPOSE:
@@ -280,5 +280,5 @@ WAV_BLOCKS CWaveFormat::CvtSrcToDstSize( WAV_BLOCKS SrcSize, const WAVEFORMATEX 
 	__int64 Rate = ((__int64)( pDstForm->nAvgBytesPerSec * get_BlockSize()))
 		/ ((__int64)( get_BytesPerSec() * pDstForm->nBlockAlign ));
 
-	return((WAV_BLOCKS)( SrcSize * Rate ));
+	return((WAVE_BLOCKS_t)( SrcSize * Rate ));
 }

@@ -31,7 +31,8 @@ typedef struct tWAVEFORMATEX
 } WAVEFORMATEX;
 #endif // _WAVEFORMATEX_
 
-typedef DWORD WAV_BLOCKS;     // Index in blocks to the sound buffer.
+typedef DWORD WAVE_BLOCKS_t;     // Index in blocks to the sound buffer.
+typedef DWORD TIMESYS_t;		// GetTickCount() = mSec
 
 //***********************************************************************
 // -CWaveFormat
@@ -67,7 +68,7 @@ public:
 
 	bool IsSameAs( const WAVEFORMATEX FAR* pForm ) const;
 
-	WAV_BLOCKS CvtSrcToDstSize( WAV_BLOCKS SrcSize, const WAVEFORMATEX* pDstForm ) const;
+	WAVE_BLOCKS_t CvtSrcToDstSize( WAVE_BLOCKS_t SrcSize, const WAVEFORMATEX* pDstForm ) const;
 	DWORD GetRateDiff( const WAVEFORMATEX* pDstForm ) const
 	{
 		// Get a sample rate conversion factor.
@@ -135,20 +136,20 @@ public:
 	// Convert Samples, Time(ms), and Bytes to Blocks and back.
 	//
 
-	DWORD CvtBlocksToBytes( WAV_BLOCKS index ) const
+	DWORD CvtBlocksToBytes( WAVE_BLOCKS_t index ) const
 	{
 		return( index * get_BlockSize());
 	}
-	WAV_BLOCKS CvtBytesToBlocks( DWORD sizebytes ) const
+	WAVE_BLOCKS_t CvtBytesToBlocks( DWORD sizebytes ) const
 	{
 		return( sizebytes / get_BlockSize());
 	}
 
-	DWORD CvtBlocksToSamples( WAV_BLOCKS index ) const;
-	WAV_BLOCKS CvtSamplesToBlocks( DWORD dwSamples ) const;
+	DWORD CvtBlocksToSamples( WAVE_BLOCKS_t index ) const;
+	WAVE_BLOCKS_t CvtSamplesToBlocks( DWORD dwSamples ) const;
 
-	DWORD CvtBlocksTomSec( WAV_BLOCKS index ) const;
-	WAV_BLOCKS CvtmSecToBlocks( DWORD mSec ) const;
+	TIMESYS_t CvtBlocksTomSec( WAVE_BLOCKS_t index ) const;
+	WAVE_BLOCKS_t CvtmSecToBlocks( TIMESYS_t mSec ) const;
 
 	static int __stdcall FormatCalcSize( const WAVEFORMATEX FAR* pForm );
 	bool ReAllocFormatSize( int iSize );

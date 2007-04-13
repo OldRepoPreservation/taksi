@@ -162,7 +162,7 @@ DWORD CAVIThread::ThreadRun()
 		if ( g_AVIFile.HasAudio())
 		{
 			// Write all the audio data available.
-			g_AVIFile.WriteAudioBlock( pFrame->m_Audio, pFrame->m_dwFrameDups );
+			// g_AVIFile.WriteAudioBlock( pFrame->m_Audio, pFrame->m_dwFrameDups );
 		}
 #endif
 
