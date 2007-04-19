@@ -130,6 +130,19 @@ CAVIThread::~CAVIThread()
 	StopAVIThread();
 }
 
+void CAVIThread::InitFrameQ()
+{
+	// called by StartAVIThread() and constructor
+	m_iFrameBusyIdx=0;	// index to Frame ready to compress.
+	m_iFrameFreeIdx=0;	// index to empty frame. ready to fill
+	m_iFrameCount.m_lValue = 0;
+#ifdef USE_AUDIO
+	m_AudioBufferSize = 0;
+	m_AudioBufferHeadIdx=0;
+	m_AudioBufferStart=0;
+#endif
+}
+
 DWORD CAVIThread::ThreadRun()
 {
 	// A background thread to do the compression/writing.
@@ -141,7 +154,7 @@ DWORD CAVIThread::ThreadRun()
 	{
 		int iFrameCountPrev = m_iFrameCount.m_lValue;
 		ASSERT( m_iFrameCount.m_lValue > 0 );
-		CAVIFrame* pFrame = &m_aFrames[ m_iFrameBusy ];
+		CAVIFrame* pFrame = &m_aFrames[ m_iFrameBusyIdx ];
 		ASSERT(pFrame);
 		ASSERT(pFrame->m_Video.IsValidFrame());
 		ASSERT(pFrame->m_dwFrameDups);
@@ -169,7 +182,7 @@ DWORD CAVIThread::ThreadRun()
 		// we are done.
 		m_dwTotalFramesProcessed++;
 		pFrame->m_dwFrameDups = 0;	// done.
-		m_iFrameBusy = ( m_iFrameBusy + 1 ) % AVI_FRAME_QTY;
+		m_iFrameBusyIdx = ( m_iFrameBusyIdx + 1 ) % AVI_FRAME_QTY;
 		ASSERT( m_iFrameCount.m_lValue > 0 );
 		bool bMore = m_iFrameCount.Dec();
 		m_EventDataDone.SetEvent();	// done at least one frame!
@@ -243,7 +256,7 @@ CAVIFrame* CAVIThread::WaitForNextFrame()
 	}
 
 	ASSERT( m_iFrameCount.m_lValue < AVI_FRAME_QTY );
-	CAVIFrame* pFrame = &m_aFrames[ m_iFrameFree ];
+	CAVIFrame* pFrame = &m_aFrames[ m_iFrameFreeIdx ];
 	ASSERT( pFrame );
 	ASSERT( pFrame->m_dwFrameDups == 0 ); 
 	ASSERT( g_AVIFile.m_FrameForm.get_SizeBytes());
@@ -260,7 +273,7 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 {
 	// New data is ready so wake up the thread.
 	// ARGS:
-	//  pFrame = m_aFrames[ m_iFrameFree ]
+	//  pFrame = m_aFrames[ m_iFrameFreeIdx ]
 	//  dwFrameDups = Multiple time frames have gone by.
 	// ASSUME: 
 	//  WaitForNextFrame() was just called.
@@ -273,10 +286,10 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 	ASSERT(pFrame);
 	ASSERT( pFrame->m_Video.IsValidFrame());
 	ASSERT( pFrame->m_dwFrameDups == 0 ); 
-	ASSERT( pFrame == &m_aFrames[ m_iFrameFree ] );
+	ASSERT( pFrame == &m_aFrames[ m_iFrameFreeIdx ] );
 
 	pFrame->m_dwFrameDups = dwFrameDups;	// indicate this pFrame is ready to go.
-	m_iFrameFree = ( m_iFrameFree + 1 ) % AVI_FRAME_QTY;	// its full and ready to process.
+	m_iFrameFreeIdx = ( m_iFrameFreeIdx + 1 ) % AVI_FRAME_QTY;	// its full and ready to process.
 	m_EventDataDone.ResetEvent();	// manual reset.
 
 	ASSERT( m_iFrameCount.m_lValue < AVI_FRAME_QTY );

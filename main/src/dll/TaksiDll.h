@@ -98,12 +98,7 @@ public:
 	{
 		return m_iFrameCount.m_lValue;	// how many busy frames are there? (not yet processed)
 	}
-	void InitFrameQ()
-	{
-		m_iFrameBusy=0;	// index to Frame ready to compress.
-		m_iFrameFree=0;	// index to empty frame. ready to fill
-		m_iFrameCount.m_lValue = 0;
-	}
+	void InitFrameQ();
 
 private:
 	DWORD ThreadRun();
@@ -121,21 +116,25 @@ private:
 	CNTEvent m_EventDataStart;		// Data ready to work on. AVIThread waits on this
 	CNTEvent m_EventDataDone;		// We are done compressing a single frame. foreground waits on this.
 
+	DWORD m_dwTotalFramesProcessed;
+
 	// Make a pool of frames waiting to be compressed/written
 	// ASSUME: dont need a critical section on these since i assume int x=y assignment is atomic.
 	//  One thread reads the other writes. so it should be safe.
-#define AVI_FRAME_QTY 8	// make this variable ??? (full screen raw frames are HUGE!)
+#define AVI_FRAME_QTY		8	// make this variable ??? (full screen raw frames are HUGE!)
 	CAVIFrame m_aFrames[AVI_FRAME_QTY];		// buffer to keep current video frame 
-	int m_iFrameBusy;	// index to Frame ready to compress.
-	int m_iFrameFree;	// index to Frame ready to fill.
+	int m_iFrameBusyIdx;	// index to Frame ready to compress.
+	int m_iFrameFreeIdx;	// index to Frame ready to fill.
 	// (must be locked because it is changed by 2 threads)
 	CThreadLockedLong m_iFrameCount;	// how many busy frames are there? 
 
-	DWORD m_dwTotalFramesProcessed;
-
 #ifdef USE_AUDIO
+#define AUDIO_FRAME_QTY		8	
 	CWaveRecorder m_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
-	CWaveHeaderBase m_AudioBuffers[4];	// keep these buffers for recording.
+	CWaveHeaderBase m_AudioBuffers[AUDIO_FRAME_QTY];	// keep these buffers for recording.
+	WAVE_BLOCKS_t m_AudioBufferSize;	// Size of each buffer in blocks
+	int m_AudioBufferHeadIdx;			// m_AudioBuffers that is time head.
+	WAVE_BLOCKS_t m_AudioBufferStart;	// Total Time counter for m_AudioBufferHeadIdx from 0 % m_AudioBufferSize
 #endif
 };
 extern CAVIThread g_AVIThread;
