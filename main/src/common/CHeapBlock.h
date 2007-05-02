@@ -16,10 +16,10 @@
 #include <crtdbg.h>
 #endif
 
-#define CHeapBlock_IsValid(p)	1
-#define CHeapBlock_IsValidOffset(p,i) 1
-#define CHeapBlock_Alloc(i) malloc(i)
-#define CHeapBlock_Free(p)	free(p)
-#define CHeapBlock_ReAlloc(p,i)	realloc(p,i)
+#define CHeapBlock_IsValid(p)			((p)!=NULL)
+#define CHeapBlock_IsValidOffset(p,i)	((p)!=NULL)
+#define CHeapBlock_Alloc(i)				malloc(i)
+#define CHeapBlock_Free(p)				free(p)
+#define CHeapBlock_ReAlloc(p,i)			realloc(p,i)
 
 #endif	// _INC_CHeapBlock_H

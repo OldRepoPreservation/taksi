@@ -500,7 +500,7 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 		int iSize = Mem_ReadFromString( bTmp, sizeof(bTmp)-1, pszValue );
 		if ( iSize < sizeof(PCMWAVEFORMAT))
 		{
-			ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
+			//ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
 			return false;
 		}
 		if ( ! m_AudioFormat.SetFormatBytes( bTmp, iSize ))

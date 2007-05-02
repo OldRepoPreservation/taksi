@@ -130,14 +130,14 @@ int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc )
 #define STR_GETNONWHITESPACE( pStr ) while ( Str_IsSpace((pStr)[0] )) { (pStr)++; } // isspace()
 
 	int i=0;
-	for ( ; i<iLengthMax; i++ )
+	for ( ; i<iLengthMax; )
 	{
 		STR_GETNONWHITESPACE(pszSrc);
 		if (pszSrc[0]=='\0')
 			break;
 		const char* pszSrcStart = pszSrc;
 		char* pszEnd;
-		pDst[i] = (BYTE) strtol(pszSrc,&pszEnd,0);
+		pDst[i++] = (BYTE) strtol(pszSrc,&pszEnd,0);
 		if ( pszSrcStart == pszEnd )	// must be the field terminator? ")},;"
 			break;
 		pszSrc = pszEnd;

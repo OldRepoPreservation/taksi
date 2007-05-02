@@ -189,7 +189,7 @@ public:
 	HRESULT WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength );
 	HRESULT WriteVideoBlocks( CVideoFrame& frame, int iTimesDupe );
 
-	void CloseAVI();
+	HRESULT CloseAVI();
 
 #ifdef _DEBUG
 	static bool _stdcall UnitTest();
