@@ -269,6 +269,11 @@ bool CVideoCodec::put_Str( const char* pszValue )
 	if ( iSize != sizeof(m_v))
 	{
 	}
+	m_v.hic = NULL;
+	m_v.lpbiIn = NULL;
+	m_v.lpbiOut = NULL;
+	m_v.lpBitsPrev = NULL;
+	m_v.lpState = NULL;
 	return true;
 }
 
@@ -1042,11 +1047,17 @@ HRESULT CAVIFile::OpenAVI( const TCHAR* pszFileName, CVideoFrameForm& FrameForm,
 }
 #endif
 
-void CAVIFile::CloseAVI()
+HRESULT CAVIFile::CloseAVI()
 {
 	// finish sequence compression
 	if ( ! m_File.IsValidHandle())
-		return;
+	{
+		return S_FALSE;
+	}
+	if ( m_VideoCodec.m_v.lpbiOut == NULL )
+	{
+		return E_FAIL;
+	}
 
 	// flush the buffers
 	::FlushFileBuffers(m_File);
@@ -1089,6 +1100,7 @@ void CAVIFile::CloseAVI()
 
 	// close file
 	m_File.CloseHandle();
+	return S_OK;
 }
 
 HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )

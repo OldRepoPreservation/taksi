@@ -215,7 +215,7 @@ bool CWaveFormat::IsValidFormat( void ) const
 	//  true = OK.
 	//@------------------------------------------------------------------------
 
-	if ( ! CHeapBlock_IsValid(m_pWF))    // Illegal format.
+	if ( m_pWF == NULL || ! CHeapBlock_IsValid(m_pWF))    // Illegal format.
 		return( false );
 
 	if ( ! get_Channels() ||

@@ -228,6 +228,9 @@
 				RelativePath="..\common\CDll.h">
 			</File>
 			<File
+				RelativePath="..\common\CHeapBlock.h">
+			</File>
+			<File
 				RelativePath="..\common\CHookJump.cpp">
 			</File>
 			<File
