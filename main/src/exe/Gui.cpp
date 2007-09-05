@@ -34,10 +34,11 @@ CGui::CGui()
 {
 }
 
-int CGui::MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp ) // static
+int CGui::MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp, const TCHAR* pszState ) // static
 {
+	// ASSUME pszTitle is _MAX_PATH
 	TCHAR szName[ _MAX_PATH ];
-	int iLen = LoadString( g_hInst, ID_APP, szName, sizeof(szName)-1 );
+	int iLen = LoadString( g_hInst, ID_APP, pszTitle, _MAX_PATH-1 );
 	if ( iLen <= 0 )
 	{
 		ASSERT(0);
@@ -46,12 +47,14 @@ int CGui::MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp ) // static
 
 	if ( pszHookApp == NULL || pszHookApp[0] == '\0' )
 	{
-		return _sntprintf( pszTitle, _MAX_PATH, _T("%s v") _T(TAKSI_VERSION_S), szName ); 
+		return _sntprintf( pszTitle+iLen, _MAX_PATH-iLen, _T(" v") _T(TAKSI_VERSION_S) ); 
 	}
-	else
+	if ( pszState != NULL )
 	{
-		return _sntprintf( pszTitle, _MAX_PATH, _T("%s - %s"), szName, pszHookApp ); 
+		iLen += _sntprintf( pszTitle+iLen, _MAX_PATH-iLen, _T(" %s"), pszState ); 
 	}
+
+	return _sntprintf( pszTitle+iLen, _MAX_PATH-iLen, _T(" - %s"), pszHookApp ); 
 }
 
 bool CGui::UpdateWindowTitle()
@@ -64,26 +67,29 @@ bool CGui::UpdateWindowTitle()
 		pszHookApp = ::GetFileTitlePtr( sg_ProcStats.m_szProcessPath );
 	}
 
-	TCHAR szTitle[ _MAX_PATH ];
-	int iLen = MakeWindowTitle( szTitle, pszHookApp );
-	if ( iLen <= 0 )
-		return false;
+	int iLenState = 0;
+	TCHAR szState[ _MAX_PATH ];
 
 	switch (sg_ProcStats.m_eState)
 	{
 	case TAKSI_INDICATE_Hooking:
-		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen,
-			_T(" (Hooking)") );
+		iLenState += _sntprintf( szState, COUNTOF(szState),
+			_T("(Hooking)") );
 		break;
 	case TAKSI_INDICATE_Recording:
-		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
-			_T(" (Rec %.2gM)"), sg_ProcStats.get_DataRecMeg());
+		iLenState += _sntprintf( szState, COUNTOF(szState),
+			_T("(Rec %.2gM)"), sg_ProcStats.get_DataRecMeg());
 		break;
 	case TAKSI_INDICATE_RecordPaused:
-		iLen += _sntprintf( szTitle + iLen, COUNTOF(szTitle)-iLen, 
-			_T(" (Pause %.2gM)"), sg_ProcStats.get_DataRecMeg());
+		iLenState += _sntprintf( szState, COUNTOF(szState),
+			_T("(Pause %.2gM)"), sg_ProcStats.get_DataRecMeg());
 		break;
 	}
+
+	TCHAR szTitle[ _MAX_PATH ];
+	int iLen = MakeWindowTitle( szTitle, pszHookApp, (iLenState>0)? szState : NULL );
+	if ( iLen <= 1 )
+		return false;
 
 	SetWindowText( m_hWnd, szTitle );
 	return true;
@@ -270,7 +276,7 @@ void CGui::OnCommandHelpURL() // static
 static void About_OnInitDialog( HWND hwndDlg )
 {
 	TCHAR szTmp[ _MAX_PATH ];
-	int iLen = g_GUI.MakeWindowTitle( szTmp, NULL );
+	int iLen = g_GUI.MakeWindowTitle( szTmp, NULL, NULL );
 	iLen += _sntprintf( szTmp+iLen, COUNTOF(szTmp)-iLen, _T(", (built:") _T(__DATE__) _T(")") );
 	SetDlgItemText( hwndDlg, IDC_ABOUT_1, szTmp );
 
