@@ -26,7 +26,7 @@ public:
 	static void OnCommandHelpURL();
 	static int OnCommandHelpAbout( HWND hWnd );
 
-	static int MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp );
+	static int MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp, const TCHAR* pszState );
 	bool UpdateWindowTitle();
 
 private:
