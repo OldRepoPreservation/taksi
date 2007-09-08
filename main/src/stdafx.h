@@ -10,7 +10,7 @@
 #define USE_DIRECTX			// remove this to compile if u dont have the DirectX SDK
 #define USE_LOGFILE
 
-// This cuases us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
+// This causes us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
 #define USE_GDIP		// use Gdiplus::Bitmap to save images as PNG (or JPEG)
 #define USE_AUDIO
 

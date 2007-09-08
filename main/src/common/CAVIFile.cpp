@@ -840,20 +840,17 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 
 	// Set the audio codec format desired.
 #ifdef USE_AUDIO
-	if ( pAudioFormat )
+	if ( pAudioFormat && m_AudioFormat.SetFormat( *pAudioFormat ))
 	{
 		// Open the Audio compression codec. 
-		m_AudioFormat.SetFormat( *pAudioFormat );
-		if ( HasAudio())
-		{
-		}
+		ASSERT(HasAudioFormat());
 	}
 	else
 #endif
 	{
 		// No audio desired. 
 		m_AudioFormat.SetFormat( NULL );
-		ASSERT( ! HasAudio());
+		ASSERT( ! HasAudioFormat());
 	}
 
 	// open compressor
@@ -964,7 +961,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 	AVI_AUDIO_HEADER aah;
 	InitFileHeader(afh, 
 		(HasVideo())?(&avh):NULL,
-		(HasAudio())?(&aah):NULL);
+		(HasAudioFormat())?(&aah):NULL);
 
 	DWORD dwBytesWritten = 0;
 	::WriteFile(m_File, &afh, sizeof(afh), &dwBytesWritten, NULL);
@@ -987,7 +984,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 		}
 		iJunkChunkSize -= dwBytesWritten;
 	}
-	if (HasAudio())
+	if (HasAudioFormat())
 	{
 		::WriteFile(m_File, &aah, sizeof(aah), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(aah))
@@ -1068,7 +1065,7 @@ HRESULT CAVIFile::CloseAVI()
 	AVI_AUDIO_HEADER aah;
 	int iPadFile = InitFileHeader(afh, 
 		(HasVideo())?(&avh):NULL,
-		(HasAudio())?(&aah):NULL);
+		(HasAudioFormat())?(&aah):NULL);
 
 	// save update header back with my changes.
 	DWORD dwBytesWritten = 0;
@@ -1078,7 +1075,7 @@ HRESULT CAVIFile::CloseAVI()
 	{
 		::WriteFile(m_File, &avh, sizeof(avh), &dwBytesWritten, NULL);
 	}
-	if ( HasAudio())
+	if ( HasAudioFormat())
 	{
 		::WriteFile(m_File, &aah, sizeof(aah), &dwBytesWritten, NULL);
 	}
@@ -1196,8 +1193,14 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 {
 	// Write out the audio blocks associated with the video frames.
-	if ( ! m_File.IsValidHandle() || ! HasAudio()) 
+	if ( ! m_File.IsValidHandle()) 
+	{
 		return 0;
+	}
+	if ( ! HasAudioFormat())	// this shouldnt happen!
+	{
+		return E_FAIL;
+	}
 
 	DWORD dwTags[2];
 	dwTags[0] = MAKEFOURCC('0', '1', 'w', 'b');

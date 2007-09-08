@@ -30,8 +30,8 @@ public:
 	bool InitFreqUnits();
 	void InitStart()
 	{
-		m_fLeftoverWeight = 0;
 		m_tLastCount = 0;
+		m_fLeftoverWeight = 0;
 		m_dwLastOverhead = 0;
 		m_dwOverheadPenalty = 0;
 	}
@@ -132,7 +132,7 @@ private:
 #define AUDIO_FRAME_QTY		8	
 	CWaveRecorder m_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
 	CWaveHeaderBase m_AudioBuffers[AUDIO_FRAME_QTY];	// keep these buffers for recording.
-	WAVE_BLOCKS_t m_AudioBufferSize;	// Size of each buffer in blocks
+	WAVE_BLOCKS_t m_AudioBufferSize;	// Size of each m_AudioBuffers in wave format blocks
 	int m_AudioBufferHeadIdx;			// m_AudioBuffers that is time head.
 	WAVE_BLOCKS_t m_AudioBufferStart;	// Total Time counter for m_AudioBufferHeadIdx from 0 % m_AudioBufferSize
 #endif

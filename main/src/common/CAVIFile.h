@@ -176,7 +176,7 @@ public:
 	{
 		return( true );
 	}
-	bool HasAudio() const
+	bool HasAudioFormat() const
 	{
 		return( m_AudioFormat.IsValidFormat());
 	}
