@@ -68,7 +68,7 @@ double CTaksiFrameRate::CheckFrameWeight( __int64 iTimeDiff )
 		DEBUG_TRACE(( "adjusted iTimeDiff = %d, LastOverhead=%u" LOG_CR, (int) iTimeDiff, (int) m_dwLastOverhead ));
 	}
 
-	double fFrameRateCur = (double)m_dwFreqUnits / (double)iTimeDiff;
+	double fFrameRateCur = ((double)m_dwFreqUnits) / ((double)iTimeDiff);
 
 	if ( g_Proc.m_Stats.m_fFrameRate != fFrameRateCur )
 	{
@@ -172,9 +172,10 @@ DWORD CAVIThread::ThreadRun()
 
 #ifdef USE_AUDIO
 		// Audio data?
-		if ( g_AVIFile.HasAudio())
+		if ( m_AudioInput.get_Handle())	// g_AVIFile.HasAudioFormat()
 		{
 			// Write all the audio data available.
+
 			// g_AVIFile.WriteAudioBlock( pFrame->m_Audio, pFrame->m_dwFrameDups );
 		}
 #endif
@@ -305,7 +306,7 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 
 void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
 {
-	// waveInProc()
+	// waveInProc() = data is ready
 	// uMsg = MM_WIM_DATA etc.
 	// dwInstance = CAVIThread
 	// NOTE: this is called on an unknown thread!
@@ -349,6 +350,8 @@ HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWav
 		return E_FAIL;
 	}
 
+	ASSERT( m_AudioInput.get_Handle());
+
 	// Queue up Max of N seconds of audio.
 	// Compute a buffer size. approximate max per frame. honor blockAlign min
 	DWORD dwBufferSize = 0;
@@ -368,7 +371,9 @@ HRESULT CAVIThread::StopAVIThread()
 {
 	// Destroy the thread. might be better to just let it sit ?
 	if ( ! m_hThread.IsValidHandle())
+	{
 		return S_FALSE;
+	}
 
 	DEBUG_TRACE(( "CAVIThread::StopAVIThread" LOG_CR ));
 
@@ -393,11 +398,14 @@ HRESULT CAVIThread::StopAVIThread()
 	}
 
 #ifdef USE_AUDIO
-	// Close the audio last.
-	m_AudioInput.Close();
-	for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
+	// Close the audio last. 
+	if ( m_AudioInput.get_Handle())
 	{
-		m_AudioBuffers[j].DetachData();
+		m_AudioInput.Close();
+		for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
+		{
+			m_AudioBuffers[j].DetachData();
+		}
 	}
 #endif
 
@@ -445,6 +453,7 @@ do_erroret:
 #ifdef USE_AUDIO
 	if ( m_AudioInput.get_Handle())
 	{
+		// HasAudio
 		m_AudioInput.Start();	// start active recording.
 	}
 #endif

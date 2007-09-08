@@ -141,7 +141,7 @@ private:
 protected:
 	WAVE_DEVICEID_TYPE m_uDeviceID;	// Device number on the current system. NOTE: use ProductID for serialize. (device id can change)
 	HWAVE	m_hDevice;		// Handle to the open input or output device. HWAVEIN or HWAVEOUT
-	bool	m_fActive;			// Is the device actively playing or recording ?
+	bool	m_fActive;			// Is the device actively playing or recording ? waveInStart()
 	int		m_iHeadersInQueue;	// device has possesion of this # of headers. Cannot close til this is 0.
 };
 

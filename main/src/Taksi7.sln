@@ -41,6 +41,7 @@ Global
 		..\doc\TaksiManual.txt = ..\doc\TaksiManual.txt
 		..\doc\TaksiPic.jpg = ..\doc\TaksiPic.jpg
 		..\doc\TaksiTasks.txt = ..\doc\TaksiTasks.txt
+		..\..\web\TaksiVer.txt = ..\..\web\TaksiVer.txt
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
