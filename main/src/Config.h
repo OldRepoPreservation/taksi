@@ -38,8 +38,10 @@ enum TAKSI_GAPI_TYPE
 	TAKSI_GAPI_DESKTOP,	// HWND_DESKTOP
 	TAKSI_GAPI_GDI,		// prefer all other modes over this.
 	TAKSI_GAPI_OGL,		// a static linked dll, so can get a false positive.
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 	TAKSI_GAPI_DX8,
+#endif
+#ifdef USE_DIRECTX9
 	TAKSI_GAPI_DX9,		// highest priority, always pick DX9 (over others) if it is supported.
 #endif
 	TAKSI_GAPI_QTY,

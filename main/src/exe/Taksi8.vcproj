@@ -352,6 +352,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\TaksiShared.h"
+				>
+			</File>
+			<File
 				RelativePath="..\TaksiVersion.h"
 				>
 			</File>

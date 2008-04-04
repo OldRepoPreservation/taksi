@@ -7,7 +7,10 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif
-#define USE_DIRECTX			// remove this to compile if u dont have the DirectX SDK
+
+#define USE_DIRECTI
+#define USE_DIRECTX8			// remove this to compile if u dont have the DirectX 8 SDK
+#define USE_DIRECTX9			// remove this to compile if u dont have the DirectX 9 SDK
 #define USE_LOGFILE
 
 // This causes us not to load under Win2k, so use /DELAYLOAD:gdiplus.dll
