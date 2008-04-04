@@ -144,8 +144,10 @@ int APIENTRY WinMain( HINSTANCE hInstance,
 		return -1;
 	}
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 	Test_DirectX8(g_GUI.m_hWnd);		// Get method offsets of IDirect3DDevice8 vtable
+#endif
+#ifdef USE_DIRECTX9
 	Test_DirectX9(g_GUI.m_hWnd);		// Get method offsets of IDirect3DDevice9 vtable
 #endif
 

@@ -438,7 +438,8 @@ void CTaksiGAPIBase::PresentFrameBegin( bool bDrawIndicator )
 		// determine how we are going to handle keyboard hot-keys:
 		g_HotKeys.AttachHotKeysToApp();
 	}
-#ifdef USE_DIRECTX
+
+#ifdef USE_DIRECTI
 	// Process DirectInput input. polled.
 	if ( g_UserDI.m_bSetup)
 	{

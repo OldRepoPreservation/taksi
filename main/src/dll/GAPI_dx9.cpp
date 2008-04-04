@@ -6,7 +6,7 @@
 #include "TaksiDll.h"
 #include "GAPI_Base.h"
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX9
 #include <d3d9types.h>
 #include <d3d9.h>
 

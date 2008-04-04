@@ -416,10 +416,14 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_GDI]));
 	case TAKSI_CFGPROP_UseOGL:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_OGL]));
+#ifdef USE_DIRECTX8
 	case TAKSI_CFGPROP_UseDX8:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_DX8]));
+#endif
+#ifdef USE_DIRECTX9
 	case TAKSI_CFGPROP_UseDX9:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_abUseGAPI[TAKSI_GAPI_DX9]));
+#endif
 
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bUseOverheadCompensation));
@@ -528,12 +532,16 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 	case TAKSI_CFGPROP_UseOGL:
 		m_abUseGAPI[TAKSI_GAPI_OGL] = GetStrBool(pszValue);
 		break;
+#ifdef USE_DIRECTX8
 	case TAKSI_CFGPROP_UseDX8:
 		m_abUseGAPI[TAKSI_GAPI_DX8] = GetStrBool(pszValue);
 		break;
+#endif
+#ifdef USE_DIRECTX9
 	case TAKSI_CFGPROP_UseDX9:
 		m_abUseGAPI[TAKSI_GAPI_DX9] = GetStrBool(pszValue);
 		break;
+#endif
 	case TAKSI_CFGPROP_UseOverheadCompensation:
 		m_bUseOverheadCompensation = GetStrBool(pszValue);
 		break;

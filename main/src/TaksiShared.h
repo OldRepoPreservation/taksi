@@ -37,7 +37,6 @@ extern LIBSPEC CTaksiLogFile g_Log;
 
 #define TAKSI_MASTER_CLASSNAME _T("TaksiMaster")
 
-#ifdef USE_DIRECTX
 enum TAKSI_INTF_TYPE
 {
 	// DX interface entry offsets.
@@ -51,7 +50,6 @@ enum TAKSI_INTF_TYPE
 	TAKSI_INTF_DX9_Reset = 16,
 	TAKSI_INTF_DX9_Present = 17,
 };
-#endif
 
 enum TAKSI_INDICATE_TYPE
 {
@@ -176,11 +174,13 @@ public:
 	bool m_bRecordPause;			// paused video record by command.
 	int m_iMasterUpdateCount;		// how many WM_APP_UPDATE messages unprocessed.
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 	// keep Direct3D-related pointers, tested just once for all.
 	// DX8
 	UINT_PTR m_nDX8_Present; // offset from start of DLL to the interface element i want.
 	UINT_PTR m_nDX8_Reset;
+#endif
+#ifdef USE_DIRECTX9
 	// DX9
 	UINT_PTR m_nDX9_Present;
 	UINT_PTR m_nDX9_Reset;

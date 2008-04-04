@@ -10,8 +10,10 @@
 
 #define USE_TRAYICON	// Tray icon or not ?
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 extern bool Test_DirectX8(HWND hWnd );
+#endif
+#ifdef USE_DIRECTX9
 extern bool Test_DirectX9(HWND hWnd );
 #endif
 extern int DlgHelp( HWND hWnd, const TCHAR* pszMsg, UINT uType = MB_OK );

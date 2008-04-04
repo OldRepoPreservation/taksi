@@ -181,8 +181,10 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		_T("Desktop"),
 		_T("GDI"),		// TAKSI_GAPI_GDI
 		_T("OpenGL"),	// TAKSI_GAPI_OGL
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 		_T("DirectX8"), // TAKSI_GAPI_DX8
+#endif
+#ifdef USE_DIRECTX9
 		_T("DirectX9"), // TAKSI_GAPI_DX9
 #endif
 		_T(""),
@@ -327,8 +329,12 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	UPDATE_CHECK(GDIDesktop,config.m_abUseGAPI[TAKSI_GAPI_DESKTOP]);
 	UPDATE_CHECK(UseGDI,config.m_abUseGAPI[TAKSI_GAPI_GDI]);
 	UPDATE_CHECK(UseOGL,config.m_abUseGAPI[TAKSI_GAPI_OGL]);
+#ifdef USE_DIRECTX8
 	UPDATE_CHECK(UseDX8,config.m_abUseGAPI[TAKSI_GAPI_DX8]);
+#endif
+#ifdef USE_DIRECTX9
 	UPDATE_CHECK(UseDX9,config.m_abUseGAPI[TAKSI_GAPI_DX9]);
+#endif
 
 	m_bDataUpdating = false;
 }
@@ -673,12 +679,16 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_UseOGL:
 		sg_Config.m_abUseGAPI[TAKSI_GAPI_OGL] = g_Config.m_abUseGAPI[TAKSI_GAPI_OGL] = OnCommandCheck( m_hControlUseOGL );
 		return true;
+#ifdef USE_DIRECTX8
 	case IDC_C_UseDX8:
 		sg_Config.m_abUseGAPI[TAKSI_GAPI_DX8] = g_Config.m_abUseGAPI[TAKSI_GAPI_DX8] = OnCommandCheck( m_hControlUseDX8 );
 		return true;
+#endif
+#ifdef USE_DIRECTX9
 	case IDC_C_UseDX9:
 		sg_Config.m_abUseGAPI[TAKSI_GAPI_DX9] = g_Config.m_abUseGAPI[TAKSI_GAPI_DX9] = OnCommandCheck( m_hControlUseDX9 );
 		return true;
+#endif
 
 	case IDC_C_CaptureDirectory:
 		if ( iNotify == EN_CHANGE && !m_bDataUpdating )

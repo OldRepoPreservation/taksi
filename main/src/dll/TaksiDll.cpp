@@ -37,8 +37,10 @@ static CTaksiGAPIBase* const s_aGAPIs[ TAKSI_GAPI_QTY ] =
 	NULL,	// TAKSI_GAPI_DESKTOP // lowest priority, 
 	&g_GDI,	// TAKSI_GAPI_GDI // lowest priority, since all apps do GDI
 	&g_OGL,	// TAKSI_GAPI_OGL
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 	&g_DX8,	// TAKSI_GAPI_DX8
+#endif
+#ifdef USE_DIRECTX9
 	&g_DX9,	// TAKSI_GAPI_DX9 // almost no apps load this unless they are going to use it.
 #endif
 };
@@ -374,9 +376,11 @@ bool CTaksiShared::InitShared()
 	m_dwHotKeyMask = 0;
 	m_bRecordPause = false;
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 	m_nDX8_Present = 0; // offset from start of DLL to the interface element i want.
 	m_nDX8_Reset = 0;
+#endif
+#ifdef USE_DIRECTX9
 	m_nDX9_Present = 0;
 	m_nDX9_Reset = 0;
 #endif

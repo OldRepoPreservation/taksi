@@ -9,8 +9,10 @@ ConfigProp(AudioDevice,				m_iAudioDevice,	"Use audio device for AVI or not")
 ConfigProp(CaptureDir,				m_szCaptureDir,	"Capture directory (NOTE: must end with a backslash)")
 ConfigProp(DebugLog,				m_bDebugLog,	"Debug Log kept?")
 
-#ifdef USE_DIRECTX
+#ifdef USE_DIRECTX8
 ConfigProp(UseDX8,					m_abUseGAPI[TAKSI_GAPI_DX8],	"hook DirectX8 API or not?")
+#endif
+#ifdef USE_DIRECTX9
 ConfigProp(UseDX9,					m_abUseGAPI[TAKSI_GAPI_DX9],	"hook DirectX9 API or not?")
 #endif
 
