@@ -4,6 +4,7 @@
 #include "../stdafx.h"
 #include "Taksi.h"
 #include "resource.h"
+#include "gui.h"
 #include "guiConfig.h"
 #include <windowsx.h>
 #include <commctrl.h>	// HKM_GETHOTKEY

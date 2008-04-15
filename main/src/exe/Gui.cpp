@@ -6,6 +6,7 @@
 #include <richedit.h>	// NM_RCLICK
 #include "Taksi.h"
 #include "resource.h"
+#include "gui.h"
 #include "guiConfig.h"
 
 #ifdef USE_TRAYICON
