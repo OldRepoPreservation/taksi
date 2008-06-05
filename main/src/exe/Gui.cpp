@@ -376,20 +376,32 @@ void CGui::OnInitMenuPopup( HMENU hMenu )
 	}
 }
 
-BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, TCHAR* pszTip )
+BOOL CGui::TrayIcon_Command( DWORD dwMessage, HICON hIcon, const TCHAR* pszTip, const TCHAR* pszInfo )
 {
 	// dwMessage = NIM_ADD;
 	NOTIFYICONDATA tnd;
 	tnd.cbSize = sizeof(NOTIFYICONDATA);
 	tnd.hWnd = m_hWnd;
 	tnd.uID = ID_APP;
-	tnd.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
+	tnd.uFlags = NIF_MESSAGE|NIF_TIP;
 	tnd.uCallbackMessage = WM_APP_TRAY_NOTIFICATION;
-	tnd.hIcon = hIcon;
+	if ( hIcon )
+	{
+		tnd.hIcon = hIcon;
+		tnd.uFlags |= NIF_ICON;
+	}
 	if ( pszTip )
 		lstrcpyn(tnd.szTip, pszTip, sizeof(tnd.szTip));
 	else
 		tnd.szTip[0] = '\0';
+	if ( pszInfo )
+	{
+		tnd.uFlags |= NIF_INFO;
+		lstrcpyn( tnd.szInfo, pszInfo, sizeof(tnd.szInfo));
+		tnd.uTimeout = 1000;
+		lstrcpyn( tnd.szInfoTitle, pszTip, sizeof(tnd.szInfoTitle));
+		tnd.dwInfoFlags = NIIF_INFO;
+	}
 
 	return Shell_NotifyIcon(dwMessage, &tnd);
 }
@@ -408,8 +420,19 @@ void CGui::TrayIcon_OnEvent( LPARAM lParam )
 		// SetForegroundWindow. To find out more, search for Q135788 in MSDN.
 		SetForegroundWindow(m_hWnd);
 		POINT mouse;
-		GetCursorPos(&mouse);
-		TrackPopupMenu(m_hTrayIconMenu, 0, mouse.x, mouse.y, 0, m_hWnd, NULL);
+		if ( GetCursorPos(&mouse))
+		{
+			TrackPopupMenu(m_hTrayIconMenu, 0, mouse.x, mouse.y, 0, m_hWnd, NULL);
+		}
+		}
+		break;
+
+	case WM_LBUTTONDOWN:
+		// put up the status balloon help.
+		{
+		TCHAR szBuff[ _MAX_PATH ];
+		LoadString( g_hInst, IDS_APP_DESC, szBuff, sizeof(szBuff));
+		TrayIcon_Command( NIM_MODIFY, NULL, szBuff, "Status" );
 		}
 		break;
 
