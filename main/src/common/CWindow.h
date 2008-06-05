@@ -7,8 +7,9 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+#include "TaksiCommon.h"
 
-struct CWindowChild
+struct TAKSI_LINK CWindowChild
 {
 	// NOTE: dont destroy window in destructor
 	CWindowChild()

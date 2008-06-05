@@ -19,7 +19,7 @@
 #pragma warning(disable : 4355)
 #pragma warning(disable : 4275)
 
-class CNonCopyable 
+class TAKSI_LINK CNonCopyable 
 {
 protected:
 	//! Create a NonCopyable object
@@ -69,17 +69,17 @@ public:
     }
 
     // the singleton accessor
-    static _T* GRAYAPI get_Instance()
+    static _T* TAKSICALL get_Instance()
     {
 		// This is a complex or abstract type that we cannot just create automatically.
 		ASSERT(sm_pThe!=NULL);
         return(sm_pThe);
     }
-    static _T& GRAYAPI Instance()
+    static _T& TAKSICALL Instance()
     {
         return(*get_Instance());
     }
-	static _T& GRAYAPI I()
+	static _T& TAKSICALL I()
 	{
         return(*get_Instance());
 	}
@@ -104,18 +104,18 @@ public:
 	CSingleton(_T* pObject) : CSingletonBase<_T>(pObject)
 	{
 	}
-	static _T* GRAYAPI get_Instance();
-    static _T& GRAYAPI Instance()
+	static _T* TAKSICALL get_Instance();
+    static _T& TAKSICALL Instance()
     {
         return(*get_Instance());
     }
-	static _T& GRAYAPI I()
+	static _T& TAKSICALL I()
 	{
         return(*get_Instance());
 	}
 };
 
-template <class _T> _T* GRAYAPI CSingleton<_T>::get_Instance()
+template <class _T> _T* TAKSICALL CSingleton<_T>::get_Instance()
 {
 	if ( sm_pThe == NULL )
 	{

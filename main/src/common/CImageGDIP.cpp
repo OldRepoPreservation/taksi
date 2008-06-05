@@ -2,9 +2,11 @@
 // CImageGDIP.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "..\stdafx.h"
-#include <gdiplus.h>
+
+#include "stdafx.h"
 #include "CImageGDIP.h"
+#include "CLogBase.h"
+#include "Common.h"
 
 CImageGDIPInt g_gdiplus;
 

@@ -24,7 +24,7 @@
 #define acmFormatTagDetails acmFormatTagDetailsA
 #endif // acmFormatTagDetails
 
-class LIBSPEC CWaveACMStream
+class TAKSI_LINK CWaveACMStream
 {
 	// A conversion state for convert from one format to another.
 	// Keep track of a single conversion stream process.
@@ -37,7 +37,7 @@ public:
 	void StreamClose();
 
 #ifdef _DEBUG
-	static bool GRAYAPI UnitTest();
+	static bool TAKSICALL UnitTest();
 #endif
 
 public:
@@ -54,7 +54,7 @@ public:
 	HRESULT m_hResStop;			// Stop feeding. ERROR_CANCELLED
 };
 
-class LIBSPEC CWaveACMInit
+class TAKSI_LINK CWaveACMInit
 	: public CSingleton<CWaveACMInit>
 	, public CDllFile
 {

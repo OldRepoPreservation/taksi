@@ -2,8 +2,7 @@
 // GAPI_Base.h
 //
 #pragma once
-
-typedef DWORD TIMESYS_t; // GetTickCount()
+#include "../common/Common.h"
 
 // indicator dimensions/position
 #define INDICATOR_X 8

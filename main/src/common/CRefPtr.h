@@ -16,7 +16,7 @@
 #define CRefObjBase_STATIC_VAL 0x01000000
 #define PTR_CAST(t,p) (dynamic_cast <t*>(p))
 
-class LIBSPEC CRefObjBase 
+class TAKSI_LINK CRefObjBase 
 {
 	// base class for some derived object that is to be referenced.
 	// NOTE: These objects are normally CHeapObject, but NOT ALWAYS ! (allow static versions)
@@ -125,7 +125,7 @@ private:
 // Template for a type specific Ref
 
 template<class _TYPE> 
-class LIBSPEC CRefPtr
+class TAKSI_LINK CRefPtr
 {
 	// Smart pointer to an object. like "com_ptr_t"
 	// Just a ref to the object of some type.
@@ -286,8 +286,8 @@ private:
 };
 
 // The lowest (untypechecked) smart pointer.
-template class LIBSPEC CRefPtr<CRefObjBase>;
-typedef LIBSPEC CRefPtr<CRefObjBase> CRefBasePtr;
+template class TAKSI_LINK CRefPtr<CRefObjBase>;
+typedef TAKSI_LINK CRefPtr<CRefObjBase> CRefBasePtr;
 
 // Similar to COM QueryInterface() this checks to see if the class is supported.
 #define REF_CAST(_DSTCLASS,p) PTR_CAST(_DSTCLASS,(p).get_RefObj())

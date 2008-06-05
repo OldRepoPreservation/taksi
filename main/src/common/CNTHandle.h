@@ -8,11 +8,9 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-#ifndef ASSERT
-#define ASSERT assert
-#endif
+#include "TaksiCommon.h"
 
-struct LIBSPEC CNTHandle
+struct TAKSI_LINK CNTHandle
 {
 	// Wrap ownership of a Windows HANDLE
 	CNTHandle( HANDLE h=INVALID_HANDLE_VALUE ) 

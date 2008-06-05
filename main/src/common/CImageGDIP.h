@@ -10,7 +10,7 @@
 #include "CDll.h"
 #include <gdiplus.h>
 
-class LIBSPEC CImageGDIPInt : public CDllFile
+class TAKSI_LINK CImageGDIPInt : public CDllFile
 {
 	// binding to the gdiplus.dll.
 	// Use /DELAYLOAD:gdiplus.dll for win2k !!
@@ -28,5 +28,5 @@ public:
 	ULONG_PTR m_Token;
 };
 
-extern CImageGDIPInt g_gdiplus;
+extern TAKSI_LINK CImageGDIPInt g_gdiplus;
 #endif	// _INC_CImageGDIP_H

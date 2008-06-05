@@ -8,6 +8,7 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+#include "TaksiCommon.h"
 
 #if defined(_MT) && defined(_WIN32)
 extern "C"
@@ -21,7 +22,7 @@ extern "C"
 #pragma intrinsic( _InterlockedIncrement, _InterlockedDecrement, _InterlockedExchange, _InterlockedCompareExchange )
 #endif
 
-class LIBSPEC CThreadLockedLong
+class TAKSI_LINK CThreadLockedLong
 {
 	// thread interlocked int
 	// thread safe unitary actions on a LONG value
@@ -82,7 +83,7 @@ public:
 //#pragma pack(pop)
 };
 
-class LIBSPEC CThreadReentrant
+class TAKSI_LINK CThreadReentrant
 {
 	// A check for reentrancy. even on the same thread.
 	// define an instance of this on the stack.

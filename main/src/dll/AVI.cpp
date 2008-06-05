@@ -445,7 +445,7 @@ HRESULT CAVIThread::StartAVIThread()
 	{
 		m_nThreadId = 0;
 do_erroret:
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
 		LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}

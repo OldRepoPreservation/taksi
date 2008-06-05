@@ -2,7 +2,7 @@
 // CLogBase.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CLogBase.h"
 
 CLogBase* g_pLog = NULL;	// singleton // always access the base via pointer. (or g_Log)

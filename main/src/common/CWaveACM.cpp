@@ -3,10 +3,11 @@
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 // Interface connection to Windows WaveACM
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CWaveACM.h"
 #include "CLogBase.h"
 #include <windowsx.h>
+#include <tchar.h>
 
 #pragma comment( lib, "MsAcm32.lib" )
 
@@ -215,7 +216,7 @@ void CWaveACMStream::StreamClose()
 
 #ifdef _DEBUG
 
-bool GRAYAPI CWaveACMStream::UnitTest() // static
+bool TAKSICALL CWaveACMStream::UnitTest() // static
 {
 	if ( ! CWaveACMInit::I().StartupACM())
 		return false;

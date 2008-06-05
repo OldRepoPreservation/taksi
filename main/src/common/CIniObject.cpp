@@ -2,8 +2,9 @@
 // CIniObject.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "CIniObject.h"
+#include "Common.h"
 
 static int Str_FindTableHead( const char* pszFind, const char** pszTable )
 {
@@ -37,9 +38,14 @@ bool CIniObject::PropSetName( const char* pszProp, const char* pszValue )
 bool CIniObject::PropWrite( FILE* pFile, int eProp ) const
 {
 	char szTmp[_MAX_PATH*2];
+	szTmp[0] = '\0';
 	if ( PropGet(eProp,szTmp,sizeof(szTmp)) < 0 )
 		return false;
-	fprintf( pFile, "%s=%s" INI_CR, get_Props()[eProp], szTmp );
+	const char* pszProp = get_Props()[eProp]; 
+	ASSERT(pszProp);
+	char szTmp2[_MAX_PATH*2];
+	_snprintf( szTmp2, sizeof(szTmp2)-1, "%s=%s" INI_CR, pszProp, szTmp );
+	fputs( szTmp2, pFile );
 	return true;
 }
 

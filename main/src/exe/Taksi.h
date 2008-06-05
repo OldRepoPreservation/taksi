@@ -16,7 +16,7 @@ extern bool Test_DirectX8(HWND hWnd );
 #ifdef USE_DIRECTX9
 extern bool Test_DirectX9(HWND hWnd );
 #endif
-extern int DlgHelp( HWND hWnd, const TCHAR* pszMsg, UINT uType = MB_OK );
+extern int DlgHelp( HWND hWnd, const TCHAR* pszMsg, UINT uType = MB_OK|MB_ICONASTERISK );
 extern const TCHAR* CheckIntResource( const TCHAR* pszText, TCHAR* pszTmp );
 extern void CheckVideoCodec( HWND hWnd, const ICINFO& info );
 

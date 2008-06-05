@@ -2,7 +2,9 @@
 // Common.h
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
+
 #pragma once
+#include "TaksiCommon.h"
 #include "CLogBase.h"
 #include "CDll.h"
 #include "CNTHandle.h"
@@ -16,21 +18,20 @@
 #define GETINTRESOURCE(p)	LOWORD((DWORD)(p))
 
 typedef LONGLONG TIMEFAST_t;
-extern LIBSPEC TIMEFAST_t GetPerformanceCounter();
+extern TAKSI_LINK TIMEFAST_t GetPerformanceCounter();
 
 inline bool FILE_IsDirSep( TCHAR ch ) { return(( ch == '/')||( ch == '\\')); }
 
-extern LIBSPEC TCHAR* GetFileTitlePtr( TCHAR* pszPath );
-extern LIBSPEC HRESULT CreateDirectoryX( const TCHAR* pszDir );
+TAKSI_LINK TCHAR* GetFileTitlePtr( TCHAR* pszPath );
+TAKSI_LINK HRESULT CreateDirectoryX( const TCHAR* pszDir );
 
-extern LIBSPEC char* Str_SkipSpace( const char* pszNon );
-extern LIBSPEC bool Str_IsSpace( char ch );
+TAKSI_LINK char* Str_SkipSpace( const char* pszNon );
+TAKSI_LINK bool Str_IsSpace( char ch );
 
-extern LIBSPEC HINSTANCE CHttpLink_GotoURL( const TCHAR* pszURL, int iShowCmd );
+TAKSI_LINK HINSTANCE CHttpLink_GotoURL( const TCHAR* pszURL, int iShowCmd );
 
-extern int Mem_ConvertToString( char* pszDst, int iSizeDstMax, const BYTE* pSrc, int iLenSrcBytes );
-extern int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc );
+TAKSI_LINK int Mem_ConvertToString( char* pszDst, int iSizeDstMax, const BYTE* pSrc, int iLenSrcBytes );
+TAKSI_LINK int Mem_ReadFromString( BYTE* pDst, int iLengthMax, const char* pszSrc );
 
-extern HWND FindWindowForProcessID( DWORD dwProcessID );
-extern HWND FindWindowTop( HWND hWnd );
-
+TAKSI_LINK HWND FindWindowForProcessID( DWORD dwProcessID );
+TAKSI_LINK HWND FindWindowTop( HWND hWnd );

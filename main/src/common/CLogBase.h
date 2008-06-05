@@ -4,13 +4,13 @@
 //
 #ifndef _INC_CLogBase_H
 #define _INC_CLogBase_H
-
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
-#define GRAYAPI
 
+#include "TaksiCommon.h"
 #include <stdarg.h>
+#include <assert.h>
 
 typedef char LOGCHAR;	// just use UTF8 for logs, dont bother with UNICODE.
 #ifdef _WIN32
@@ -55,7 +55,7 @@ enum LOG_GROUP_TYPE_
 	LOG_GROUP_ALL		= 0x7FFFFFFF,
 };
 
-class LIBSPEC CLogBase
+class TAKSI_LINK CLogBase
 {
 	// A very generic sink for log events.
 public:
@@ -90,7 +90,7 @@ protected:
 
 //***********************************************************************************
 
-class LIBSPEC CLogEventFilter
+class TAKSI_LINK CLogEventFilter
 {
 	// control flow of events. What events do I want to see?
 public:
@@ -140,7 +140,7 @@ protected:
 	LOGL_TYPE m_eLogLevel;			// Min Importance level to see
 };
 
-class LIBSPEC CLogFiltered : public CLogBase
+class TAKSI_LINK CLogFiltered : public CLogBase
 {
 	// Log event stream. (destination is independant)
 	// Actual CLogEvent may be routed or filtered to multiple destinations from here.
@@ -158,7 +158,7 @@ public:
 	CLogEventFilter m_Filter;	// filter what goes out to ALL viewers
 };
 
-extern LIBSPEC CLogBase* g_pLog;	// singleton - always access the base via pointer. (or g_Log)
+extern TAKSI_LINK CLogBase* g_pLog;	// singleton - always access the base via pointer. (or g_Log)
 
 //***********************************************************************************
 // Stuff that should stay in release mode.

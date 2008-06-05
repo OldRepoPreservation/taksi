@@ -33,7 +33,7 @@ HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	// NOTE: I cant tell if the window is being overlapped?
 	if ( ! dc.GetDCEx( m_hWnd, DCX_WINDOW|DCX_PARENTCLIP )) // DCX_CLIPSIBLINGS
 	{
-		return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_DC_NOT_FOUND));
+		return HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_DC_NOT_FOUND));
 	}
 
 	// eIndicate = color.
@@ -42,7 +42,7 @@ HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 	CWndGDI brush;
 	if ( brush.CreateSolidBrush(color) == NULL )
 	{
-		return Check_GetLastError(VIEW_E_DRAW);
+		return HRes_GetLastErrorDef(VIEW_E_DRAW);
 	}
 
 	RECT rect = { INDICATOR_X, INDICATOR_Y, INDICATOR_X+INDICATOR_Width, INDICATOR_Y+INDICATOR_Height };
@@ -57,7 +57,7 @@ HRESULT CTaksiGAPI_GDI::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 
 	if ( ! ::FillRect( dc, &rect, brush.get_HBrush()))
 	{
-		return Check_GetLastError(VIEW_E_DRAW);
+		return HRes_GetLastErrorDef(VIEW_E_DRAW);
 	}
 #if 0
 	::ValidateRect( NULL, &rectW );
@@ -138,17 +138,17 @@ HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	CWndDC ScreenDC;
 	if ( ! ScreenDC.GetDC( NULL ))
 	{
-		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+		return HRes_GetLastErrorDef(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
 	CWndDC MemDC;
 	if ( ! MemDC.CreateCompatibleDC( ScreenDC ))
 	{
-		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+		return HRes_GetLastErrorDef(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
 	CWndGDI Bitmap( ScreenDC.CreateCompatibleBitmap( frame.m_Size.cx, frame.m_Size.cy ));
 	if ( Bitmap.m_hObject == NULL )
 	{
-		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+		return HRes_GetLastErrorDef(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
 	ASSERT( Bitmap.get_HBitmap());
 
@@ -180,7 +180,7 @@ HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	}
 	if ( ! bBltRet)
 	{
-		return Check_GetLastError(CONVERT10_E_STG_DIB_TO_BITMAP);
+		return HRes_GetLastErrorDef(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
 	DrawMouse(MemDC,bHalfSize);	// Draw Mouse cursor if they want that.
 	}
@@ -208,7 +208,7 @@ HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 		(LPBITMAPINFO)&bmih, DIB_RGB_COLORS );
 	if ( iRet<=0 )
 	{
-		HRESULT hRes = Check_GetLastError( CONVERT10_E_OLESTREAM_BITMAP_TO_DIB );
+		HRESULT hRes = HRes_GetLastErrorDef( CONVERT10_E_OLESTREAM_BITMAP_TO_DIB );
 		LOG_WARN(( "GetDIBits FAILED (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
@@ -311,16 +311,22 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 	ASSERT( IsValidDll());
 	if ( IsDesktop())
 	{
-		// I cant really hook the desktop for some reason!! let the master handle that.
+		// I cant really hook the desktop for some reason!! let the master app handle that.
 		return __super::HookFunctions();
 	}
 	if ( g_Proc.m_hWndHookTry == NULL )
 	{
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
+	if ( ! ::IsWindowVisible( g_Proc.m_hWndHookTry ))
+	{
+		// dont hook invisible windows.
+		return S_FALSE;
+	}
+
 	if ( m_hWnd != HWND_DESKTOP )	// must find the window first. m_hWndHookTry
 	{
-		// already hooked some window.
+		// already hooked some window. unhook that first.
 		ASSERT(m_bHookedFunctions);
 		if ( m_hWnd == g_Proc.m_hWndHookTry )	// this was set by AttachGAPIs()
 		{

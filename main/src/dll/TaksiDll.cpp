@@ -64,7 +64,7 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		NULL ));                        // no attr. template 
 	if ( ! m_File.IsValidHandle())
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
 		return hRes;
 	}
 
@@ -268,7 +268,7 @@ HRESULT CTaksiShared::LogMessage( const TCHAR* pszPrefix )
 		NULL ));                        // no attr. template 
 	if ( !File.IsValidHandle()) 
 	{
-		return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TOO_MANY_OPEN_FILES));
+		return HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TOO_MANY_OPEN_FILES));
 	}
 
 	DWORD dwBytesWritten;

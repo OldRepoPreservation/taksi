@@ -2,8 +2,9 @@
 // CWndToolTip.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CWndToolTip.h"
+#include "Common.h"
 
 bool CWndToolTip::Create( HWND hWndParent, DWORD dwStyle /* = 0 */)
 {
