@@ -9,6 +9,8 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#include "TaksiCommon.h"
+
 #include <unknwn.h>
 #include <assert.h>
 

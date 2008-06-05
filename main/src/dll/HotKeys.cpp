@@ -49,7 +49,7 @@ HRESULT CTaksiDI::SetupDirectInput()
 	s_DirectInput8Create = (DIRECTINPUT8CREATE)GetProcAddress("DirectInput8Create");
 	if (!s_DirectInput8Create) 
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CALL_NOT_IMPLEMENTED));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_CALL_NOT_IMPLEMENTED));
 		LOG_MSG(( "SetupDirectInput: lookup for DirectInput8Create failed. (0x%x)" LOG_CR, hRes ));
 		return hRes;
 	}
@@ -313,7 +313,7 @@ HRESULT CTaksiHotKeys::AttachHotKeysToApp()
 	{
 		if ( ! g_UserKeyboard.InstallHookKeys(false))
 		{
-			return Check_GetLastError(MK_E_MUSTBOTHERUSER);
+			return HRes_GetLastErrorDef(MK_E_MUSTBOTHERUSER);
 		}
 	}
 	return S_OK;

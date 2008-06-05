@@ -7,10 +7,11 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+#include "TaksiCommon.h"
 
 #ifdef _WIN32
 
-class CWndGDI 
+class TAKSI_LINK CWndGDI 
 {
 	// HBITMAP, HBRUSH, HPEN, HRGN, HFONT
 	// Similar to MFC CGdiObject m_hObject
@@ -108,7 +109,7 @@ public:
 	HGDIOBJ m_hObject;
 };
 
-class CWndDC // similar to Std MFC class CDC
+class TAKSI_LINK CWndDC // similar to Std MFC class CDC
 {
 public:
 	CWndDC( HDC hDC = NULL, HWND hWndOwner = HWND_BROADCAST ) :
@@ -172,7 +173,7 @@ public:
 	HWND m_hWndOwner;	// Created or it belongs to a window? HWND_BROADCAST = no owner
 };
 
-class CWndGDISelect
+class TAKSI_LINK CWndGDISelect
 {
 public:
 	CWndGDISelect( HDC hDC, HGDIOBJ hGDIObj ) :
@@ -190,7 +191,7 @@ private:
 	HGDIOBJ m_hGDIObjPrv;
 };
 
-class CWndGDICur : public CWndGDI, public CWndGDISelect
+class TAKSI_LINK CWndGDICur : public CWndGDI, public CWndGDISelect
 {
 	// Select a new created GDI object.
 	// on destruct we should destruct the object then select the previous.

@@ -1,8 +1,9 @@
 //
 // CAVIFile.cpp
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CAVIFile.h"
+#include "Common.h"
 
 // Header structure for an AVI file:
 // with no audio stream, and one video stream, which uses bitmaps without palette.
@@ -86,7 +87,7 @@ void CVideoFrameForm::InitPadded( int cx, int cy, int iBPP, int iPad )
 	m_iPitch = (iRem == 0) ? iPitchUn : (iPitchUn + iPad - iRem);
 }
 
-HRESULT Check_GetLastError( HRESULT hResDefault )
+HRESULT HRes_GetLastErrorDef( HRESULT hResDefault )
 {
 	// Something failed so find out why
 	// hResDefault = E_FAIL or CONVERT10_E_OLESTREAM_BITMAP_TO_DIB
@@ -160,7 +161,7 @@ HRESULT CVideoFrame::SaveAsBMP( const TCHAR* pszFileName ) const
 		NULL ));                        // no attr. template 
 	if ( ! File.IsValidHandle()) 
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
 		DEBUG_ERR(("CVideoFrame::SaveAsBMP: FAILED save to file. 0x%x" LOG_CR, hRes ));
 		return hRes;	// 
 	}
@@ -348,7 +349,7 @@ HRESULT CVideoCodec::OpenCodec( WORD wMode )
 	m_v.hic = ::ICOpen( m_v.fccType, m_v.fccHandler, wMode );
 	if ( m_v.hic == NULL)
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_DETECT_DRIVER_FAILURE));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_CANNOT_DETECT_DRIVER_FAILURE));
 		DEBUG_WARN(("CVideoCodec::Open: ICOpen(%c,%c,%c,%c) RET NULL (0x%x)" LOG_CR,
 			pszFourCC[0], pszFourCC[1], pszFourCC[2], pszFourCC[3],
 			hRes ));
@@ -494,7 +495,7 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 
 	if ( ! ::ICSeqCompressFrameStart( &m_v, lpbiIn ))
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_TRANSFORM_NOT_SUPPORTED));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TRANSFORM_NOT_SUPPORTED));
 		DEBUG_ERR(("CVideoCodec::CompStart: ICSeqCompressFrameStart (%d x %d) FAILED (0x%x)." LOG_CR, 
 			lpbiIn->bmiHeader.biWidth, lpbiIn->bmiHeader.biHeight, hRes ));
 		return hRes;
@@ -658,7 +659,8 @@ void CAVIIndex::FlushIndexChunk( HANDLE hFile )
 //******************************************************************************
 
 CAVIFile::CAVIFile() 
-	: m_dwMoviChunkSize( sizeof(DWORD))
+	: m_pJunkData(NULL)
+	, m_dwMoviChunkSize( sizeof(DWORD))
 	, m_dwTotalFrames(0)
 {
 	m_VideoCodec.InitCodec();
@@ -949,7 +951,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 		NULL));                         // no attr. template 
 	if ( ! m_File.IsValidHandle()) 
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
 		DEBUG_ERR(( "CAVIFile:OpenAVIFile CreateFile FAILED 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
@@ -967,7 +969,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 	::WriteFile(m_File, &afh, sizeof(afh), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(afh))
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 		DEBUG_ERR(( "CAVIFile:OpenAVIFile WriteFile Header FAILED %d" LOG_CR, hRes ));
 		return hRes;
 	}
@@ -978,7 +980,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 		::WriteFile(m_File, &avh, sizeof(avh), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(avh))
 		{
-			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 			DEBUG_ERR(( "CAVIFile:OpenAVIFile WriteFile Video FAILED %d" LOG_CR, hRes ));
 			return hRes;
 		}
@@ -989,7 +991,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 		::WriteFile(m_File, &aah, sizeof(aah), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(aah))
 		{
-			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 			DEBUG_ERR(( "CAVIFile:OpenAVIFile WriteFile Audio FAILED %d" LOG_CR, hRes ));
 			return hRes;
 		}
@@ -1005,15 +1007,17 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 	pChunkJunk[1] = iJunkChunkSize - 8;
 
 	// Put some possibly useful id stuff in the junk area. why not
-	_snprintf( (char*)( &pChunkJunk[2] ), iJunkChunkSize,
-		"TAKSI v" TAKSI_VERSION_S " built:" __DATE__ " AVI recorded: XXX" );
+	if ( m_pJunkData != NULL )
+	{
+		_snprintf( (char*)( &pChunkJunk[2] ), iJunkChunkSize, m_pJunkData );
+	}
 
 	::WriteFile(m_File, pChunkJunk, iJunkChunkSize, &dwBytesWritten, NULL);
 	::HeapFree(hHeap,0,pChunkJunk);
 	}
 	if ( dwBytesWritten != iJunkChunkSize )
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 		return hRes;
 	}
 
@@ -1026,7 +1030,7 @@ HRESULT CAVIFile::OpenAVIFile( const TCHAR* pszFileName )
 	::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(dwTags))
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 		return hRes;
 	}
 
@@ -1160,7 +1164,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 		::WriteFile(m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 		if ( dwBytesWritten != sizeof(dwTags))
 		{
-			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 			DEBUG_ERR(("CAVIFile:WriteVideoBlocks:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
@@ -1169,7 +1173,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 		::WriteFile(m_File, pCompBuf, (DWORD) nSizeComp, &dwBytesWritten, NULL);
 		if ( dwBytesWritten != nSizeComp )
 		{
-			HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+			HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 			DEBUG_ERR(("CAVIFile:WriteVideoBlocks:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 			return hRes;
 		}
@@ -1210,7 +1214,7 @@ HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 	::WriteFile( m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(dwTags))
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 		DEBUG_ERR(("CAVIFile:WriteAudioBlock:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
@@ -1218,7 +1222,7 @@ HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 	::WriteFile( m_File, pWaveData, dwLength, &dwBytesWritten, NULL);
 	if ( dwBytesWritten != dwLength )
 	{
-		HRESULT hRes = Check_GetLastError( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
+		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_WRITE_FAULT));
 		DEBUG_ERR(("CAVIFile:WriteAudioBlock:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 		return hRes;
 	}

@@ -2,10 +2,12 @@
 // Common.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "../stdafx.h"
-#include <windowsx.h>
+#include "stdafx.h"
 #include "Common.h"
 #include "CWndGDI.h"
+#include <windowsx.h>
+#include <ShellAPI.h>
+#include <tchar.h>
 
 //**************************************************************************************
 
@@ -120,6 +122,7 @@ int Mem_ConvertToString( char* pszDst, int iSizeDstMax, const BYTE* pSrc, int iL
 		if ( iLenOut >= iSizeDstMax )
 			break;
 	}
+	pszDst[iLenOut] = '\0';
 	return( iLenOut );
 }
 

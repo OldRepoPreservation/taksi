@@ -9,7 +9,7 @@
 #endif
 
 #define USE_DIRECTI
-#define USE_DIRECTX8			// remove this to compile if u dont have the DirectX 8 SDK
+//#define USE_DIRECTX8			// remove this to compile if u dont have the DirectX 8 SDK
 #define USE_DIRECTX9			// remove this to compile if u dont have the DirectX 9 SDK
 #define USE_LOGFILE
 
@@ -21,6 +21,7 @@
 #include <windows.h>
 #include <windef.h>
 #include <tchar.h>
+#include <rpc.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>

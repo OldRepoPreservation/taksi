@@ -10,6 +10,7 @@
 #endif // _MSC_VER >= 1000
 
 #include "CRefPtr.h"
+#include <mmsystem.h>
 
 typedef UINT WAVE_DEVICEID_TYPE;
 #define WAVE_DEVICE_NONE		((WAVE_DEVICEID_TYPE)( WAVE_MAPPER-1 ))  // no device at all.
@@ -20,7 +21,7 @@ typedef UINT WAVE_PRODUCTID_TYPE;
 class CWaveDevice;
 class CWaveFormat;
 
-class LIBSPEC CWaveHeaderBase
+class TAKSI_LINK CWaveHeaderBase
 {
 	// Wrapper for WAVEHDR. 
 	// base class for any app specific stuff.
@@ -72,7 +73,7 @@ private:
 	bool m_bManageDataBuffer;	// do i locally allocate the buffer?
 };
 
-class LIBSPEC CWaveDevice : public CRefObjBase
+class TAKSI_LINK CWaveDevice : public CRefObjBase
 {
 	// A wave device we could open and send/recieve sound data to/from
 	// CRefObjBase = all WAVEHDR s that are WHDR_PREPARED for this device.
@@ -147,7 +148,7 @@ protected:
 
 typedef CRefPtr<CWaveDevice> CWaveDevicePtr;
 
-class LIBSPEC CWaveRecorder : public CWaveDevice
+class TAKSI_LINK CWaveRecorder : public CWaveDevice
 {
 	// A device for recording wave/sound data.
 public:
@@ -189,7 +190,7 @@ public:
 	WAVEINCAPS  m_Caps;       // Capabilities of the input device.
 };
 
-class LIBSPEC CWavePlayer : public CWaveDevice
+class TAKSI_LINK CWavePlayer : public CWaveDevice
 {
 	// A device for playing wave/sound data.
 public:

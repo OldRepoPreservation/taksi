@@ -2,10 +2,11 @@
 // CFileDirDlg.cpp
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CFileDirDlg.h"
 #include "IRefPtr.h"
 #include "CLogBase.h"
+#include <tchar.h>
 #include <shlobj.h>		// The documentation says this nowhere but this is the header file for SHGetPathFromIDList
 
 CFileDirDlg::CFileDirDlg( HWND hWndOwner, const TCHAR* pszDir ) :

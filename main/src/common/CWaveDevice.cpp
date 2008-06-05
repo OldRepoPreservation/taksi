@@ -3,7 +3,7 @@
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
 
-#include "../stdafx.h"
+#include "stdafx.h"
 #ifdef _WIN32
 #include <windowsx.h>
 #include "CWaveDevice.h"

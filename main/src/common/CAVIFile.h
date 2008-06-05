@@ -4,17 +4,17 @@
 //
 #ifndef _INC_CAVIFile_H
 #define _INC_CAVIFile_H
-
 #if _MSC_VER >= 1000
 #pragma once
 #endif
 
-#include <vfw.h>	// COMPVARS
 #include "CNTHandle.h"
 #include "CWaveFormat.h"
 #include "CWaveACM.h"
 
-struct CVideoFrameForm
+#include <vfw.h>	// COMPVARS
+
+struct TAKSI_LINK CVideoFrameForm
 {
 	// The format of a single video frame.
 	CVideoFrameForm()
@@ -48,7 +48,7 @@ public:
 	int m_iBPP;			// Bytes per pixel.
 };
 
-struct CVideoFrame : public CVideoFrameForm
+struct TAKSI_LINK CVideoFrame : public CVideoFrameForm
 {
 	// buffer to keep a single video frame 
 public:
@@ -77,7 +77,7 @@ public:
 	BYTE* m_pPixels;	// Pixel data for the frame buffer.
 };
 
-struct LIBSPEC CVideoCodec
+struct TAKSI_LINK CVideoCodec
 {
 	// Wrap the COMPVARS video codec.
 	// For compress, decompress or render.
@@ -116,7 +116,7 @@ public:
 	bool m_bCompressing;	// CompStart() has been called.
 };
 
-struct CAVIIndexBlock
+struct TAKSI_LINK CAVIIndexBlock
 {
 	// Build an index of frames to append to the end of the file.
 #define AVIINDEX_QTY 1024
@@ -124,7 +124,7 @@ struct CAVIIndexBlock
 	struct CAVIIndexBlock* m_pNext;
 };
 
-struct CAVIIndex
+struct TAKSI_LINK CAVIIndex
 {
 	// Create an index for an AVI file.
 	// NOTE: necessary to index all frames ???
@@ -159,7 +159,7 @@ struct AVI_FILE_HEADER;
 struct AVI_VIDEO_HEADER;
 struct AVI_AUDIO_HEADER;
 
-struct CAVIFile
+struct TAKSI_LINK CAVIFile
 {
 	// Stream to create a AVI file
 	// handles audio, video and possibly other data in the time stream.
@@ -201,6 +201,7 @@ private:
 
 public:
 	CVideoFrameForm m_FrameForm;		// pixel format of each video frame.
+	const char* m_pJunkData; // _snprintf( sdf, sizeof(sdf), "TAKSI v" TAKSI_VERSION_S " built:" __DATE__ " AVI recorded: XXX" );
 
 private:
 	CNTHandle m_File;	// the open AVI file.
@@ -218,6 +219,6 @@ private:
 	CWaveFormat m_AudioFormat;
 };
 
-extern HRESULT Check_GetLastError( HRESULT hDefault = E_FAIL );
+TAKSI_LINK HRESULT HRes_GetLastErrorDef( HRESULT hDefault = E_FAIL );
 
 #endif // _INC_CAVIFile_H

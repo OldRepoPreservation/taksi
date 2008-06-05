@@ -2,8 +2,9 @@
 // CHookJump.h
 //
 #pragma once 
+#include "TaksiCommon.h"
 
-struct CHookJump
+struct TAKSI_LINK CHookJump
 {
 	// Create a relative jump to hook an existing api call.
 	// is this 5 bytes in 64 bit mode as well?

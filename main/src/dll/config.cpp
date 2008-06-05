@@ -228,7 +228,7 @@ HRESULT CTaksiConfigData::FixCaptureDir()
 		// set it to the current APP directory then.
 		if ( ::GetModuleFileName(NULL,m_szCaptureDir, sizeof(m_szCaptureDir)-1 ) <= 0 )
 		{
-			return Check_GetLastError( HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND));
+			return HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND));
 		}
 		// strip off file name
 		TCHAR* pTitle = GetFileTitlePtr(m_szCaptureDir);

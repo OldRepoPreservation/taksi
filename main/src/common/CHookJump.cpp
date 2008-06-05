@@ -1,8 +1,9 @@
 //
 // CHookJump.cpp
 //
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "CHookJump.h"
+#include "CLogBase.h"
 
 bool CHookJump::InstallHook( LPVOID pFunc, LPVOID pFuncNew )
 {

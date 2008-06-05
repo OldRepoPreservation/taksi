@@ -3,10 +3,12 @@
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
 #pragma once
+#include "TaksiCommon.h"
+#include <stdio.h>
 
 #define INI_CR "\n"
 
-struct LIBSPEC CIniObject
+struct TAKSI_LINK CIniObject
 {
 	// Generic object with props in an INI file.
 public:

@@ -12,8 +12,9 @@
 // lib comctl32.lib
 #include "CWindow.h"
 #include <commctrl.h>
+#include <assert.h>
 
-class CWndToolTip : public CWindowChild
+class TAKSI_LINK CWndToolTip : public CWindowChild
 {
 	// Like MFC CToolTipCtrl based on TOOLTIPS_CLASS
 	// Since only one tooltip may be open at a time this can be shared with many controls/tools.

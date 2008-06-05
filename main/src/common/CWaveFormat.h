@@ -9,10 +9,10 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+#include "CHeapBlock.h"
 
 #ifdef _WIN32 
 #include <mmsystem.h>
-#include "CHeapBlock.h"
 
 #if(WINVER >= 0x0400)
 #include <mmreg.h>
@@ -32,12 +32,11 @@ typedef struct tWAVEFORMATEX
 #endif // _WAVEFORMATEX_
 
 typedef DWORD WAVE_BLOCKS_t;     // Index in blocks to the sound buffer.
-typedef DWORD TIMESYS_t;		// GetTickCount() = mSec
 
 //***********************************************************************
 // -CWaveFormat
 
-class LIBSPEC CWaveFormat
+class TAKSI_LINK CWaveFormat
 {
 	// Base container to contain WAVEFORMATEX (variable length)
 public:

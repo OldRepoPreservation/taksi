@@ -3,7 +3,7 @@
 // Copyright 1992 - 2006 Dennis Robinson (www.menasoft.com)
 //
 
-#include "../stdafx.h"
+#include "stdafx.h"
 #include <mmsystem.h>
 #include "CLogBase.h"
 #include "CWaveFormat.h"

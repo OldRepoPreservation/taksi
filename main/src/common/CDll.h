@@ -8,12 +8,13 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+#include "TaksiCommon.h"
 
 #ifdef _WIN32
 
 #define FILE_EXT_DLL ".dll"
 
-struct LIBSPEC CDllFile
+struct TAKSI_LINK CDllFile
 {
 	// manage access to a *.DLL file.
 	// Inside a DLL there may be procedures and resources.
@@ -110,7 +111,7 @@ public:
 
 	// LoadResource()
 #ifdef _DEBUG
-	static bool _stdcall UnitTest();
+	static bool TAKSICALL UnitTest();
 #endif
 
 protected:
