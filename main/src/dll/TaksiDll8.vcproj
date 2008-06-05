@@ -274,10 +274,6 @@
 				RelativePath=".\HotKeys.h"
 				>
 			</File>
-			<File
-				RelativePath=".\TaksiDll.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Shared"
@@ -296,6 +292,10 @@
 			</File>
 			<File
 				RelativePath="..\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TaksiDll.h"
 				>
 			</File>
 			<File
