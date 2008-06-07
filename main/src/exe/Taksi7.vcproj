@@ -257,55 +257,6 @@
 				RelativePath="..\TaksiVersion.h">
 			</File>
 		</Filter>
-		<Filter
-			Name="Common"
-			Filter="">
-			<File
-				RelativePath="..\common\CDll.h">
-			</File>
-			<File
-				RelativePath="..\common\CFileDirDlg.cpp">
-			</File>
-			<File
-				RelativePath="..\common\CFileDirDlg.h">
-			</File>
-			<File
-				RelativePath="..\common\CHookJump.h">
-			</File>
-			<File
-				RelativePath="..\common\CIniObject.h">
-			</File>
-			<File
-				RelativePath="..\common\CLogBase.h">
-			</File>
-			<File
-				RelativePath="..\common\CNTHandle.h">
-			</File>
-			<File
-				RelativePath="..\common\Common.h">
-			</File>
-			<File
-				RelativePath="..\common\CRefPtr.h">
-			</File>
-			<File
-				RelativePath="..\common\CWaveACM.h">
-			</File>
-			<File
-				RelativePath="..\common\CWaveDevice.h">
-			</File>
-			<File
-				RelativePath="..\common\CWindow.h">
-			</File>
-			<File
-				RelativePath="..\common\CWndToolTip.cpp">
-			</File>
-			<File
-				RelativePath="..\common\CWndToolTip.h">
-			</File>
-			<File
-				RelativePath="..\common\IRefPtr.h">
-			</File>
-		</Filter>
 		<File
 			RelativePath=".\taksi.ini">
 		</File>

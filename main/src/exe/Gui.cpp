@@ -38,7 +38,7 @@ CGui::CGui()
 int CGui::MakeWindowTitle( TCHAR* pszTitle, const TCHAR* pszHookApp, const TCHAR* pszState ) // static
 {
 	// ASSUME pszTitle is _MAX_PATH
-	TCHAR szName[ _MAX_PATH ];
+	//TCHAR szName[ _MAX_PATH ];
 	int iLen = LoadString( g_hInst, ID_APP, pszTitle, _MAX_PATH-1 );
 	if ( iLen <= 0 )
 	{

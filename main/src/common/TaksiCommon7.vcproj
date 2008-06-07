@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="TaksiDll"
-	ProjectGUID="{A6933EDB-048F-4D59-A0D8-E6DD23F9EAB2}"
+	Name="TaksiCommon"
+	ProjectGUID="{E4B122CF-EE14-41A0-8F99-F292FB3FCE52}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,23 +12,18 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../Debug"
-			IntermediateDirectory="../Debug"
+			OutputDirectory="Debug"
+			IntermediateDirectory="Debug"
 			ConfigurationType="2"
-			ATLMinimizesCRunTimeLibraryUsage="TRUE"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TAKSIDLL_EXPORTS"
-				StringPooling="TRUE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TAKSICOMMON_EXPORTS"
 				MinimalRebuild="TRUE"
-				ExceptionHandling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="../stdafx.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -36,17 +31,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/section:.SHARED,rws /DELAYLOAD:gdiplus.dll"
 				AdditionalDependencies="vfw32.lib dxguid.lib winmm.lib dinput8.lib gdiplus.lib delayimp.lib"
-				ShowProgress="0"
-				OutputFile="$(OutDir)/TaksiDll.dll"
-				Version="0.7.7.5"
+				OutputFile="$(OutDir)/TaksiCommon.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/TaksiDll.pdb"
-				GenerateMapFile="TRUE"
+				ProgramDatabaseFile="$(OutDir)/TaksiCommon.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/TaksiDll.lib"
+				ImportLibrary="$(OutDir)/TaksiCommon.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -71,19 +62,15 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="../Release"
-			IntermediateDirectory="../Release"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				EnableIntrinsicFunctions="TRUE"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TAKSIDLL_EXPORTS"
-				StringPooling="TRUE"
-				ExceptionHandling="TRUE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TAKSICOMMON_EXPORTS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="../stdafx.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -91,17 +78,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/section:.SHARED,rws /DELAYLOAD:gdiplus.dll"
 				AdditionalDependencies="vfw32.lib dxguid.lib winmm.lib dinput8.lib gdiplus.lib delayimp.lib"
-				OutputFile="$(OutDir)/TaksiDll.dll"
-				Version="0.7.7.5"
+				OutputFile="$(OutDir)/TaksiCommon.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
-				GenerateMapFile="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/TaksiDll.lib"
+				ImportLibrary="$(OutDir)/TaksiCommon.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -133,40 +117,54 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\AVI.cpp">
+				RelativePath=".\CAVIFile.cpp">
 			</File>
 			<File
-				RelativePath=".\config.cpp">
+				RelativePath=".\CFileDirDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\GAPI_Base.cpp">
+				RelativePath=".\CHookJump.cpp">
 			</File>
 			<File
-				RelativePath=".\GAPI_dx8.cpp">
+				RelativePath=".\CImageGDIP.cpp">
 			</File>
 			<File
-				RelativePath=".\GAPI_dx9.cpp">
+				RelativePath=".\CImageGDIPFunc.tbl">
 			</File>
 			<File
-				RelativePath=".\GAPI_gdi.cpp">
+				RelativePath=".\CIniObject.cpp">
 			</File>
 			<File
-				RelativePath=".\GAPI_ogl.cpp">
+				RelativePath=".\CLogBase.cpp">
 			</File>
 			<File
-				RelativePath=".\GAPI_ogl.tbl">
+				RelativePath=".\Common.cpp">
 			</File>
 			<File
-				RelativePath=".\HotKeys.cpp">
+				RelativePath=".\CVideoCodecs.tbl">
 			</File>
 			<File
-				RelativePath=".\TaksiDll.cpp">
+				RelativePath=".\CWaveACM.cpp">
+			</File>
+			<File
+				RelativePath=".\CWaveACMFunc.tbl">
+			</File>
+			<File
+				RelativePath=".\CWaveDevice.cpp">
+			</File>
+			<File
+				RelativePath=".\CWaveFormat.cpp">
+			</File>
+			<File
+				RelativePath=".\CWndToolTip.cpp">
+			</File>
+			<File
+				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="../stdafx.h"/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
@@ -176,7 +174,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\TaksiDll.rc">
+				RelativePath=".\TaksiCommon.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -184,37 +182,78 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\GAPI_Base.h">
+				RelativePath=".\CAVIFile.h">
 			</File>
 			<File
-				RelativePath=".\HotKeys.h">
+				RelativePath=".\CDll.h">
 			</File>
 			<File
-				RelativePath=".\TaksiDll.h">
+				RelativePath=".\CFileDirDlg.h">
+			</File>
+			<File
+				RelativePath=".\CHeapBlock.h">
+			</File>
+			<File
+				RelativePath=".\CHookJump.h">
+			</File>
+			<File
+				RelativePath=".\CImageGDIP.h">
+			</File>
+			<File
+				RelativePath=".\CIniObject.h">
+			</File>
+			<File
+				RelativePath=".\CLogBase.h">
+			</File>
+			<File
+				RelativePath=".\CNTHandle.h">
+			</File>
+			<File
+				RelativePath=".\Common.h">
+			</File>
+			<File
+				RelativePath=".\CRefPtr.h">
+			</File>
+			<File
+				RelativePath=".\CSingleton.h">
+			</File>
+			<File
+				RelativePath=".\CThreadLockedLong.h">
+			</File>
+			<File
+				RelativePath=".\CWaveACM.h">
+			</File>
+			<File
+				RelativePath=".\CWaveDevice.h">
+			</File>
+			<File
+				RelativePath=".\CWaveFormat.h">
+			</File>
+			<File
+				RelativePath=".\CWindow.h">
+			</File>
+			<File
+				RelativePath=".\CWndGDI.h">
+			</File>
+			<File
+				RelativePath=".\CWndToolTip.h">
+			</File>
+			<File
+				RelativePath=".\glext.h">
+			</File>
+			<File
+				RelativePath=".\IRefPtr.h">
+			</File>
+			<File
+				RelativePath=".\stdafx.h">
+			</File>
+			<File
+				RelativePath=".\TaksiCommon.h">
 			</File>
 		</Filter>
-		<Filter
-			Name="Shared"
-			Filter="">
-			<File
-				RelativePath="..\Config.h">
-			</File>
-			<File
-				RelativePath="..\ConfigProps.tbl">
-			</File>
-			<File
-				RelativePath="..\ProcStatProps.tbl">
-			</File>
-			<File
-				RelativePath="..\stdafx.h">
-			</File>
-			<File
-				RelativePath="..\TaksiShared.h">
-			</File>
-			<File
-				RelativePath="..\TaksiVersion.h">
-			</File>
-		</Filter>
+		<File
+			RelativePath=".\ReadMe.txt">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
