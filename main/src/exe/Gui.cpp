@@ -79,11 +79,11 @@ bool CGui::UpdateWindowTitle()
 		break;
 	case TAKSI_INDICATE_Recording:
 		iLenState += _sntprintf( szState, COUNTOF(szState),
-			_T("(Rec %.2gM)"), sg_ProcStats.get_DataRecMeg());
+			_T("(Rec %.2gM)"), (float) sg_ProcStats.get_DataRecMeg());
 		break;
 	case TAKSI_INDICATE_RecordPaused:
 		iLenState += _sntprintf( szState, COUNTOF(szState),
-			_T("(Pause %.2gM)"), sg_ProcStats.get_DataRecMeg());
+			_T("(Pause %.2gM)"), (float) sg_ProcStats.get_DataRecMeg());
 		break;
 	}
 
@@ -502,7 +502,7 @@ bool CGui::OnCommandKey( TAKSI_HOTKEY_TYPE eKey )
 {
 	if ( GetButtonState(eKey) <= 0 )
 		return false;
-	sg_Shared.m_dwHotKeyMask |= (1<<eKey);
+	sg_Shared.m_dwHotKeyMask |= (1<<eKey);	// trigger the action in the dll.
 	UpdateButtonStates();
 	return true;
 }

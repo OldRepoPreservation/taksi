@@ -16,6 +16,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaksiCommon", "common\TaksiCommon8.vcproj", "{7E0F9143-F2B5-4F3E-A012-5557D90333A5}"
 EndProject
 Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug8|Win32 = Debug8|Win32
@@ -40,11 +44,9 @@ Global
 		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8|Win32.ActiveCfg = Release8|Win32
 		{820F2560-D0E6-4A3B-86FA-2DD5107256BC}.Release8|Win32.Build.0 = Release8|Win32
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug|Win32.ActiveCfg = Debug8
-		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug|Win32.Build.0 = Debug8
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug8|Win32.ActiveCfg = Debug8
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Debug8|Win32.Build.0 = Debug8
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release|Win32.ActiveCfg = Release8
-		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release|Win32.Build.0 = Release8
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release8|Win32.ActiveCfg = Release8
 		{4B03E80E-18D9-41B0-A1D7-CADF66B39A57}.Release8|Win32.Build.0 = Release8
 		{7E0F9143-F2B5-4F3E-A012-5557D90333A5}.Debug|Win32.ActiveCfg = Debug8|Win32

@@ -1,7 +1,9 @@
 //
 // TaksiDll.h
 // Private to the DLL
+// Link this into the process space of the app being recorded.
 //
+
 #ifndef _INC_TAKSIDLL
 #define _INC_TAKSIDLL
 #if _MSC_VER > 1000
