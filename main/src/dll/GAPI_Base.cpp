@@ -136,7 +136,7 @@ HRESULT CTaksiGAPIBase::MakeScreenShot( bool bHalfSize )
 
 	CLOCK_STOP(a, "MakeScreenShot: clock=%d");
 
-	g_Proc.m_Stats.m_dwDataRecorded = frame.get_SizeBytes();
+	g_Proc.m_Stats.m_nDataRecorded = frame.get_SizeBytes();
 	g_Proc.UpdateStat(TAKSI_PROCSTAT_DataRecorded);
 
 	_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError),
@@ -153,6 +153,8 @@ void CTaksiGAPIBase::RecordAVI_Reset()
 	// There was a reset of the video device API
 	// Could be the window is changing size etc.
 	// Stop video record and start again later.
+
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Reset" ));
 
 	// if in recording mode, close the AVI file,
 	// and set the flag so that the next Present() will restart it.
@@ -180,6 +182,7 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 {
 	// Start a new AVI file record. With a new name that has a time stamp.
 
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Start" ));
 	sg_Shared.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
@@ -278,6 +281,7 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 
 void CTaksiGAPIBase::RecordAVI_Stop()
 {
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Stop" ));
 	if ( ! g_AVIFile.IsOpen())
 		return;
 

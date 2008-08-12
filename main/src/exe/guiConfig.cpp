@@ -211,7 +211,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_DataRecorded))
 	{
-		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%g"), stats.get_DataRecMeg());
+		_sntprintf( szTmp, COUNTOF(szTmp), _TEXT("%g"), (float) stats.get_DataRecMeg());
 		SetWindowText( m_hControlStatDataRecorded, szTmp );
 	}
 }
@@ -916,6 +916,13 @@ bool CGuiConfig::OnInitDialog( HWND hWnd, LPARAM lParam )
 	m_ToolTips.AddToolForControl(m_hControl##a); 
 #include "GuiConfigControls.tbl"
 #undef GuiConfigControl
+
+#ifdef USE_DIRECTX8
+	::EnableWindow( m_hControlUseDX8, true );
+#endif
+#ifdef USE_DIRECTX9
+	::EnableWindow( m_hControlUseDX9, true );
+#endif
 
 	// show credits
 	UPDATE_EDIT_LIMIT( CTaksiConfig, CaptureDirectory, m_szCaptureDir );

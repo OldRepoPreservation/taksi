@@ -129,7 +129,7 @@ public:
 	TCHAR  m_szImageFormatExt[16];	// the screen shot format tag. JPEG = "image/jpeg", PNG = "image/png"
 	bool   m_bShowIndicator;
 	POINT m_ptMasterWindow;	// previous position of the master EXE window.
-	bool   m_bVideoCodecMsg; // put up the warning message about the codec yet?
+	bool   m_bVideoCodecMsg; // have we put up the warning message about the codec yet?
 	// DWORD m_dwHelpShown;	// What help messages have been shown so far. throttle help.
 };
 extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set via CGuiConfig
@@ -137,7 +137,7 @@ extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set vi
 
 struct LIBSPEC CTaksiConfig : public CIniObject, public CTaksiConfigData
 {
-	// Params read from the INI file.
+	// ALL Params read from the INI file.
 #define TAKSI_INI_FILE	"taksi.ini"
 #define TAKSI_SECTION	"TAKSI"
 public:

@@ -165,7 +165,7 @@ DWORD CAVIThread::ThreadRun()
 		{
 			if ( hRes )
 			{
-				g_Proc.m_Stats.m_dwDataRecorded += hRes;
+				g_Proc.m_Stats.m_nDataRecorded += hRes;
 				g_Proc.UpdateStat(TAKSI_PROCSTAT_DataRecorded);
 			}
 		}

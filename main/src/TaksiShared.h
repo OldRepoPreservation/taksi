@@ -101,25 +101,26 @@ public:
 		UpdateProcStat(eProp);
 	}
 
-	float get_DataRecMeg() const
+	double get_DataRecMeg() const
 	{
-		return ((float) m_dwDataRecorded ) / (1024*1024);
+		// How much data has been recorded?
+		return ((double) m_nDataRecorded ) / (1024*1024);
 	}
 
 public:
-	DWORD m_dwProcessId;		// What process is this?
+	DWORD m_dwProcessId;				// What process is this?
 	TCHAR m_szProcessPath[ _MAX_PATH ];	// What is the file path for the current process. (lower case)
 
 	// dynamic info.
 	TCHAR m_szLastError[ _MAX_PATH ];	// last error message (if action failed)
 
-	HWND m_hWndCap;	// the window the graphics is in
-	SIZE m_SizeWnd;	// the window/backbuffer size. (pixels)
-	TAKSI_GAPI_TYPE m_eGAPI;
+	HWND m_hWndCap;					// the window the graphics is in
+	SIZE m_SizeWnd;					// the window/backbuffer size. (pixels)
+	TAKSI_GAPI_TYPE m_eGAPI;		// What is the primary graphics mode i detect.
 
 	TAKSI_INDICATE_TYPE m_eState;	// What are we doing with the process?
-	float m_fFrameRate;			// measured frame rate. recording or not.
-	DWORD m_dwDataRecorded;		// How much video data recorded in current stream (if any)
+	float m_fFrameRate;				// measured frame rate. recording or not.
+	UINT64 m_nDataRecorded;			// How much video data recorded in current stream (if any)
 
 public:
 	static const WORD sm_Props[ TAKSI_PROCSTAT_QTY ][2]; // offset,size
@@ -131,6 +132,7 @@ extern LIBSPEC CTaksiProcStats sg_ProcStats;	// For display in the Taksi.exe app
 #pragma pack(4)	// try to be explicit about this since its shared.
 struct LIBSPEC CTaksiShared
 {
+	// Global state info.
 	// This structure is interprocess SHARED!
 	// NOTE: So it CANT have a constructor or contain any data types that do!!
 public:
@@ -143,6 +145,7 @@ public:
 
 	bool IsHookCBT() const
 	{
+		// Are we trying to hook new processes.
 		return m_hHookCBT != NULL;
 	}
 	static LRESULT CALLBACK HookCBTProc(int nCode, WPARAM wParam, LPARAM lParam);
@@ -171,6 +174,7 @@ public:
 
 	DWORD m_dwConfigChangeCount;	// changed when the Custom stuff in m_Config changes.
 	DWORD m_dwHotKeyMask;			// TAKSI_HOTKEY_TYPE mask from App. Schedule these in FrameBegin()
+
 	bool m_bRecordPause;			// paused video record by command.
 	int m_iMasterUpdateCount;		// how many WM_APP_UPDATE messages unprocessed.
 

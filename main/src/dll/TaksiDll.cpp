@@ -1,5 +1,6 @@
 //
 // TaksiDll.cpp
+// Link this into the process space of the app being recorded.
 //
 #include "../stdafx.h"
 #include <stddef.h> // offsetof
@@ -16,7 +17,7 @@
 // NOTE: Must be init with 0
 // WARN: Constructors WOULD BE CALLED for each DLL_PROCESS_ATTACH so we cant use Constructors.
 //**************************************************************************************
-#pragma data_seg(".SHARED") // ".HKT" ".SHARED"
+#pragma data_seg(".SHARED")			// ".HKT" ".SHARED"
 CTaksiShared sg_Shared = {0};		// API to present to the Master EXE 
 CTaksiConfigData sg_Config = {0};	// Read from the INI file. and set via CGuiConfig
 CTaksiProcStats sg_ProcStats = {0};	// For display in the Taksi.exe app.
@@ -117,7 +118,7 @@ void CTaksiProcStats::InitProcStats()
 
 	m_eState = TAKSI_INDICATE_Hooking;		// assume we are looking for focus
 	m_fFrameRate = 0;			// measured frame rate. recording or not.
-	m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
+	m_nDataRecorded = 0;		// How much video data recorded in current stream (if any)
 
 	m_dwPropChangedMask = 0xFFFFFFFF;	// all new
 }
@@ -126,7 +127,7 @@ void CTaksiProcStats::ResetProcStats()
 {
 	m_szLastError[0] = '\0';
 	m_fFrameRate = 0;			// measured frame rate. recording or not.
-	m_dwDataRecorded = 0;		// How much video data recorded in current stream (if any)
+	m_nDataRecorded = 0;		// How much video data recorded in current stream (if any)
 }
 
 void CTaksiProcStats::CopyProcStats( const CTaksiProcStats& stats )
@@ -622,7 +623,9 @@ HRESULT CTaksiProcess::AttachGAPIs( HWND hWnd )
 	// Allow changing windows inside the same process.???
 	m_hWndHookTry = FindWindowTop(hWnd);	// top parent. not WS_CHILD.
 	if ( m_hWndHookTry == NULL )
+	{
 		return S_FALSE;
+	}
 
 	// Checks whether an application uses any of supported APIs (D3D8, D3D9, OpenGL).
 	// If so, their corresponding buffer-swapping/Present routines are hooked. 
