@@ -218,7 +218,7 @@ HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 
 LRESULT CTaksiGAPI_GDI::OnTick( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	// Periodically get a WM_TIMER at frame rate.
+	// Periodically get a WM_TIMER at frame rate. IDT_TIMER
 	// or whenever there is a repaint. (dont grab repaint faster than rate ?)
 	ASSERT( ! g_Proc.m_bIsProcessDesktop );
 	if (m_iReentrant)
@@ -357,7 +357,8 @@ HRESULT CTaksiGAPI_GDI::HookFunctions()
 	ASSERT( GetWindowLongPtr( m_hWnd, GWL_WNDPROC ) == (LONG_PTR) WndProcHook );
 
 	// Set up a timer to give me a frame rate / basic update time. seperate from WM_PAINT
-	m_uTimerId = ::SetTimer( m_hWnd, IDT_TIMER, 1000, NULL );
+	TIMESYS_t dwTimeWaitMS = TIMESYS_FREQ / sg_Config.m_fFrameRateTarget;
+	m_uTimerId = ::SetTimer( m_hWnd, IDT_TIMER, dwTimeWaitMS, NULL );
 	if ( m_uTimerId == 0 )
 	{
 		DEBUG_ERR(( "CTaksiGAPI_GDI::HookFunctions SetTimer=NULL" LOG_CR ));
