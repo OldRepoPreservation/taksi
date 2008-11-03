@@ -130,6 +130,7 @@ public:
 	bool   m_bShowIndicator;
 	POINT m_ptMasterWindow;	// previous position of the master EXE window.
 	bool   m_bVideoCodecMsg; // have we put up the warning message about the codec yet?
+	bool	m_bMasterTopMost;	// TOPMOST
 	// DWORD m_dwHelpShown;	// What help messages have been shown so far. throttle help.
 };
 extern LIBSPEC CTaksiConfigData sg_Config;	// Read from the INI file. and set via CGuiConfig

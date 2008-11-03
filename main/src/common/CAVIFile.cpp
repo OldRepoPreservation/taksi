@@ -275,6 +275,7 @@ bool CVideoCodec::put_Str( const char* pszValue )
 	m_v.lpbiOut = NULL;
 	m_v.lpBitsPrev = NULL;
 	m_v.lpState = NULL;
+	//m_v.cbState = 0;
 	return true;
 }
 
@@ -289,6 +290,7 @@ void CVideoCodec::CopyCodec( const CVideoCodec& codec )
 	m_v.lpbiOut = NULL;
 	m_v.lpBitsPrev = NULL;
 	m_v.lpState = NULL;
+	//m_v.cbState = 0; 
 }
 
 bool CVideoCodec::CompChooseDlg( HWND hWnd, char* lpszTitle )
@@ -494,7 +496,9 @@ HRESULT CVideoCodec::CompStart( BITMAPINFO* lpbiIn )
 	DEBUG_MSG(( "CVideoCodec::CompStart" LOG_CR ));
 
 	if ( ! ::ICSeqCompressFrameStart( &m_v, lpbiIn ))
-	{
+	{	
+		// m_v.lpbiOut = trash ??
+		// NOTE: may fail because of odd frame sizes ??
 		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TRANSFORM_NOT_SUPPORTED));
 		DEBUG_ERR(("CVideoCodec::CompStart: ICSeqCompressFrameStart (%d x %d) FAILED (0x%x)." LOG_CR, 
 			lpbiIn->bmiHeader.biWidth, lpbiIn->bmiHeader.biHeight, hRes ));
@@ -519,7 +523,7 @@ void CVideoCodec::CompEnd()
 	::ICSeqCompressFrameEnd(&m_v);
 }
 
-bool CVideoCodec::CompFrame( const CVideoFrame& frame, const void*& rpCompRet, LONG& nSize, BOOL& bIsKey )
+HRESULT CVideoCodec::CompFrame( const CVideoFrame& frame, const void*& rpCompRet, LONG& nSize, BOOL& bIsKey )
 {
 	// Compress the frame in the stream.
 	// ASSUME: CompStart() was called.
@@ -533,19 +537,19 @@ bool CVideoCodec::CompFrame( const CVideoFrame& frame, const void*& rpCompRet, L
 		// DEBUG_TRACE(("CVideoCodec::CompFrame: NOT ACTIVE!." LOG_CR));
 		rpCompRet = frame.m_pPixels;
 		nSize = frame.get_SizeBytes();
-		return false;
+		return S_FALSE;
 	}
 	void* pCompRet = ::ICSeqCompressFrame( &m_v, 0, (LPVOID) frame.m_pPixels, &bIsKey, &nSize );
 	if (pCompRet == NULL)
 	{
-		// Just use the raw frame.
+		// Just use the raw frame? NOT COMPRESSED.
 		DEBUG_ERR(("CVideoCodec::CompFrame: ICSeqCompressFrame FAILED."));
-		rpCompRet = frame.m_pPixels;
-		nSize = frame.get_SizeBytes();
-		return false;
+		nSize = 0;
+		return E_FAIL;
 	}
+	ASSERT( (DWORD) nSize <= 2*frame.get_SizeBytes());
 	rpCompRet = pCompRet; // ASSUME m_v owns this buffer and it will get cleaned up on CompEnd()
-	return true;
+	return S_OK;
 }
 
 //******************************************************************************
@@ -1124,7 +1128,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 	ASSERT( ! memcmp( &frame, &m_FrameForm, sizeof(m_FrameForm)));
 	DEBUG_TRACE(("CAVIFile:WriteVideoBlocks: called. writing frame %d time(s)" LOG_CR, nTimes ));
 
-	bool bCompressed;
+	HRESULT hCompressed;
 	const void* pCompBuf;
 	LONG nSizeComp;
 	BOOL bIsKey = false;
@@ -1136,7 +1140,12 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 		// NOTE: we need to recompress the frame even tho it may be the same as last time!
 		if ( i < 2 )
 		{
-			bCompressed = m_VideoCodec.CompFrame( frame, pCompBuf, nSizeComp, bIsKey );
+			hCompressed = m_VideoCodec.CompFrame( frame, pCompBuf, nSizeComp, bIsKey );
+			if ( FAILED(hCompressed))
+			{
+				DEBUG_ERR(("CAVIBuilder:m_VideoCodec.CompFrame FAIL %d" LOG_CR, hCompressed ));
+				return hCompressed;
+			}
 		}
 		else
 		{
@@ -1147,7 +1156,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 		DEBUG_TRACE(("CAVIFile:WriteVideoBlocks: size=%d, bIsKey=%d" LOG_CR, nSizeComp, bIsKey ));
 
 		DWORD dwTags[2];
-		dwTags[0] = bCompressed ? MAKEFOURCC('0', '0', 'd', 'c') : MAKEFOURCC('0', '0', 'd', 'b');
+		dwTags[0] = ( hCompressed == S_OK ) ? MAKEFOURCC('0', '0', 'd', 'c') : MAKEFOURCC('0', '0', 'd', 'b');
 		dwTags[1] = nSizeComp;
 
 		// NOTE: do we really need to index each frame ?

@@ -160,6 +160,7 @@ void CTaksiConfigData::InitConfig()
 	m_bShowIndicator = true;
 	m_ptMasterWindow.x = 0;
 	m_ptMasterWindow.y = 0;
+	m_bMasterTopMost = false;
 
 	DEBUG_MSG(("CTaksiConfig::InitConfig" LOG_CR ));
 }
@@ -189,6 +190,7 @@ void CTaksiConfigData::CopyConfig( const CTaksiConfigData& config )
 	// CAN NOT be set from CGuiConfig directly
 	m_bShowIndicator = config.m_bShowIndicator;
 	m_ptMasterWindow = config.m_ptMasterWindow;	// previous position of the master EXE window.
+	m_bMasterTopMost = config.m_bMasterTopMost;
 
 	// CANT COPY m_pCustomList for interproces access ??
 	DEBUG_MSG(("CTaksiConfig::CopyConfig '%s'" LOG_CR, m_szCaptureDir ));
@@ -407,6 +409,9 @@ int CTaksiConfig::PropGet( int eProp, char* pszValue, int iSizeMax ) const
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bShowIndicator));
 	case TAKSI_CFGPROP_PosMasterWindow:
 		return _snprintf(pszValue, iSizeMax, "%d,%d", m_ptMasterWindow.x, m_ptMasterWindow.y );
+	case TAKSI_CFGPROP_PosMasterTopMost:
+		return _snprintf(pszValue, iSizeMax, "%d", m_bMasterTopMost );
+
 	case TAKSI_CFGPROP_GDIFrame:
 		return _snprintf(pszValue, iSizeMax, GetBoolStr(m_bGDIFrame));
 
@@ -467,6 +472,9 @@ bool CTaksiConfig::PropSet( int eProp, const char* pszValue )
 
 	case TAKSI_CFGPROP_PosMasterWindow:
 		sscanf( pszValue, "%d,%d", &m_ptMasterWindow.x, &m_ptMasterWindow.y );
+		break;
+	case TAKSI_CFGPROP_PosMasterTopMost:
+		m_bMasterTopMost = GetStrBool(pszValue);
 		break;
 		
 	case TAKSI_CFGPROP_VKey_ConfigOpen:

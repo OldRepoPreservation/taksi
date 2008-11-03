@@ -1,0 +1,5 @@
+
+Change the tray icon to reflect the record/pause/stopped state.
+Add Always on top option.
+
+

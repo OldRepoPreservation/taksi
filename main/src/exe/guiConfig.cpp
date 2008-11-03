@@ -667,6 +667,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_GDIFrame:
 		sg_Config.m_bGDIFrame = g_Config.m_bGDIFrame = OnCommandCheck( m_hControlGDIFrame );
 		return true;
+	case IDC_C_MasterTopMost:
+		sg_Config.m_bMasterTopMost = g_Config.m_bMasterTopMost = OnCommandCheck( m_hControlMasterTopMost );
+		return true;
 	case IDC_C_UseOverheadCompensation:
 		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );
 		return true;

@@ -692,6 +692,8 @@ LRESULT CALLBACK CGui::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		// Use m_iMasterUpdateCount to throttle these ?
 		g_GUI.UpdateButtonToolTips();
 		g_GUI.UpdateButtonStates();
+		// Update config.m_bMasterTopMost IsTopMost
+		// if ( m_bMasterTopMost
 		return 1;
 	case WM_APP_REHOOKCBT:
 		// Re-install system-wide hook
@@ -760,7 +762,7 @@ bool CGui::CreateGuiWindow( UINT nCmdShow )
 	RECT rect = { 0, 0, bmi.bmWidth*BTN_QTY, bmi.bmHeight };
 	::AdjustWindowRectEx( &rect, c_dwStyle, false, c_dwExStyle );
 
-	m_hWnd = CreateWindowEx( c_dwExStyle,
+	m_hWnd = CreateWindowEx( c_dwExStyle | ( g_Config.m_bMasterTopMost ? WS_EX_TOPMOST : 0 ),
 		TAKSI_MASTER_CLASSNAME,      // class name
 		_T(""), // title for our window (appears in the titlebar)
 		c_dwStyle,
