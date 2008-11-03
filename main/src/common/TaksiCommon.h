@@ -19,3 +19,4 @@
 #endif
 
 typedef DWORD TIMESYS_t;		// GetTickCount() = mSec
+#define TIMESYS_FREQ 1000

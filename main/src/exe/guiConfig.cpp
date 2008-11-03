@@ -326,6 +326,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 
 	// Display options
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
+	UPDATE_CHECK(MasterTopMost,config.m_bMasterTopMost);
 
 	UPDATE_CHECK(GDIDesktop,config.m_abUseGAPI[TAKSI_GAPI_DESKTOP]);
 	UPDATE_CHECK(UseGDI,config.m_abUseGAPI[TAKSI_GAPI_GDI]);
