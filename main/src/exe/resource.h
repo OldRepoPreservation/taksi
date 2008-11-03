@@ -82,6 +82,7 @@
 #define IDC_C_UseOverheadCompensation   1071
 #define IDC_C_GDIDesktop                1072
 #define IDC_C_GDIFrame                  1073
+#define IDC_C_MasterTopMost             1074
 #define IDC_C_UseGDI                    1075
 #define IDC_C_UseOGL                    1076
 #define IDC_C_UseDX8                    1077

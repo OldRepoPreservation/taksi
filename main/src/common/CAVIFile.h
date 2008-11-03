@@ -104,7 +104,7 @@ public:
 	LRESULT GetCompFormat( const BITMAPINFO* lpbiIn, BITMAPINFO* lpbiOut=NULL ) const;
 
 	HRESULT CompStart( BITMAPINFO* lpbi = NULL );
-	bool CompFrame( const CVideoFrame& frame, const void*& rpCompRet, LONG& nSizeRet, BOOL& bIsKey );
+	HRESULT CompFrame( const CVideoFrame& frame, const void*& rpCompRet, LONG& nSizeRet, BOOL& bIsKey );
 	void CompEnd();
 
 #ifdef _DEBUG
