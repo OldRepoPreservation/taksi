@@ -1164,7 +1164,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 		AVIINDEXENTRY indexentry;
 		indexentry.ckid = dwTags[0]; 
 		indexentry.dwFlags = (bIsKey) ? AVIIF_KEYFRAME : 0;
-		indexentry.dwChunkOffset = AVI_MOVILIST_OFFSET + 8 + m_dwMoviChunkSize;
+		indexentry.dwChunkOffset = m_dwMoviChunkSize;
 		indexentry.dwChunkLength = dwTags[1];
 		m_Index.AddFrame( indexentry );
 
