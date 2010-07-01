@@ -29,8 +29,6 @@ int CWaveFormat::FormatCalcSize( const WAVEFORMATEX FAR* pForm ) // static
 int CWaveFormat::get_CalcSize( void ) const
 {
 	// What size should it be? not what size it actually is. m_iAllocSize
-	if ( ! CHeapBlock_IsValid(m_pWF))
-		return( 0 );
 	return( FormatCalcSize( get_WF()));
 }
 
@@ -92,12 +90,9 @@ WAVE_BLOCKS_t CWaveFormat::CvtmSecToBlocks( DWORD mSec ) const
 
 bool CWaveFormat::ReAllocFormatSize( int iSize )
 {
-	if ( m_pWF && iSize == m_iAllocSize )
-		return true;
-	ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
-	m_pWF = (WAVEFORMATEX*) CHeapBlock_ReAlloc( m_pWF, iSize );
-	if ( m_pWF == NULL )
+	if ( iSize > sizeof(m_cbBytes) )
 		return false;
+	ASSERT( iSize >= sizeof(PCMWAVEFORMAT));
 	m_iAllocSize = iSize;
 	return true;
 }
@@ -143,8 +138,7 @@ bool CWaveFormat::SetFormat( const WAVEFORMATEX FAR* pForm )
 	// NOTE: don't bother to check if this is valid.
 	if ( pForm == NULL )
 	{
-		CHeapBlock_Free(m_pWF);
-		m_pWF = NULL;
+		ZeroMemory(m_cbBytes, sizeof(m_cbBytes));
 		return false;
 	}
 	int iSize = FormatCalcSize( pForm );
@@ -155,7 +149,7 @@ bool CWaveFormat::SetFormat( const WAVEFORMATEX FAR* pForm )
 		ASSERT(0);
 		return false;
 	}
-	memcpy( m_pWF, pForm, iSize );
+	memcpy( m_cbBytes, pForm, iSize );
 	return( true );
 }
 
@@ -215,8 +209,8 @@ bool CWaveFormat::IsValidFormat( void ) const
 	//  true = OK.
 	//@------------------------------------------------------------------------
 
-	if ( m_pWF == NULL || ! CHeapBlock_IsValid(m_pWF))    // Illegal format.
-		return( false );
+	//if ( m_pWF == NULL || ! CHeapBlock_IsValid(m_pWF))    // Illegal format.
+	//	return( false );
 
 	if ( ! get_Channels() ||
 		! get_SamplesPerSec())
@@ -248,10 +242,15 @@ bool CWaveFormat::IsValidFormat( void ) const
 		return( false );
 	}
 
-	if ( m_iAllocSize <= sizeof(WAVEFORMATEX) + pFormX->cbSize )
+	if ( m_iAllocSize < sizeof(WAVEFORMATEX) + pFormX->cbSize )
 	{
 		return false;
 	}
+
+	// TODO: Support codecs with extra bytes. The AVI file header file writer 
+	// needs work to support codecs that have extra bytes.
+	if ( m_iAllocSize > sizeof(WAVEFORMATEX) )
+		return( false );
 
 	return( true );
 }

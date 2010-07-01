@@ -127,7 +127,7 @@ HRESULT CTaksiGAPI_OGL::DrawIndicator( TAKSI_INDICATE_TYPE eIndicate )
 		s_glColor3f(1.0f, 0.26f, 0.0f); // RED: recording mode
 		break;
 	case TAKSI_INDICATE_RecordPaused:
-		s_glColor3f(0.53f, 1.0f, 0.0f); // GREEN: normal mode
+		s_glColor3f(0.26f, 0.26f, 0.26f); // GRAY: paused mode
 		break;
 	default:
 		ASSERT(0);

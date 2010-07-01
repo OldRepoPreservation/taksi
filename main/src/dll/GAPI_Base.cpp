@@ -154,7 +154,7 @@ void CTaksiGAPIBase::RecordAVI_Reset()
 	// Could be the window is changing size etc.
 	// Stop video record and start again later.
 
-	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Reset" ));
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Reset" LOG_CR));
 
 	// if in recording mode, close the AVI file,
 	// and set the flag so that the next Present() will restart it.
@@ -223,8 +223,9 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 		fFrameRate = g_Proc.m_pCustomConfig->m_fFrameRate;
 	}
 
+	// Set the video and audio codecs, if there is no audio device then don't use the audio format
 	HRESULT hRes = g_AVIFile.OpenAVICodec( FrameForm, fFrameRate, 
-		sg_Config.m_VideoCodec, &sg_Config.m_AudioFormat );
+		sg_Config.m_VideoCodec, sg_Config.m_iAudioDevice != WAVE_DEVICE_NONE ? &sg_Config.m_AudioFormat : NULL );
 	if ( FAILED(hRes))
 	{
 		// ? strerror()
@@ -281,12 +282,16 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 
 void CTaksiGAPIBase::RecordAVI_Stop()
 {
-	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Stop" ));
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Stop" LOG_CR));
 	if ( ! g_AVIFile.IsOpen())
 		return;
+	sg_Shared.m_bRecordPause = false;
 
-	DEBUG_MSG(( "CTaksiGAPIBase:RecordAVI_Stop" LOG_CR));
+	//DEBUG_MSG(( "CTaksiGAPIBase:RecordAVI_Stop" LOG_CR));
+	g_AVIThread.StopAudioRecorder();
 	g_AVIThread.WaitForAllFrames();
+	// TODO: at this point there may be audio that still needs written to the AVI file
+	g_AVIThread.CloseAudioInputDevice();
 	g_AVIFile.CloseAVI();
 
 	_sntprintf( g_Proc.m_Stats.m_szLastError, sizeof(g_Proc.m_Stats.m_szLastError), 
@@ -367,12 +372,29 @@ void CTaksiGAPIBase::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 		RecordAVI_Stop();
 		break;
 	case TAKSI_HOTKEY_RecordPause:	// toggle pause.
-		sg_Shared.m_bRecordPause = ! sg_Shared.m_bRecordPause;
-		if ( ! g_AVIFile.IsOpen() && ! sg_Shared.m_bRecordPause )
+		if ( ! g_AVIFile.IsOpen() )	// start video if not started
 		{
 			RecordAVI_Start();
 		}
+		else
+		{
+			// toggle pause state
+			sg_Shared.m_bRecordPause = ! sg_Shared.m_bRecordPause;
+			if ( sg_Shared.m_bRecordPause )
+			{
+				// recording paused, stop audio recorder and re-init frame rate
+				g_AVIThread.StopAudioRecorder();
 		g_FrameRate.InitStart();
+			}
+			else
+			{
+				// recording un-paused
+				// NOTE: the write remaining audio is called on un-pause so that some time is
+				// given to the wave device to complete the buffer it was last recording to.
+				g_AVIThread.WaitAndWriteAVIAudioBlock();
+				g_AVIThread.StartAudioRecorder();
+			}
+		}
 		break;
 	case TAKSI_HOTKEY_Screenshot:	// make custom screen shot
 		MakeScreenShot(false);

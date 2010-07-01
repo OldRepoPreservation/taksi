@@ -141,11 +141,11 @@ int _cdecl CLogBase::Debug_Trace( const LOGCHAR* pszFormat, ... )
 	va_start( vargs, pszFormat );
 	if ( this == NULL )
 	{
-		//iRet = VDebugEvent( LOG_GROUP_DEBUG|LOG_GROUP_CRLF, LOGL_TRACE, pszFormat, vargs );
+		iRet = VDebugEvent( LOG_GROUP_DEBUG|LOG_GROUP_CRLF, LOGL_TRACE, pszFormat, vargs );
 	}
 	else
 	{
-		//iRet = VEvent( LOG_GROUP_DEBUG|LOG_GROUP_CRLF, LOGL_TRACE, pszFormat, vargs );
+		iRet = VEvent( LOG_GROUP_DEBUG|LOG_GROUP_CRLF, LOGL_TRACE, pszFormat, vargs );
 	}
 	va_end( vargs );
 	return( iRet );

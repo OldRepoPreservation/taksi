@@ -666,6 +666,7 @@ CAVIFile::CAVIFile()
 	: m_pJunkData(NULL)
 	, m_dwMoviChunkSize( sizeof(DWORD))
 	, m_dwTotalFrames(0)
+	, m_dwAudioBytes(0)
 {
 	m_VideoCodec.InitCodec();
 	m_AudioFormat.InitFormatEmpty();
@@ -782,8 +783,8 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AV
 	afh.m_AviHeader.dwMicroSecPerFrame = (DWORD)( 1000000.0/m_fFrameRate );
 	afh.m_AviHeader.dwMaxBytesPerSec = (DWORD)( m_FrameForm.get_SizeBytes() * m_fFrameRate );
 	afh.m_AviHeader.dwTotalFrames = m_dwTotalFrames;
-	afh.m_AviHeader.dwStreams = 1;
-	afh.m_AviHeader.dwFlags = 0x10; // uses index
+	afh.m_AviHeader.dwStreams = pAudio ? 2 : 1;
+	afh.m_AviHeader.dwFlags = AVIF_HASINDEX; // uses index 0x10
 	afh.m_AviHeader.dwSuggestedBufferSize = m_FrameForm.get_SizeBytes();
 	afh.m_AviHeader.dwWidth = m_FrameForm.m_Size.cx;
 	afh.m_AviHeader.dwHeight = m_FrameForm.m_Size.cy;	// ?? was /2 ?
@@ -794,8 +795,9 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AV
 		pVideo->m_StreamHeader.fccType = streamtypeVIDEO; // 'vids' - NOT m_VideoCodec.m_v.fccType; = 'vidc'
 		pVideo->m_StreamHeader.fccHandler = m_VideoCodec.m_v.fccHandler;
 
-		pVideo->m_StreamHeader.dwScale = 1;
-		pVideo->m_StreamHeader.dwRate = ( m_fFrameRate < 1 ) ? 1 : ((DWORD)m_fFrameRate);	// Float to DWORD ??? <1 is a problem!
+		// for video: rate / scale == frame rate, we'll use 1000 (and add .49 to round up, this allows exactly 29.97)
+		pVideo->m_StreamHeader.dwScale = 1000;
+		pVideo->m_StreamHeader.dwRate = ( m_fFrameRate * 1000.0 < 1000.0 ) ? 1000 : (DWORD)(m_fFrameRate * 1000.0 + 0.49);	// Float to DWORD ??? <1 is a problem!
 		pVideo->m_StreamHeader.dwLength = m_dwTotalFrames;
 		pVideo->m_StreamHeader.dwQuality = m_VideoCodec.m_v.lQ;
 		pVideo->m_StreamHeader.dwSuggestedBufferSize = afh.m_AviHeader.dwSuggestedBufferSize;
@@ -806,16 +808,26 @@ int CAVIFile::InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AV
 		memcpy(&pVideo->m_biHeader, &m_VideoCodec.m_v.lpbiOut->bmiHeader, sizeof(pVideo->m_biHeader));
 	}
 
-	if ( pAudio )
+	// if pAudio is not null m_AudioFormat should be valid, but there's a potential divide by 0 below
+	if ( pAudio && m_AudioFormat.IsValidFormat() )
 	{
+		// add audio rate to overall
+		afh.m_AviHeader.dwMaxBytesPerSec += m_AudioFormat.get_BytesPerSec();
+
 		// fill-in Audio AVIStreamHeader and m_AudioFormat
 
 		pAudio->m_StreamHeader.fccType = streamtypeAUDIO; // 'vids' - NOT m_VideoCodec.m_v.fccType; = 'vidc'
 		pAudio->m_StreamHeader.fccHandler = 0;
+		pAudio->m_StreamHeader.dwScale = 1;	// PCM is always 1, so rate is simply the sample rate
+		pAudio->m_StreamHeader.dwRate = m_AudioFormat.get_SamplesPerSec();	// I think this will only be valid for PCM
+		pAudio->m_StreamHeader.dwLength = m_dwAudioBytes / m_AudioFormat.get_BlockSize();	// number of audio blocks
+		pAudio->m_StreamHeader.dwQuality = (DWORD)-1;	// default quality
+		pAudio->m_StreamHeader.dwSuggestedBufferSize = 0;	// this should actually be the largest AVI audio chunk size
+		pAudio->m_StreamHeader.dwSampleSize = m_AudioFormat.get_BlockSize();	// for audio use nBlockAlign, get_BlockSize()
 
 		// fill in m_AudioFormat header
-		memcpy(&pAudio->m_AudioFormat, &m_AudioFormat, sizeof(m_AudioFormat));
-		// ??? Variable size !! m_AudioFormat.cbSize
+		memcpy(&pAudio->m_AudioFormat, m_AudioFormat.get_WF(), m_AudioFormat.get_FormatSize() );
+		// TODO: ??? Variable size !! m_AudioFormat.cbSize
 	}
 
 	return iPadFile;
@@ -845,14 +857,12 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 	m_Index.FlushIndexChunk();	// kill any previous index.
 
 	// Set the audio codec format desired.
-#ifdef USE_AUDIO
 	if ( pAudioFormat && m_AudioFormat.SetFormat( *pAudioFormat ))
 	{
 		// Open the Audio compression codec. 
 		ASSERT(HasAudioFormat());
 	}
 	else
-#endif
 	{
 		// No audio desired. 
 		m_AudioFormat.SetFormat( NULL );
@@ -870,6 +880,11 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 	// prepare BITMAPINFO for compressor
 	InitBitmapIn(m_biIn);
 
+/* NOTE: This code could be useful if ffdshow ever supports resizing when using
+ICSeqCompressFrame(), in which case the below code asks the compressor for the
+output format.  The output format would then need set (m_v.lpbiOut). As of this
+writing it's interesting how ICCompressGetFormat() returns the proper format
+but ICCompressQuery() and ICSeqCompressFrame() will fail. */
 #if 0 //def _DEBUG
 	// print compressor settings
 	// m_VideoCodec.DumpSettings();
@@ -878,32 +893,36 @@ HRESULT CAVIFile::OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, c
 	if ( lFormatSize <= 0 )
 	{
 		// dwFormatSize = -2 = ICERR_BADFORMAT 
-		DEBUG_ERR(("CAVIFile:GetCompFormat=%d BAD FORMAT?!" LOG_CR, dwFormatSize));
+		DEBUG_ERR(("CAVIFile:GetCompFormat=%d BAD FORMAT?!" LOG_CR, lFormatSize));
 		//ASSERT(0);
 		return m_VideoCodec.GetHError(lFormatSize);
 	}
 
-	DEBUG_MSG(("CAVIFile:GetCompFormatSize=%d" LOG_CR, dwFormatSize));
+	DEBUG_MSG(("CAVIFile:GetCompFormatSize=%d" LOG_CR, lFormatSize));
 
-	BITMAPINFO biOut;
-	ZeroMemory(&biOut, sizeof(biOut));
-	LRESULT lRes = m_VideoCodec.GetCompFormat(&m_biIn,&biOut);
+	BITMAPINFO* pbiOut = (BITMAPINFO*)GlobalAlloc(GPTR, lFormatSize);
+	if ( !pbiOut )
+		return E_OUTOFMEMORY;
+	pbiOut->bmiHeader.biSize = lFormatSize;
+	LRESULT lRes = m_VideoCodec.GetCompFormat(&m_biIn,pbiOut);
 	if ( lRes != 0 )
 	{	
 		// lRes = -2 = ICERR_BADFORMAT, should be 0x28 = sizeof(m_biIn.bmiHeader)
 		DEBUG_ERR(( "CAVIFile:GetCompFormat FAILED %d" LOG_CR, lRes ));
 		//ASSERT(0);
+		GlobalFree(pbiOut);
 		return m_VideoCodec.GetHError(lRes);
 	}
 
 	// The codec doesnt like odd sizes !!
-	if ( m_biIn.bmiHeader.biHeight != biOut.bmiHeader.biHeight 
-		|| m_biIn.bmiHeader.biWidth != biOut.bmiHeader.biWidth )
+	if ( m_biIn.bmiHeader.biHeight != pbiOut->bmiHeader.biHeight 
+		|| m_biIn.bmiHeader.biWidth != pbiOut->bmiHeader.biWidth )
 	{
 		DEBUG_MSG(( "Codec changes the size! from (%d x %d) to (%d x %d)" LOG_CR,
 			m_biIn.bmiHeader.biHeight, m_biIn.bmiHeader.biWidth,
-			biOut.bmiHeader.biWidth, biOut.bmiHeader.biHeight ));
+			pbiOut->bmiHeader.biWidth, pbiOut->bmiHeader.biHeight ));
 	}
+	GlobalFree(pbiOut);
 #endif
 
 	// initialize compressor
@@ -1206,7 +1225,7 @@ HRESULT CAVIFile::WriteVideoBlocks( CVideoFrame& frame, int nTimes )
 HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 {
 	// Write out the audio blocks associated with the video frames.
-	if ( ! m_File.IsValidHandle()) 
+	if ( ! m_File.IsValidHandle() || !dwLength ) 
 	{
 		return 0;
 	}
@@ -1219,6 +1238,15 @@ HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 	dwTags[0] = MAKEFOURCC('0', '1', 'w', 'b');
 	dwTags[1] = dwLength;
 	
+	// Add audio index
+	// NOTE: audio would not play unless the audio blocks are indexed
+	AVIINDEXENTRY indexentry;
+	indexentry.ckid = dwTags[0]; 
+	indexentry.dwFlags = 0;
+	indexentry.dwChunkOffset = m_dwMoviChunkSize;
+	indexentry.dwChunkLength = dwTags[1];
+	m_Index.AddFrame( indexentry );
+
 	DWORD dwBytesWritten = 0;
 	::WriteFile( m_File, dwTags, sizeof(dwTags), &dwBytesWritten, NULL);
 	if ( dwBytesWritten != sizeof(dwTags))
@@ -1235,6 +1263,9 @@ HRESULT CAVIFile::WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength )
 		DEBUG_ERR(("CAVIFile:WriteAudioBlock:WriteFile FAIL=0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
+
+	m_dwMoviChunkSize += sizeof(dwTags) + dwLength;
+	m_dwAudioBytes += dwLength;
 
 	return( dwLength + sizeof(dwTags));
 }

@@ -137,14 +137,22 @@ void CAVIThread::InitFrameQ()
 	m_iFrameFreeIdx=0;	// index to empty frame. ready to fill
 	m_iFrameCount.m_lValue = 0;
 #ifdef USE_AUDIO
-	m_AudioBufferSize = 0;
 	m_AudioBufferHeadIdx=0;
-	m_AudioBufferStart=0;
+	m_iAudioBufferCount.m_lValue = 0;
+	//m_AudioBufferSize = 0;
+	//m_AudioBufferStart = 0;
 #endif
 }
 
 DWORD CAVIThread::ThreadRun()
 {
+#ifdef USE_AUDIO
+	// Alloc a buffer to write a single AVI audio frame
+	DWORD dwBufferSize = m_AudioBufferSizeBytes * AUDIO_FRAME_QTY;
+	LPBYTE pBuffer = (LPBYTE)::HeapAlloc( ::GetProcessHeap(), 0, dwBufferSize );
+	if ( !pBuffer)
+		return E_OUTOFMEMORY;
+#endif
 	// A background thread to do the compression/writing.
 	// m_hThread
 	DEBUG_MSG(( "CAVIThread::ThreadRun() n=%d" LOG_CR, m_dwTotalFramesProcessed ));
@@ -174,9 +182,26 @@ DWORD CAVIThread::ThreadRun()
 		// Audio data?
 		if ( m_AudioInput.get_Handle())	// g_AVIFile.HasAudioFormat()
 		{
-			// Write all the audio data available.
+			WriteAVIAudioBlock( pBuffer, dwBufferSize );
 
-			// g_AVIFile.WriteAudioBlock( pFrame->m_Audio, pFrame->m_dwFrameDups );
+			// TODO: come up with a better way to keep audio in sync with the video.
+			// If more video has been written than audio, get the audio caught up.
+			// This not an ideal solution, but does work for PCM.
+			// TODO: If video frames are dropped, audio needs dropped
+			// NOTE: adding and dropping audio can only happen in PCM
+			DWORD dwAudioTime = g_AVIFile.GetAudioTimeMs() + AUDIO_BUFFER_MS;
+			if ( g_AVIFile.GetFrameTimeMs() > dwAudioTime )
+			{
+				// dwAudioTime = number of bytes to write
+				dwAudioTime = g_AVIFile.GetAudioBytesForMs( (g_AVIFile.GetFrameTimeMs() - dwAudioTime) );
+				ZeroMemory( pBuffer, dwBufferSize );
+				while( dwAudioTime > 0 )
+				{
+					DWORD dwBytesToWrite = dwAudioTime < dwBufferSize ? dwAudioTime : dwBufferSize;
+					dwAudioTime -= dwBytesToWrite;
+					g_AVIFile.WriteAudioBlock( pBuffer, dwBytesToWrite );
+				}
+			}
 		}
 #endif
 
@@ -201,6 +226,7 @@ do_wait:
 		}
 	}
 
+	::HeapFree( ::GetProcessHeap(), 0, pBuffer );
 	m_iFrameCount.Exchange(0);
 	m_nThreadId = 0;		// it actually is closed!
 	DEBUG_MSG(( "CAVIThread::ThreadRun() END" LOG_CR ));
@@ -304,6 +330,70 @@ void CAVIThread::SignalFrameAdd( CAVIFrame* pFrame, DWORD dwFrameDups )	// ready
 
 #ifdef USE_AUDIO
 
+// This method was born because there may be remaining audio that needs saved
+// when recording stops, so only writing audio in ThreadRun() may miss a bit
+// of audio at the end of the file.
+// Called from ThreadRun() and CloseAudioInputDevice()
+HRESULT CAVIThread::WriteAVIAudioBlock( LPBYTE pBuffer, DWORD dwBufferSize, bool bClip )
+{
+	ASSERT( dwBufferSize >= AUDIO_FRAME_QTY * m_AudioBufferSizeBytes );
+	ASSERT( g_AVIFile.IsOpen() );
+	LONG nBuffers = m_iAudioBufferCount.m_lValue;
+	if ( nBuffers )
+	{
+		// Count number of bytes to write in the AVI block
+		DWORD dwBytesThisFrame = 0;
+
+		// Copy to wave data to the buffer, maybe audio deserves its own thread?
+		for ( LONG i = 0; i < nBuffers; i++ )
+		{
+			LPWAVEHDR pwh = m_AudioBuffers[m_AudioBufferHeadIdx].get_wh();
+			memcpy(pBuffer + dwBytesThisFrame, pwh->lpData, pwh->dwBytesRecorded);
+			dwBytesThisFrame += pwh->dwBytesRecorded;
+			m_iAudioBufferCount.Dec();
+			m_AudioBuffers[m_AudioBufferHeadIdx].UnprepareDevice();
+			m_AudioInput.WriteHeader(&m_AudioBuffers[m_AudioBufferHeadIdx]);
+			++m_AudioBufferHeadIdx %= AUDIO_FRAME_QTY;
+		}
+
+		// If clip audio to video length
+		if ( bClip )
+		{
+			if ( g_AVIFile.GetFrameTimeMs() > g_AVIFile.GetAudioTimeMs() )
+			{
+				DWORD dwBytes = g_AVIFile.GetAudioBytesForMs( g_AVIFile.GetFrameTimeMs() - g_AVIFile.GetAudioTimeMs() );
+				if ( dwBytes < dwBytesThisFrame )
+					dwBytesThisFrame = dwBytes;
+			}
+			else
+				dwBytesThisFrame = 0;
+		}
+		// Write audio AVI block
+		return g_AVIFile.WriteAudioBlock(pBuffer, dwBytesThisFrame);
+	}
+	return S_FALSE;
+}
+
+// called from CloseAudioInputDevice() and HandlePause()
+HRESULT CAVIThread::WriteAVIAudioBlock()
+{
+	// If AVI file is open, write remaining audio
+	if ( g_AVIFile.IsOpen() )
+	{
+		// Alloc a buffer to write a single AVI audio frame
+		DWORD dwBufferSize = m_AudioBufferSizeBytes * AUDIO_FRAME_QTY;
+		LPBYTE pBuffer = (LPBYTE)::HeapAlloc( ::GetProcessHeap(), 0, dwBufferSize );
+		if ( pBuffer)
+		{
+			WriteAVIAudioBlock( pBuffer, dwBufferSize, true );
+			HeapFree( ::GetProcessHeap(), 0, pBuffer );
+		}
+		else
+			return E_OUTOFMEMORY;
+	}
+	return S_OK;
+}
+
 void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
 {
 	// waveInProc() = data is ready
@@ -317,6 +407,9 @@ void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInsta
 	if ( uMsg == MM_WIM_DATA )
 	{
 		// waveInAddBuffer is complete. recycle and/or move to next
+		LPWAVEHDR pwh = (LPWAVEHDR)dwParam1;
+		CWaveDevice::OnHeaderReturn(pwh);
+		pThread->m_iAudioBufferCount.Inc();
 	}
 }
 
@@ -354,12 +447,44 @@ HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWav
 
 	// Queue up Max of N seconds of audio.
 	// Compute a buffer size. approximate max per frame. honor blockAlign min
-	DWORD dwBufferSize = 0;
+	DWORD dwAudioBufferBlocks = WaveFormat.CvtmSecToBlocks( AUDIO_BUFFER_MS );
+	m_AudioBufferSizeBytes = WaveFormat.CvtBlocksToBytes( dwAudioBufferBlocks );
 	for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
 	{
-		m_AudioBuffers[j].AttachData(NULL,dwBufferSize);
+		m_AudioBuffers[j].AttachData( NULL, m_AudioBufferSizeBytes );
+		m_AudioInput.WriteHeader( &m_AudioBuffers[j] );
 	}
 
+	return S_OK;
+}
+
+HRESULT CAVIThread::CloseAudioInputDevice()
+{
+	HRESULT hRes = S_OK;
+	
+	if ( m_AudioInput.get_Handle())
+	{
+		hRes = WriteAVIAudioBlock();
+		// Free audio buffers and close
+		m_AudioInput.Stop();
+		m_AudioInput.Reset();
+		for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
+		{
+			m_AudioBuffers[j].DetachData();
+		}
+		m_AudioInput.Close();
+	}
+	return hRes;
+}
+
+// called when recording is paused to ensure no extra audio is written
+HRESULT CAVIThread::WaitAndWriteAVIAudioBlock()
+{
+	if ( m_AudioInput.get_Handle())
+	{
+		WaitForAllFrames();
+		return WriteAVIAudioBlock();
+	}
 	return S_OK;
 }
 
@@ -398,15 +523,7 @@ HRESULT CAVIThread::StopAVIThread()
 	}
 
 #ifdef USE_AUDIO
-	// Close the audio last. 
-	if ( m_AudioInput.get_Handle())
-	{
-		m_AudioInput.Close();
-		for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
-		{
-			m_AudioBuffers[j].DetachData();
-		}
-	}
+	CloseAudioInputDevice();
 #endif
 
 	m_hThread.CloseHandle();
@@ -415,15 +532,14 @@ HRESULT CAVIThread::StopAVIThread()
 
 HRESULT CAVIThread::StartAVIThread()
 {
-	// Create my resources.	
-	if ( m_nThreadId != NULL )	// already running
-	{
-		return S_FALSE;
-	}
+	HRESULT hRes = S_FALSE;
+	InitFrameQ();
 
+	// Create my resources.	
+	if ( m_nThreadId == NULL )	// not already running
+	{
 	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
 	m_bStop	= false;
-	InitFrameQ();
 
 	if ( ! m_EventDataStart.CreateEvent(NULL,false,false))
 	{
@@ -449,6 +565,8 @@ do_erroret:
 		LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
 		return hRes;
 	}
+		hRes = S_OK;
+	}
 
 #ifdef USE_AUDIO
 	if ( m_AudioInput.get_Handle())
@@ -457,5 +575,6 @@ do_erroret:
 		m_AudioInput.Start();	// start active recording.
 	}
 #endif
-	return S_OK;
+
+	return hRes;
 }

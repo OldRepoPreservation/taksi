@@ -66,14 +66,15 @@ public:
 	}
 
 public:
-	CRefPtr<CWaveDevice> m_pDevice;	// What device are we prepared for ?
+	CWaveDevice *m_pDevice;
 
 private:
 	LPWAVEHDR m_pwh;	// Specially global allocated buffer.
 	bool m_bManageDataBuffer;	// do i locally allocate the buffer?
 };
 
-class TAKSI_LINK CWaveDevice : public CRefObjBase
+// No longer need CRefObjBase
+class TAKSI_LINK CWaveDevice /*: public CRefObjBase */
 {
 	// A wave device we could open and send/recieve sound data to/from
 	// CRefObjBase = all WAVEHDR s that are WHDR_PREPARED for this device.
@@ -137,7 +138,7 @@ public:
 
 private:
 	virtual MMRESULT PrepareHeader( LPWAVEHDR pwh ) = 0;
-	virtual void UnprepareHeader( LPWAVEHDR pwh ) = 0;
+	virtual MMRESULT UnprepareHeader( LPWAVEHDR pwh ) = 0;
 
 protected:
 	WAVE_DEVICEID_TYPE m_uDeviceID;	// Device number on the current system. NOTE: use ProductID for serialize. (device id can change)
@@ -185,7 +186,7 @@ public:
 
 private:
 	virtual MMRESULT PrepareHeader( LPWAVEHDR pwh );
-	virtual void UnprepareHeader( LPWAVEHDR pwh );
+	virtual MMRESULT UnprepareHeader( LPWAVEHDR pwh );
 public:
 	WAVEINCAPS  m_Caps;       // Capabilities of the input device.
 };
@@ -233,7 +234,7 @@ public:
 
 private:
 	virtual MMRESULT PrepareHeader( LPWAVEHDR pwh );
-	virtual void UnprepareHeader( LPWAVEHDR pwh );
+	virtual MMRESULT UnprepareHeader( LPWAVEHDR pwh );
 public:
 	WAVEOUTCAPS m_Caps;      // Capabilities of the output device.
 };

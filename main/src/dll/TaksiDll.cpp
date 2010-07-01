@@ -477,6 +477,7 @@ bool CTaksiProcess::CheckProcessIgnored() const
 		_T("js7jit"),	// debugger!
 		_T("monitor"),	// debugger!
 		_T("taskmgr"),	// debugger!
+		_T("dbgview"),	// debugger! SysInternals DebugView
 	};
 
 	for ( int i=0; i<COUNTOF(sm_SpecialNames); i++ )

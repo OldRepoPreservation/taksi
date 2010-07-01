@@ -430,6 +430,7 @@ BEGIN
     IDC_C_StatsClear        "Clear the stats values"
     IDC_C_UseOverheadCompensation 
                             "Check = compensate for the overhead of recording to keep videos at their original speed. (Good for cinematics) Unchecked = play videos as observed during record."
+	IDC_C_GDIFrame          "Include window frame for GDI Window recordings"
 END
 
 STRINGTABLE 

@@ -85,10 +85,6 @@ public:
 	CAVIThread();
 	~CAVIThread();
 
-#ifdef USE_AUDIO
-	HRESULT OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat );
-#endif
-
 	HRESULT StartAVIThread();
 	HRESULT StopAVIThread();
 
@@ -108,6 +104,20 @@ private:
 
 #ifdef USE_AUDIO
 	static void CALLBACK AudioInProc( HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 );
+	HRESULT WriteAVIAudioBlock( LPBYTE pBuffer, DWORD dwBufferSize, bool bClip = false );
+	HRESULT WriteAVIAudioBlock();
+public:
+	MMRESULT StartAudioRecorder()
+	{
+		return m_AudioInput.Start();
+	}
+	MMRESULT StopAudioRecorder()
+	{
+		return m_AudioInput.Stop();
+	}
+	HRESULT OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWaveFormat& WaveFormat );
+	HRESULT CloseAudioInputDevice();
+	HRESULT WaitAndWriteAVIAudioBlock();
 #endif
 
 private:
@@ -131,12 +141,19 @@ private:
 	CThreadLockedLong m_iFrameCount;	// how many busy frames are there? 
 
 #ifdef USE_AUDIO
+// Maybe the audio buffer values should be configurable? At the very least they probably
+// shouldn't be constants as codecs other than PCM may need longer buffers.  For PCM A
+// shorter buffer would probably be better for keeping the audio in sync for when the
+// the wave in recording exhausts the buffers.
 #define AUDIO_FRAME_QTY		8	
+#define AUDIO_BUFFER_MS		100
 	CWaveRecorder m_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
 	CWaveHeaderBase m_AudioBuffers[AUDIO_FRAME_QTY];	// keep these buffers for recording.
-	WAVE_BLOCKS_t m_AudioBufferSize;	// Size of each m_AudioBuffers in wave format blocks
+	DWORD m_AudioBufferSizeBytes;		// Size of audio buffer in bytes
+	CThreadLockedLong m_iAudioBufferCount;	// how many audio buffers are ready
 	int m_AudioBufferHeadIdx;			// m_AudioBuffers that is time head.
-	WAVE_BLOCKS_t m_AudioBufferStart;	// Total Time counter for m_AudioBufferHeadIdx from 0 % m_AudioBufferSize
+	//WAVE_BLOCKS_t m_AudioBufferSize;	// Size of each m_AudioBuffers in wave format blocks
+	//WAVE_BLOCKS_t m_AudioBufferStart;	// Total Time counter for m_AudioBufferHeadIdx from 0 % m_AudioBufferSize
 #endif
 };
 extern CAVIThread g_AVIThread;

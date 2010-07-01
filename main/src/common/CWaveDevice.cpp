@@ -36,11 +36,11 @@ void CWaveHeaderBase::UnprepareDevice()
 		return;
 	ASSERT( m_pwh->dwUser == (DWORD_PTR) this );
 	ASSERT( ! ( m_pwh->dwFlags & WHDR_INQUEUE ));
-	if ( m_pDevice.IsValidRefObj())
+	if ( m_pDevice != NULL )
 	{
 		m_pDevice->UnprepareHeader( m_pwh );
 		ASSERT( ! ( m_pwh->dwFlags & WHDR_PREPARED ));
-		m_pDevice.ReleaseRefObj();
+		m_pDevice = NULL;
 	}
 }
 
@@ -79,6 +79,7 @@ void CWaveHeaderBase::DetachData()
 	if ( m_bManageDataBuffer )
 	{
 		GlobalFreePtr( m_pwh->lpData );
+		m_bManageDataBuffer = false;
 	}
 	GlobalFreePtr( m_pwh );
 	m_pwh = NULL;
@@ -197,7 +198,8 @@ CWaveHeaderBase* CWaveDevice::OnHeaderReturn( LPWAVEHDR pwh ) // static
 	CWaveHeaderBase* pHdr = (CWaveHeaderBase*) ( pwh->dwUser );
 	ASSERT( pHdr->IsValidCheck()); 
 
-	CRefPtr<CWaveDevice> pDev = pHdr->m_pDevice;
+	//CRefPtr<CWaveDevice> pDev = pHdr->m_pDevice;
+	CWaveDevice *pDev = pHdr->m_pDevice;
 	ASSERT(pDev);
 	if ( pDev )
 	{
@@ -332,6 +334,7 @@ MMRESULT CWaveRecorder::Stop()
 MMRESULT CWaveRecorder::Reset()
 {
 	// All headers will be returned now.
+	// Note: this function can hang if the waveIn device/handle is in a bad state
 	m_fActive = false;
 	return ::waveInReset( get_Handle());
 }
@@ -364,13 +367,13 @@ MMRESULT CWaveRecorder::PrepareHeader( LPWAVEHDR pwh ) // virtual
 	return ::waveInPrepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
 }
 
-void CWaveRecorder::UnprepareHeader( LPWAVEHDR pwh ) // virtual
+MMRESULT CWaveRecorder::UnprepareHeader( LPWAVEHDR pwh ) // virtual
 {
 	// Protected function.
 	ASSERT(pwh);
-	if ( ! ( pwh->dwFlags & WHDR_PREPARED ))
-		return;
-	::waveInUnprepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
+	if ( ! ( pwh->dwFlags & WHDR_PREPARED ) || !get_Handle() )
+		return( MMSYSERR_NOERROR );
+	return ::waveInUnprepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
 }
 
 //***************************************************************
@@ -533,13 +536,13 @@ MMRESULT CWavePlayer::PrepareHeader( LPWAVEHDR pwh ) // virtual
 	return ::waveOutPrepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
 }
 
-void CWavePlayer::UnprepareHeader( LPWAVEHDR pwh ) // virtual
+MMRESULT CWavePlayer::UnprepareHeader( LPWAVEHDR pwh ) // virtual
 {
 	// Protected function.
 	ASSERT(pwh);
 	if ( ! ( pwh->dwFlags & WHDR_PREPARED ))
-		return;
-	::waveOutUnprepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
+		return( MMSYSERR_NOERROR );
+	return ::waveOutUnprepareHeader( get_Handle(), pwh, sizeof( WAVEHDR ));
 }
 
 //******************************************************************

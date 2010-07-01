@@ -54,6 +54,8 @@ HRESULT CTaksiDI::SetupDirectInput()
 		return hRes;
 	}
 
+	// why is this translation needed? this will only reliably translate into
+	// scan codes for the left keys. why not just use the DIK_ defines in ProcessDirectInut()?
 	static const BYTE sm_vKeysExt[ COUNTOF(m_bScanExt) ] = 
 	{
 		VK_SHIFT,		// HOTKEYF_SHIFT
@@ -119,11 +121,19 @@ void CTaksiDI::ProcessDirectInput()
 	if (FAILED(hRes))
 		return;
 
+	// Need to also handle the right set of keys.  MapVirtualKey() only really 
+	// works for getting the left keys (despite what MSDN says).
+	static const BYTE sm_diKeys[ COUNTOF(m_bScanExt) ] = 
+	{
+		DIK_RSHIFT,		// HOTKEYF_SHIFT
+		DIK_RCONTROL,	// HOTKEYF_CONTROL
+		DIK_RMENU		// HOTKEYF_ALT
+	};
 	// check for HOTKEYF_SHIFT, HOTKEYF_CONTROL, HOTKEYF_ALT
 	BYTE bHotMask = 0;
 	for ( int i=0; i<COUNTOF(m_bScanExt); i++ )
 	{
-		if ( buffer[ m_bScanExt[i]] & 0x80 ) 
+		if ( (buffer[ m_bScanExt[i]] & 0x80) || (buffer[ sm_diKeys[i]] & 0x80) ) 
 			bHotMask |= (1<<i);
 	}
 
