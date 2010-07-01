@@ -44,7 +44,6 @@ public:
 	void InitFormatEmpty()
 	{
 		m_iAllocSize = 0;
-		m_pWF = NULL;
 	}
 
 	int get_FormatSize( void ) const
@@ -59,8 +58,6 @@ public:
 	bool IsValidFormat() const;
 	bool IsValidBasic() const
 	{
-		if ( ! CHeapBlock_IsValid(m_pWF)) 
-			return( false );
 		return( get_BlockSize() != 0 );
 	}
 	void ReCalc( void );
@@ -79,15 +76,15 @@ public:
 	//
 	WAVEFORMATEX* get_WF() const
 	{
-		return( m_pWF );
+		return( (WAVEFORMATEX*)m_cbBytes );
 	}
 	operator WAVEFORMATEX*()
 	{
-		return( m_pWF );
+		return( (WAVEFORMATEX*)m_cbBytes );
 	}
 	operator const WAVEFORMATEX*() const
 	{
-		return( m_pWF );
+		return( (const WAVEFORMATEX*)m_cbBytes );
 	}
 	bool IsPCM() const
 	{
@@ -158,7 +155,7 @@ protected:
 
 protected:
 	int m_iAllocSize;		// sizeof(WAVEFORMATEX) + cbSize;
-	WAVEFORMATEX* m_pWF;    // variable size structure. CHeapBlock_ReAlloc()
+	char m_cbBytes[256];	// Note: this must be shared memory since it lives in sg_Config
 };
 
 #endif

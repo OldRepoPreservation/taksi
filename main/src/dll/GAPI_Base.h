@@ -45,6 +45,10 @@ protected:
 	}
 	virtual void UnhookFunctions()
 	{
+		// Important to stop the recording now (before DLL_PROCESS_DETACH) so
+		// the WaveIn and codec handles can be properly closed in the case
+		// where the app is exiting while still recording.
+		RecordAVI_Stop();
 		DEBUG_MSG(( "CTaksiGAPIBase::UnhookFunctions" LOG_CR ));
 		m_bHookedFunctions = false;
 	}

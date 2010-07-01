@@ -180,6 +180,19 @@ public:
 	{
 		return( m_AudioFormat.IsValidFormat());
 	}
+	DWORD GetAudioTimeMs() const
+	{
+		// avoid overflow with __int64
+		return( (DWORD)(((__int64)m_dwAudioBytes * 1000) / m_AudioFormat.get_BytesPerSec()) );
+	}
+	DWORD GetFrameTimeMs() const
+	{
+		return( (DWORD)(((__int64)m_dwTotalFrames * 1000) / m_fFrameRate) );
+	}
+	DWORD GetAudioBytesForMs( DWORD dwMs ) const
+	{
+		return( m_AudioFormat.CvtBlocksToBytes( m_AudioFormat.CvtmSecToBlocks( dwMs ) ) );
+	}
 
 	HRESULT OpenAVICodec( CVideoFrameForm& FrameForm, double fFrameRate, const CVideoCodec& CodecInfo, const CWaveFormat* pAudioFormat=NULL );
 	HRESULT OpenAVIFile( const TCHAR* pszFileName );
@@ -208,6 +221,7 @@ private:
 
 	DWORD m_dwMoviChunkSize;	// total amount of data created. in 'movi' chunk
 	DWORD m_dwTotalFrames;		// total frames compressed/written.
+	DWORD m_dwAudioBytes;		// audio bytes written
 
 	CAVIIndex m_Index;			// build an index as we go.
 
@@ -216,7 +230,7 @@ private:
 	CVideoCodec m_VideoCodec;	// What video compression params did we choose?
 	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.
 
-	CWaveFormat m_AudioFormat;
+	CWaveFormat m_AudioFormat;	// audio format
 };
 
 TAKSI_LINK HRESULT HRes_GetLastErrorDef( HRESULT hDefault = E_FAIL );

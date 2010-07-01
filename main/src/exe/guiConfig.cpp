@@ -327,6 +327,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 	// Display options
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
 	UPDATE_CHECK(MasterTopMost,config.m_bMasterTopMost);
+	UPDATE_CHECK(UseOverheadCompensation,config.m_bUseOverheadCompensation);
 
 	UPDATE_CHECK(GDIDesktop,config.m_abUseGAPI[TAKSI_GAPI_DESKTOP]);
 	UPDATE_CHECK(UseGDI,config.m_abUseGAPI[TAKSI_GAPI_GDI]);
@@ -541,6 +542,10 @@ void CGuiConfig::OnCommandAudioCodecButton()
 	// Really changed??
 	UpdateAudioCodec( g_Config.m_AudioFormat );
 	OnChanges();
+	if ( !g_Config.m_AudioFormat.IsValidFormat() )
+	{
+		DlgHelp( g_GUIConfig, _T("This codec is not supported, audio will not be recorded.") );
+	}
 }
 
 void CGuiConfig::OnCommandKeyChange( HWND hControl )
@@ -764,10 +769,6 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		{
 			g_Config.m_iAudioDevice = (UINT) iDeviceId;
 			OnChanges();
-			if ( iDeviceId != WAVE_DEVICE_NONE )
-			{
-				DlgHelp( m_hWnd, _T("TODO: Audio doesnt actually work yet") );
-			}
 		}
 		}
 		break;

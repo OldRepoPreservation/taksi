@@ -31,8 +31,8 @@ Windows NT 4.0, Windows 2000, Windows XP.
 3. Capture specifications:
 --------------------------
 Screenshot format: 24 bit BMP files.
-Video: compressed or uncompressed AVI-files (no audio).
-
+Video: compressed or uncompressed AVI-files.
+Audio: PCM
 
 4. Games/Apps tested with:
 --------------------------
@@ -47,7 +47,8 @@ Direct3D 9:
    3DMark03.
 OpenGL:
    DOOM 3, Return To Castle Wolfenstein (demo),
-   Tennis Critters (demo), PyOpenGL bindings.
+   Tennis Critters (demo), PyOpenGL bindings,
+   Quake 2.
 
 
 5. Usage:
@@ -208,6 +209,26 @@ either very slow or very fast videos. You may need to experiment with
 the settings. However, i found out that for some applications, good
 custom settings can deliver much better (and smaller) videos than the ones
 captured in Adaptive mode.
+
+5) Recommended video codec:
+===========================
+Use ffshow-tryouts.  There are a few encoders that can work well for real-time
+recordings.  In each case the "one pass quality" or "one pass quantizer" modes
+are known to work well.
+
+MJPEG: Very fast, requires the most amount of drive space.  All frames
+       are key frames so this is nice for editing.
+
+MS MPEG4 v2: Smaller files than MJPEG but slower.
+
+MPEG-2: Smaller files than MS MPEG4 v2 but probably slower.
+        Make sure "b frames" is unchecked in the Generic options.
+
+MPEG-4: Smaller files than MPEG-2 but probably slower.
+        Make sure "b frames" is unchecked in the Generic options. Make sure 
+        "Qpel" in the "motion estimation" is unchecked.
+
+FLV1: File size somewhere between MJPEG and MPEG-2.
 
 
 9. Credits:

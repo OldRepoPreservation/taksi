@@ -412,3 +412,13 @@ Restore PNG format still frame capture with delay loading of gdiplus for Win2K s
 3/1/2007
 Build files for MSVC 8 (Visual Studio 2005)
 Renaming of all the Graphics API code to GAPI_*
+
+0.779
+6/27/2010
+Audio recording via Wave In (no mixer settings and only supports PCM)
+Recording should now properly stop if the app closes while recording
+Paused recording indicator is now gray for OpenGL
+Compensate for record overhead check box will now appear checked (when enabled)
+Right ctrl, alt, and shift keys now recognized when using DirectInput hotkeys
+Stopping record from paused state will clear paused state (return indicator to green)
+AVI header now properly written to handle fractional frame rates, such as 29.97

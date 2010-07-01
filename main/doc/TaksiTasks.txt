@@ -14,7 +14,6 @@ Some codecs use profiles requiring precise size/format to work.
 
 TODO:
 Alternate input stream like Vidcap32 ?
-Audio record
 optional BMP,PNG,JPG for still shots ? use GDI+ if present.
 fix installer to default to install for all and ask if they want desktop icon ?
 Allow GUI adjust of the size of the background thread Q
@@ -40,8 +39,9 @@ add a watermark or logo ? optionally of course.
 color reduction for GDI. reduce to a smaller number of colors ? for better compression?
 
 AUDIO TASK:
-Get audio from WaveIn (assumes loopback) ? (much easier)
-Compress and write audio frames to the AVI file.
+Better audio/video syncronization?  Currently audio is added if needed, but video frames should
+ be dropped if audio is dropped (or have the option to sync video to audio).
+Support formats other than PCM?
 Hook Audio stream from output?
  Capture of audio is quite complex unless there is already a loopback in place on the hardware.
  Without a loopback input the output must be hooked at a very low (kernel) level.
@@ -51,3 +51,4 @@ Does Windows Media Encoder record audio? How do others do it? hooked WaveOut ?
 
 OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
+some encoders in ffdshow allow 32 bit RGB, could this be faster than the conversion to 24 bit?

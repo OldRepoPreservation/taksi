@@ -399,7 +399,7 @@ void CTaksiGAPI_GDI::UnhookFunctions()
 	{
 		// Someone re-hooked the API! We are screwed!
 		ASSERT( _WndProcCur == (LONG_PTR) WndProcHook );
-		DEBUG_ERR(( "CTaksiGAPI_GDI::UnhookFunctions FAILED Unhook!" ));
+		DEBUG_ERR(( "CTaksiGAPI_GDI::UnhookFunctions FAILED Unhook!" LOG_CR ));
 	}
 	m_WndProcOld = NULL;
 
