@@ -61,3 +61,7 @@ void CHookJump::RemoveHook( LPVOID pFunc )
 	}
 }
 
+bool CHookJump::VerifyHook( const LPVOID pFunc ) const
+{
+	return (IsHookInstalled() && !memcmp(m_Jump, pFunc, sizeof(m_Jump)));
+}

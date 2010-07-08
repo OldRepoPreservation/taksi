@@ -544,8 +544,9 @@ bool CGui::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case TAKSI_HOTKEY_IndicatorToggle:
 	case IDB_IndicatorToggle_1:
-		g_Config.m_bShowIndicator = !g_Config.m_bShowIndicator;
-		sg_Config.m_bShowIndicator = g_Config.m_bShowIndicator;
+		// toggle shared state and update config, no save?
+		sg_Config.m_bShowIndicator = !sg_Config.m_bShowIndicator;
+		g_Config.m_bShowIndicator = sg_Config.m_bShowIndicator;
 		UpdateButtonStates();
 		return true;
 

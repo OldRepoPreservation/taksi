@@ -201,7 +201,7 @@ void CGuiConfig::UpdateProcStats( const CTaksiProcStats& stats, DWORD dwMask )
 		int id = stats.m_eState;
 		if ( id < 0 || id >= TAKSI_INDICATE_QTY )
 			id = TAKSI_INDICATE_QTY;
-		LoadString( g_hInst, id + IDS_STATE_Ready, szTmp, sizeof(szTmp)-1 );
+		LoadString( g_hInst, id + IDS_STATE_Idle, szTmp, sizeof(szTmp)-1 );
 		SetWindowText( m_hControlStatState, szTmp );
 	}
 	if ( dwMask & (1<<TAKSI_PROCSTAT_FrameRate))
@@ -761,15 +761,15 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 	case IDC_C_AudioDevices:
 		if ( iNotify == CBN_SELCHANGE )
 		{
-		LRESULT iDeviceId = SendMessage( m_hControlAudioDevices, CB_GETCURSEL, 0, 0 );
-		if ( iDeviceId < 0 )
-			break;
-		iDeviceId += WAVE_DEVICE_NONE;
-		if ( iDeviceId != g_Config.m_iAudioDevice )
-		{
-			g_Config.m_iAudioDevice = (UINT) iDeviceId;
-			OnChanges();
-		}
+			LRESULT iDeviceId = SendMessage( m_hControlAudioDevices, CB_GETCURSEL, 0, 0 );
+			if ( iDeviceId < 0 )
+				break;
+			iDeviceId += WAVE_DEVICE_NONE;
+			if ( iDeviceId != g_Config.m_iAudioDevice )
+			{
+				g_Config.m_iAudioDevice = (UINT) iDeviceId;
+				OnChanges();
+			}
 		}
 		break;
 	case IDC_C_AudioCodecButton:

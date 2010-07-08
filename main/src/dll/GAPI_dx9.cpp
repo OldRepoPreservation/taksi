@@ -33,6 +33,8 @@ typedef HRESULT (STDMETHODCALLTYPE *PFN_DX9_RESET)(IDirect3DDevice9* pDevice, LP
 static PFN_DX9_RESET   s_D3D9_Reset = NULL;
 typedef HRESULT (STDMETHODCALLTYPE *PFN_DX9_PRESENT)(IDirect3DDevice9* pDevice, const RECT*, const RECT*, HWND, LPVOID);
 static PFN_DX9_PRESENT s_D3D9_Present = NULL;
+typedef HRESULT (STDMETHODCALLTYPE *PFN_DX9_SCPRESENT)(IDirect3DSwapChain9* pSwapChain, const RECT*,const RECT*, HWND, LPVOID, DWORD);
+static PFN_DX9_SCPRESENT s_D3D9_SCPresent = NULL;
 
 //********************************
 
@@ -229,7 +231,7 @@ HWND CTaksiGAPI_DX9::GetFrameInfo( SIZE& rSize ) // virtual
 		IREF_GETPPTR(backBuffer,IDirect3DSurface9));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x", hRes ));
+		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x" LOG_CR, hRes ));
 		return NULL;
 	}
 
@@ -265,7 +267,7 @@ HWND CTaksiGAPI_DX9::GetFrameInfo( SIZE& rSize ) // virtual
 	hRes = m_pDevice->GetCreationParameters(&params);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x", hRes ));
+		DEBUG_ERR(( "DX9:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x" LOG_CR, hRes ));
 		return NULL;
 	}
 
@@ -827,7 +829,7 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Reset(
 	g_DX9.RecordAVI_Reset();
 	g_DX9.InvalidateDeviceObjects();
 
-	//call real Present() 
+	//call real Reset() 
 	HRESULT hRes = s_D3D9_Reset(pDevice, params);
 
 	DX9_HooksVerify(pDevice);
@@ -851,6 +853,13 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Present(
 
 	g_DX9.m_pDevice = pDevice;
 
+	// if swap chain present is hooked it needs removed since device present will
+	// eventually call swap chain present.
+	if (g_DX9.m_Hook_SCPresent.IsHookInstalled())
+	{
+		g_DX9.m_Hook_SCPresent.RemoveHook(s_D3D9_SCPresent);
+	}
+
 	// rememeber IDirect3DDevice9::Release pointer so that we can clean-up properly.
 	if (g_DX9.m_Hook_AddRef == NULL || g_DX9.m_Hook_Release == NULL)
 	{
@@ -868,6 +877,44 @@ EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_Present(
 	DEBUG_TRACE(( "DX9_Present: done." LOG_CR ));
 
 	g_DX9.m_Hook_Present.SwapReset(s_D3D9_Present);
+	return hRes;
+}
+
+EXTERN_C HRESULT _declspec(dllexport) STDMETHODCALLTYPE DX9_SCPresent(
+	IDirect3DSwapChain9* pSwapChain, const RECT* src, const RECT* dest, HWND hWnd, LPVOID unused, DWORD dwFlags)
+{
+	// New IDirect3DSwapChain9::Present function 
+	// m_nDX9_SCPresent
+	IRefPtr<IDirect3DDevice9> pDevice;
+	if ( FAILED( pSwapChain->GetDevice( IREF_GETPPTR(pDevice,IDirect3DDevice9) ) ) )
+	{
+		return s_D3D9_SCPresent(pSwapChain, src, dest, hWnd, unused, dwFlags);
+	}
+
+	g_DX9.m_Hook_SCPresent.SwapOld(s_D3D9_SCPresent);
+
+	DEBUG_TRACE(( "--------------------------------" LOG_CR ));
+	DEBUG_TRACE(( "DX9_SCPresent: called (%08x)." LOG_CR, dwFlags ));
+
+	g_DX9.m_pDevice = pDevice;
+
+	// rememeber IDirect3DDevice9::Release pointer so that we can clean-up properly.
+	if (g_DX9.m_Hook_AddRef == NULL || g_DX9.m_Hook_Release == NULL)
+	{
+		DX9_HooksInit(pDevice);
+	}
+
+	g_DX9.PresentFrameBegin(true);
+
+	// call real IDirect3DSwapChain9::Present() 
+	HRESULT hRes = s_D3D9_SCPresent(pSwapChain, src, dest, hWnd, unused, dwFlags);
+
+	g_DX9.PresentFrameEnd();
+
+	DX9_HooksVerify(pDevice);
+	DEBUG_TRACE(( "DX9_SCPresent: done." LOG_CR ));
+
+	g_DX9.m_Hook_SCPresent.SwapReset(s_D3D9_SCPresent);
 	return hRes;
 }
 
@@ -916,10 +963,20 @@ HRESULT CTaksiGAPI_DX9::HookFunctions()
 
 	if ( ! m_Hook_Present.InstallHook(s_D3D9_Present,DX9_Present))
 	{
-		LOG_WARN(( "CTaksiGAPI_DX9::HookFunctions: FAILED to InstallHook!" LOG_CR));
+		LOG_WARN(( "CTaksiGAPI_DX9::HookFunctions: FAILED to InstallHook for IDirect3DDevice9::Present!" LOG_CR));
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 	m_Hook_Reset.InstallHook(s_D3D9_Reset,DX9_Reset);
+
+	if (sg_Shared.m_nDX9_SCPresent)
+	{
+		// Also hook IDirect3DSwapChain9::Present in case the app calls it directly
+		s_D3D9_SCPresent = (PFN_DX9_SCPRESENT)(get_DllInt() + sg_Shared.m_nDX9_SCPresent);
+		if ( ! m_Hook_SCPresent.InstallHook(s_D3D9_SCPresent,DX9_SCPresent))
+		{
+			LOG_WARN(( "CTaksiGAPI_DX9::HookFunctions: FAILED to InstallHook for IDirect3DSwapChain9::Present!" LOG_CR));
+		}
+	}
 
 	return __super::HookFunctions();
 }
@@ -941,6 +998,7 @@ void CTaksiGAPI_DX9::UnhookFunctions()
 	}
 
 	// restore IDirect3D9Device methods
+	m_Hook_SCPresent.RemoveHook(s_D3D9_SCPresent);
 	m_Hook_Present.RemoveHook(s_D3D9_Present);
 	m_Hook_Reset.RemoveHook(s_D3D9_Reset);
 

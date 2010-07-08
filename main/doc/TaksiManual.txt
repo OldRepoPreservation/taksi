@@ -44,11 +44,11 @@ Direct3D 8:
 Direct3D 9:
    Prince of Persia: Sands of Time,
    Leisure Suit Larry: Magna Cum Laude,
-   3DMark03.
+   3DMark03, Battlefield 2, StarCraft II beta.
 OpenGL:
    DOOM 3, Return To Castle Wolfenstein (demo),
    Tennis Critters (demo), PyOpenGL bindings,
-   Quake 2.
+   Quake 2, Half Life, IL-2 Sturmovik.
 
 
 5. Usage:
@@ -210,14 +210,16 @@ the settings. However, i found out that for some applications, good
 custom settings can deliver much better (and smaller) videos than the ones
 captured in Adaptive mode.
 
-5) Recommended video codec:
-===========================
-Use ffshow-tryouts.  There are a few encoders that can work well for real-time
-recordings.  In each case the "one pass quality" or "one pass quantizer" modes
-are known to work well.
+5) Recommended video codecs:
+============================
+1. ffshow-tryouts
+There are a few encoders in ffshow-tryouts that can work well for real-time
+recordings. For the lossy encoders the "one pass quality" or "one pass
+quantizer" modes are known to work well.
 
-MJPEG: Very fast, requires the most amount of drive space.  All frames
-       are key frames so this is nice for editing.
+MJPEG: Very fast but uses more disk space compared to MPEG and x264. All
+       frames are key frames so this is nice for editing. Quality values
+	   of 90 or more have minimal to no noticeable artifacts.
 
 MS MPEG4 v2: Smaller files than MJPEG but slower.
 
@@ -229,6 +231,20 @@ MPEG-4: Smaller files than MPEG-2 but probably slower.
         "Qpel" in the "motion estimation" is unchecked.
 
 FLV1: File size somewhere between MJPEG and MPEG-2.
+
+Huffyuv: Very fast lossless codec. At high resolutions and/or frame rates
+         a lot of disk space will be needed (and a fast drive).
+
+FFV1: Lossless codec, slower than Huffyuv but better compression.
+
+Lossless JPEG: another lossless option, slower than Huffyuv.
+
+2. x264vfw
+To optimize x264vfw for fast encoding, use the Ultrafast Preset. You should
+enable the "Zero Latency" otherwise your recorded video may have glitches.
+The "Single pass - ratefactor-based (CRF)" is probably the best rate control
+option with a ratefactor value of 23 or less.  Higher ratefactor values may
+have noticeable artifacts.
 
 
 9. Credits:

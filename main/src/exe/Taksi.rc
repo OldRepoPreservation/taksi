@@ -407,6 +407,7 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDS_STATE_Idle			"Idle"
     IDS_STATE_Ready         "Ready"
     IDS_STATE_Hooked        "Hook"
     IDS_STATE_Recording     "Record"

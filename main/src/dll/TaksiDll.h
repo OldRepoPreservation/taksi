@@ -99,6 +99,7 @@ public:
 	void InitFrameQ();
 
 private:
+	HRESULT CheckAVIFileReset();
 	DWORD ThreadRun();
 	static DWORD __stdcall ThreadEntryProc( void* pThis );
 
@@ -145,7 +146,7 @@ private:
 // shouldn't be constants as codecs other than PCM may need longer buffers.  For PCM A
 // shorter buffer would probably be better for keeping the audio in sync for when the
 // the wave in recording exhausts the buffers.
-#define AUDIO_FRAME_QTY		8	
+#define AUDIO_FRAME_QTY		8
 #define AUDIO_BUFFER_MS		100
 	CWaveRecorder m_AudioInput;		// Device for Raw PCM audio input. (loopback from output?)
 	CWaveHeaderBase m_AudioBuffers[AUDIO_FRAME_QTY];	// keep these buffers for recording.

@@ -47,6 +47,7 @@ enum TAKSI_INTF_TYPE
 	TAKSI_INTF_DX8_Reset = 14,
 	TAKSI_INTF_DX8_Present = 15,
 
+	TAKSI_INTF_DX9_SCPresent = 3,
 	TAKSI_INTF_DX9_Reset = 16,
 	TAKSI_INTF_DX9_Present = 17,
 };
@@ -187,6 +188,7 @@ public:
 #ifdef USE_DIRECTX9
 	// DX9
 	UINT_PTR m_nDX9_Present;
+	UINT_PTR m_nDX9_SCPresent;
 	UINT_PTR m_nDX9_Reset;
 #endif
 };

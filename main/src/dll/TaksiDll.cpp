@@ -69,6 +69,12 @@ HRESULT CTaksiLogFile::OpenLogFile( const TCHAR* pszFileName )
 		return hRes;
 	}
 
+	// Append to the end of the file if it exists
+	if ( GetLastError() == ERROR_ALREADY_EXISTS )
+	{
+		SetFilePointer( (HANDLE)m_File, GetFileSize((HANDLE)m_File, NULL), NULL, FILE_BEGIN );
+	}
+
 	return S_OK;
 }
 
@@ -315,9 +321,11 @@ void CTaksiShared::HotKey_ConfigOpen()
 void CTaksiShared::HotKey_IndicatorToggle()
 {
 	sg_Config.m_bShowIndicator = !sg_Config.m_bShowIndicator;
+	UpdateMaster();
 }
 void CTaksiShared::HotKey_HookModeToggle()
 {
+	// don't switch during video capture
 	if ( g_AVIFile.IsOpen())
 		return;
 	if ( sg_Shared.IsHookCBT())
@@ -425,7 +433,7 @@ void CTaksiProcess::UpdateStat( TAKSI_PROCSTAT_TYPE eProp )
 	}
 	if ( eProp == TAKSI_PROCSTAT_LastError )
 	{
-		LOG_MSG(( "%s" LOG_CR, m_Stats.m_szLastError ));
+		LOG_MSG(( "Last Error: %s" LOG_CR, m_Stats.m_szLastError ));
 	}
 }
 

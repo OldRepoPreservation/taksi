@@ -119,7 +119,7 @@ public:
 struct TAKSI_LINK CAVIIndexBlock
 {
 	// Build an index of frames to append to the end of the file.
-#define AVIINDEX_QTY 1024
+#define AVIINDEX_QTY 2048
 	AVIINDEXENTRY* m_pEntry;	// block of AVIINDEX_QTY entries
 	struct CAVIIndexBlock* m_pNext;
 };
@@ -159,6 +159,15 @@ struct AVI_FILE_HEADER;
 struct AVI_VIDEO_HEADER;
 struct AVI_AUDIO_HEADER;
 
+// Set the threshold to 4GB minus 100MB.
+// This value is used as a limit to indicate when the current file should be
+// closed and a new file opened to avoid a corrupt AVI file (due to the
+// limitation of AVI files using 32 bit values).
+// There's no reason for choosing 100MB other than this should be more than
+// enough space for some additional A/V chunks and the index.
+// See CAVIFile::ResetAVIFile() for the usage.
+#define AVI_MOVI_SIZE_RESET_THRESHOLD (0xffffffff - 1024 * 1024 * 100)
+
 struct TAKSI_LINK CAVIFile
 {
 	// Stream to create a AVI file
@@ -174,7 +183,7 @@ public:
 	}
 	bool HasVideo() const
 	{
-		return( true );
+		return( true );	// NOTE: video is not yet optional
 	}
 	bool HasAudioFormat() const
 	{
@@ -202,7 +211,8 @@ public:
 	HRESULT WriteAudioBlock( const BYTE* pWaveData, DWORD dwLength );
 	HRESULT WriteVideoBlocks( CVideoFrame& frame, int iTimesDupe );
 
-	HRESULT CloseAVI();
+	HRESULT CloseAVI( bool bCloseCodec = true );
+	HRESULT ResetAVIFile( const TCHAR* pszFileName );
 
 #ifdef _DEBUG
 	static bool _stdcall UnitTest();
@@ -210,7 +220,8 @@ public:
 
 private:
 	void InitBitmapIn( BITMAPINFO& biIn ) const;
-	int InitFileHeader( AVI_FILE_HEADER& afh, AVI_VIDEO_HEADER* pVideo, AVI_AUDIO_HEADER* pAudio );
+	int InitFileHeader( AVI_FILE_HEADER& afh, bool bInitVideo, AVI_AUDIO_HEADER* pAudio );
+	HRESULT AllocVideoHeader( DWORD dwSize );
 
 public:
 	CVideoFrameForm m_FrameForm;		// pixel format of each video frame.
@@ -222,10 +233,12 @@ private:
 	DWORD m_dwMoviChunkSize;	// total amount of data created. in 'movi' chunk
 	DWORD m_dwTotalFrames;		// total frames compressed/written.
 	DWORD m_dwAudioBytes;		// audio bytes written
+	LPBYTE m_pVideoHeader;		// complete AVI video header LIST buffer
+	DWORD m_dwVideoHeaderSize;	// size of the video buffer
 
 	CAVIIndex m_Index;			// build an index as we go.
 
-	// Params set at OpenAVIFile().
+	// Params set at OpenAVICodec().
 	double m_fFrameRate;		// What video framerate are we trying to use? (x/second)
 	CVideoCodec m_VideoCodec;	// What video compression params did we choose?
 	BITMAPINFO m_biIn;			// m_VideoCodec points at this. needs to persist.

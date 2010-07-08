@@ -268,6 +268,7 @@ LRESULT CALLBACK CTaksiGAPI_GDI::WndProcHook( HWND hWnd, UINT uMsg, WPARAM wPara
 		{
 		g_GDI.m_iReentrant++;
 		WNDPROC WndProcOld = g_GDI.m_WndProcOld;
+		g_GDI.RecordAVI_Reset();	// stop recording
 		g_GDI.UnhookFunctions();
 		LRESULT lRes = ::CallWindowProc( WndProcOld, hWnd, uMsg, wParam, lParam );
 		g_GDI.m_hWnd = HWND_DESKTOP;

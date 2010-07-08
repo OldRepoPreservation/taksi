@@ -94,11 +94,12 @@
 #define IDS_GuiConfigHelp4              2013
 #define IDS_GuiConfigHelp5              2014
 #define IDS_GuiConfigHelp6              2015
-#define IDS_STATE_Ready                 2020
+#define IDS_STATE_Idle					2020
 #define IDS_STATE_Hooked                2021
-#define IDS_STATE_Recording             2022
-#define IDS_STATE_RecordPause           2023
-#define IDS_STATE_QTY                   2024
+#define IDS_STATE_Ready                 2022
+#define IDS_STATE_Recording             2023
+#define IDS_STATE_RecordPause           2024
+#define IDS_STATE_QTY                   2025
 #define IDS_STATUS_CHANGES              2101
 #define IDS_STATUS_RESTORED             2102
 #define IDS_STATUS_SAVED                2103

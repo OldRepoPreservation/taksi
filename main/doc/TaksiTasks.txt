@@ -7,21 +7,21 @@ move all text to RC files for translation.
 KNOWN BUGS:
 Crash - GDI doesnt unhook properly on close of Taksi sometimes. (Explorer.exe error message?)
 Odd time lag at the start of the recording? frozen frame for a few seconds??
-<=1 FPS not recording properly? re-test this
 GDI indicator drawn over overlapped windows. bleeds through.
 Some Codecs MUST have mult of 4 input even tho they dont fail. MSMPEG4
 Some codecs use profiles requiring precise size/format to work.
+If compensate for record overhead is used then the video will drift out of sync with the audio.
+Audio will only stay in sync for frame rates of 2 FPS or higher.
 
 TODO:
 Alternate input stream like Vidcap32 ?
-optional BMP,PNG,JPG for still shots ? use GDI+ if present.
+GUI configure screenshot type BMP,PNG,JPG for still shots (uses GDI+ default to png).
 fix installer to default to install for all and ask if they want desktop icon ?
 Allow GUI adjust of the size of the background thread Q
 Support DirectShow plugin codec to get Theora support
 Need message explaining focus changing/hooking.
 Graphics Mode Text overlay - display frame rate/ Megs of data written as text on live window
 makefile, Manual.txt completely out of date!
-AVI doesnt understand < 1 FPS ??
 render the mouse cursor in graphics modes.
 Support auto switch to alternate codec if codec fails ?
 Suggest codecs appropriate to desired CPU usage. MSMpeg4v3 seems good.
@@ -39,7 +39,7 @@ add a watermark or logo ? optionally of course.
 color reduction for GDI. reduce to a smaller number of colors ? for better compression?
 
 AUDIO TASK:
-Better audio/video syncronization?  Currently audio is added if needed, but video frames should
+Better audio/video synchronization?  Currently audio is added if needed, but video frames should
  be dropped if audio is dropped (or have the option to sync video to audio).
 Support formats other than PCM?
 Hook Audio stream from output?
@@ -51,4 +51,4 @@ Does Windows Media Encoder record audio? How do others do it? hooked WaveOut ?
 
 OPEN QUESTIONS:
 why use HeapAlloc instead of new for allocs ? seems the same to me.
-some encoders in ffdshow allow 32 bit RGB, could this be faster than the conversion to 24 bit?
+some codecs allow 32 bit RGB (dummy alpha), could this be faster than the conversion to 24 bit?

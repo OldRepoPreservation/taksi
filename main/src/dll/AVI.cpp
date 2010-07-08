@@ -137,7 +137,7 @@ void CAVIThread::InitFrameQ()
 	m_iFrameFreeIdx=0;	// index to empty frame. ready to fill
 	m_iFrameCount.m_lValue = 0;
 #ifdef USE_AUDIO
-	m_AudioBufferHeadIdx=0;
+	m_AudioBufferHeadIdx = 0;
 	m_iAudioBufferCount.m_lValue = 0;
 	//m_AudioBufferSize = 0;
 	//m_AudioBufferStart = 0;
@@ -203,7 +203,12 @@ DWORD CAVIThread::ThreadRun()
 				}
 			}
 		}
+		else
 #endif
+		{
+			// No audio so check for the file reset
+			CheckAVIFileReset();
+		}
 
 		// we are done.
 		m_dwTotalFramesProcessed++;
@@ -237,6 +242,19 @@ DWORD __stdcall CAVIThread::ThreadEntryProc( void* pThis ) // static
 {
 	ASSERT(pThis);
 	return ((CAVIThread*)pThis)->ThreadRun();
+}
+
+HRESULT CAVIThread::CheckAVIFileReset()
+{
+	// Check if a new file is needed
+	if ( g_AVIFile.ResetAVIFile( NULL ) == S_FALSE )
+	{
+		// Generate a new file name and reset the AVI file
+		TCHAR szFileName[_MAX_PATH];
+		g_Proc.MakeFileName( szFileName, _T("avi"));
+		return g_AVIFile.ResetAVIFile( szFileName );
+	}
+	return S_OK;
 }
 
 //*****************************************************************
@@ -369,12 +387,18 @@ HRESULT CAVIThread::WriteAVIAudioBlock( LPBYTE pBuffer, DWORD dwBufferSize, bool
 				dwBytesThisFrame = 0;
 		}
 		// Write audio AVI block
-		return g_AVIFile.WriteAudioBlock(pBuffer, dwBytesThisFrame);
+		HRESULT hRes = g_AVIFile.WriteAudioBlock(pBuffer, dwBytesThisFrame);
+		
+		// When using audio, check for the file reset after an audio block is written
+		CheckAVIFileReset();
+		
+		return hRes;
 	}
 	return S_FALSE;
 }
 
-// called from CloseAudioInputDevice() and HandlePause()
+// write AVI audio chunk clipped to the length of the video
+// called from CloseAudioInputDevice() and WaitAndWriteAVIAudioBlock()
 HRESULT CAVIThread::WriteAVIAudioBlock()
 {
 	// If AVI file is open, write remaining audio
@@ -458,15 +482,18 @@ HRESULT CAVIThread::OpenAudioInputDevice( WAVE_DEVICEID_TYPE iWaveDeviceId, CWav
 	return S_OK;
 }
 
+// Close audio input and free the buffers, but write final audio chunk first.
+// NOTE: this is bad to call in DLL_PROCESS_DETACH (Reset may hang)
 HRESULT CAVIThread::CloseAudioInputDevice()
 {
 	HRESULT hRes = S_OK;
 	
 	if ( m_AudioInput.get_Handle())
 	{
+		// Stop audio and write final audio block
+		m_AudioInput.Stop();
 		hRes = WriteAVIAudioBlock();
 		// Free audio buffers and close
-		m_AudioInput.Stop();
 		m_AudioInput.Reset();
 		for ( int j=0; j<COUNTOF(m_AudioBuffers); j++ )
 		{
@@ -485,7 +512,7 @@ HRESULT CAVIThread::WaitAndWriteAVIAudioBlock()
 		WaitForAllFrames();
 		return WriteAVIAudioBlock();
 	}
-	return S_OK;
+	return S_FALSE;	// indicate the wait didn't happen
 }
 
 #endif // USE_AUDIO
@@ -538,33 +565,33 @@ HRESULT CAVIThread::StartAVIThread()
 	// Create my resources.	
 	if ( m_nThreadId == NULL )	// not already running
 	{
-	DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
-	m_bStop	= false;
+		DEBUG_TRACE(( "CAVIThread::StartAVIThread" LOG_CR));
+		m_bStop	= false;
 
-	if ( ! m_EventDataStart.CreateEvent(NULL,false,false))
-	{
-		goto do_erroret;
-	}
-	if ( ! m_EventDataDone.CreateEvent(NULL,true,true))	// manual set/reset.
-	{
-		goto do_erroret;
-	}
+		if ( ! m_EventDataStart.CreateEvent(NULL,false,false))
+		{
+			goto do_erroret;
+		}
+		if ( ! m_EventDataDone.CreateEvent(NULL,true,true))	// manual set/reset.
+		{
+			goto do_erroret;
+		}
 
-	m_hThread.AttachHandle( ::CreateThread(
-		NULL, // LPSECURITY_ATTRIBUTES lpThreadAttributes,
-		0, // SIZE_T dwStackSize,
-		ThreadEntryProc, // LPTHREAD_START_ROUTINE lpStartAddress,
-		this, // LPVOID lpParameter,
-		0, // dwCreationFlags
-		&m_nThreadId ));
-	if ( ! m_hThread.IsValidHandle())
-	{
-		m_nThreadId = 0;
+		m_hThread.AttachHandle( ::CreateThread(
+			NULL, // LPSECURITY_ATTRIBUTES lpThreadAttributes,
+			0, // SIZE_T dwStackSize,
+			ThreadEntryProc, // LPTHREAD_START_ROUTINE lpStartAddress,
+			this, // LPVOID lpParameter,
+			0, // dwCreationFlags
+			&m_nThreadId ));
+		if ( ! m_hThread.IsValidHandle())
+		{
+			m_nThreadId = 0;
 do_erroret:
-		HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
-		LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
-		return hRes;
-	}
+			HRESULT hRes = HRes_GetLastErrorDef( HRESULT_FROM_WIN32(ERROR_TOO_MANY_TCBS));
+			LOG_WARN(( "CAVIThread: FAILED to create new thread 0x%x" LOG_CR, hRes ));
+			return hRes;
+		}
 		hRes = S_OK;
 	}
 

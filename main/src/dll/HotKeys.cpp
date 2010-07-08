@@ -68,6 +68,7 @@ HRESULT CTaksiDI::SetupDirectInput()
 	}
 
 	m_bSetup = true;
+	DEBUG_MSG(("SetupDirectInput: done." LOG_CR ));
 	return S_OK;
 }
 
@@ -275,7 +276,7 @@ void CTaksiHotKeys::DoHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	case TAKSI_HOTKEY_ConfigOpen:	// Open the config dialog window.
 		sg_Shared.HotKey_ConfigOpen();
 		return;
-	case TAKSI_HOTKEY_HookModeToggle:	// don't switch during video capture?
+	case TAKSI_HOTKEY_HookModeToggle:
 		sg_Shared.HotKey_HookModeToggle();
 		return;
 	case TAKSI_HOTKEY_IndicatorToggle:
