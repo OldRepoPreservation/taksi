@@ -11,6 +11,7 @@
 GAPIOGLFUNC( wglSwapBuffers,		BOOL,	( HDC ))
 GAPIOGLFUNC( wglGetCurrentDC,		HDC,	( void ))
 GAPIOGLFUNC( wglGetProcAddress,	PROC,	( LPCSTR ))
+GAPIOGLFUNC( wglDeleteContext,		BOOL,	( HGLRC ))
 
 GAPIOGLFUNC( glBegin,				void,	(GLenum mode))	
 GAPIOGLFUNC( glDisable,			void,	(GLenum cap))

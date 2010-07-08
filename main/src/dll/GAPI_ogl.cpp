@@ -305,6 +305,26 @@ EXTERN_C __declspec(dllexport) BOOL APIENTRY OGL_WglSwapBuffers(HDC hdc)
 	return bRes;
 }
 
+EXTERN_C __declspec(dllexport) BOOL APIENTRY OGL_WglDeleteContext(HGLRC hRc)
+{
+	// New wglSwapBuffers function 
+	DEBUG_TRACE(("+++++++++++++++++++++++++++++++++++++" LOG_CR ));
+	DEBUG_MSG(("OGL_WglDeleteContext: called." LOG_CR));
+
+	// put back saved code fragment
+	g_OGL.m_Hook_Delete.SwapOld(s_wglDeleteContext);
+
+	// if recording, close the AVI file
+	g_OGL.RecordAVI_Reset();
+
+	// call original function
+	BOOL bRes = s_wglDeleteContext(hRc);
+
+	// put JMP instruction again
+	g_OGL.m_Hook_Delete.SwapReset(s_wglDeleteContext);
+	return bRes;
+}
+
 //*******************************************************************
 
 HRESULT CTaksiGAPI_OGL::HookFunctions()
@@ -323,7 +343,16 @@ HRESULT CTaksiGAPI_OGL::HookFunctions()
 	ASSERT( IsValidDll());
 	if ( m_bHookedFunctions )
 	{
-		return S_FALSE;
+		// Verify the hook as Quake 2 is strange when starting (or toggling to
+		// fullscreen), the first hook will be lost since opengl.dll gets
+		// unloaded then loaded again.
+		if ( m_Hook.VerifyHook(s_wglSwapBuffers) )
+		{
+			return S_FALSE;
+		}
+		// At this point the protection is back, so just attempt to re-hook.
+		DEBUG_MSG(("CTaksiGAPI_OGL::HookFunctions: hook got replaced!" LOG_CR));
+		m_bHookedFunctions = false;
 	}
   	
 	// initialize function pointers
@@ -342,11 +371,21 @@ HRESULT CTaksiGAPI_OGL::HookFunctions()
 		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
 	}
 
+	DEBUG_MSG(( "CTaksiGAPI_OGL::HookFunctions: checking JMP-implant..." LOG_CR));
+	if ( ! m_Hook_Delete.InstallHook(s_wglDeleteContext,OGL_WglDeleteContext))
+	{
+		return HRESULT_FROM_WIN32(ERROR_INVALID_HOOK_HANDLE);
+	}
+
 	return __super::HookFunctions();
 }
 
 void CTaksiGAPI_OGL::UnhookFunctions()
 {
+	// restore OpenGL functions
+	m_Hook.RemoveHook(s_wglSwapBuffers);
+	m_Hook_Delete.RemoveHook(s_wglDeleteContext);
+
 	__super::UnhookFunctions();
 }
 
@@ -357,8 +396,8 @@ void CTaksiGAPI_OGL::FreeDll()
 	if ( ! IsValidDll())
 		return;
 
-	// restore wglSwapBuffers
-	m_Hook.RemoveHook(s_wglSwapBuffers);
+	// restore hooked functions
+	UnhookFunctions();
 
 	// release pixel buffers
 	m_SurfTemp.FreeFrame();
@@ -366,4 +405,3 @@ void CTaksiGAPI_OGL::FreeDll()
 	DEBUG_MSG(( "CTaksiGAPI_OGL::FreeDll: done." LOG_CR));
 	__super::FreeDll();
 }
-

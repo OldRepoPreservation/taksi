@@ -45,10 +45,6 @@ protected:
 	}
 	virtual void UnhookFunctions()
 	{
-		// Important to stop the recording now (before DLL_PROCESS_DETACH) so
-		// the WaveIn and codec handles can be properly closed in the case
-		// where the app is exiting while still recording.
-		RecordAVI_Stop();
 		DEBUG_MSG(( "CTaksiGAPIBase::UnhookFunctions" LOG_CR ));
 		m_bHookedFunctions = false;
 	}
@@ -155,6 +151,7 @@ public:
 	ULONG m_iRefCountMe;	// RefCounts that i know i have made.
 
 	CHookJump m_Hook_Present;
+	CHookJump m_Hook_SCPresent;
 	CHookJump m_Hook_Reset;
 	UINT_PTR* m_Hook_AddRef;
 	UINT_PTR* m_Hook_Release;
@@ -196,6 +193,7 @@ private:
 public:
 	bool m_bTestTextureCaps;
 	CHookJump m_Hook;
+	CHookJump m_Hook_Delete;
 	CVideoFrame m_SurfTemp;	// temporary full size frame if we are halfing the image.
 };
 extern CTaksiGAPI_OGL g_OGL;

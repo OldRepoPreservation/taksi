@@ -23,6 +23,7 @@ public:
 	}
 	bool InstallHook( LPVOID pFunc, LPVOID pFuncNew );
 	void RemoveHook( LPVOID pFunc );
+	bool VerifyHook( const LPVOID pFunc ) const;
 	
 	void SwapOld( LPVOID pFunc )
 	{

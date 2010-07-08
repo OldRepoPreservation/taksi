@@ -167,7 +167,7 @@ HRESULT CTaksiGAPI_DX8::RestoreDeviceObjects()
 HRESULT CTaksiGAPI_DX8::InvalidateDeviceObjects(bool bDetaching)
 {
 	// Desc: Destroys all device-dependent objects
-	DEBUG_MSG(("CTaksiGAPI_DX8::InvalidateDeviceObjects: called."));
+	DEBUG_MSG(("CTaksiGAPI_DX8::InvalidateDeviceObjects: called." LOG_CR));
 	//if (bDetaching) return S_OK;
 
     // Delete the state blocks
@@ -216,7 +216,7 @@ HWND CTaksiGAPI_DX8::GetFrameInfo( SIZE& rSize ) // virtual
 		IREF_GETPPTR(pBackBuffer,IDirect3DSurface8));
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x", hRes ));
+		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetBackBuffer FAIL 0x%x" LOG_CR, hRes ));
 		return NULL;
 	}
 
@@ -252,7 +252,7 @@ HWND CTaksiGAPI_DX8::GetFrameInfo( SIZE& rSize ) // virtual
 	hRes = m_pDevice->GetCreationParameters(&params);
 	if (FAILED(hRes))
 	{
-		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x", hRes ));
+		DEBUG_ERR(( "DX8:GetFrameInfo:m_pDevice->GetCreationParameters FAIL 0x%x" LOG_CR, hRes ));
 		return NULL;
 	}
 
@@ -853,7 +853,7 @@ HRESULT CTaksiGAPI_DX8::HookFunctions()
 	s_D3D8_Present = (PFN_DX8_PRESENT)(get_DllInt() + sg_Shared.m_nDX8_Present);
 	s_D3D8_Reset = (PFN_DX8_RESET)(get_DllInt() + sg_Shared.m_nDX8_Reset);
 
-	DEBUG_MSG(( "CTaksiGAPI_DX8::HookFunctions:checking JMP-implants..."));
+	DEBUG_MSG(( "CTaksiGAPI_DX8::HookFunctions:checking JMP-implants..." LOG_CR));
 
 	if ( ! m_Hook_Present.InstallHook(s_D3D8_Present,DX8_Present))
 	{

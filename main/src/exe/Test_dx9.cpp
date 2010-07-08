@@ -75,6 +75,22 @@ bool Test_DirectX9( HWND hWnd )
 		(UINT_PTR)pD3DDevice.get_RefObj(),
 		sg_Shared.m_nDX9_Present, sg_Shared.m_nDX9_Reset ));
 
+	IRefPtr<IDirect3DSwapChain9> pD3DSwapChain;
+	hRes = pD3DDevice->GetSwapChain( 0, IREF_GETPPTR(pD3DSwapChain,IDirect3DSwapChain9) );
+    if (FAILED(hRes))
+    {
+		LOG_MSG(("Test_DirectX9 GetSwapChain failed. 0x%x" LOG_CR, hRes ));
+    }
+	else
+	{
+		pVTable = (UINT_PTR*)(*((UINT_PTR*)pD3DSwapChain.get_RefObj()));
+		ASSERT(pVTable);
+		sg_Shared.m_nDX9_SCPresent = ( pVTable[TAKSI_INTF_DX9_SCPresent] - _DX9.get_DllInt());
+		LOG_MSG(("Test_DirectX9: %08x, GetSwapChain=0%x" LOG_CR,
+			(UINT_PTR)pD3DSwapChain.get_RefObj(),
+			sg_Shared.m_nDX9_SCPresent ));
+	}
+
 	return true;
 }
 

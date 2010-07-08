@@ -335,6 +335,7 @@ MMRESULT CWaveRecorder::Reset()
 {
 	// All headers will be returned now.
 	// Note: this function can hang if the waveIn device/handle is in a bad state
+	// or if called during DLL_PROCESS_DETATCH
 	m_fActive = false;
 	return ::waveInReset( get_Handle());
 }

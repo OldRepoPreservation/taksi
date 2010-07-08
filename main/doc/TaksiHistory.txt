@@ -421,4 +421,9 @@ Paused recording indicator is now gray for OpenGL
 Compensate for record overhead check box will now appear checked (when enabled)
 Right ctrl, alt, and shift keys now recognized when using DirectInput hotkeys
 Stopping record from paused state will clear paused state (return indicator to green)
-AVI header now properly written to handle fractional frame rates, such as 29.97
+AVI header now uses values to handle fractional frame rates, such as 29.97 or 0.5
+Added a DX9 hook for IDirect3DSwapChain9::Present() (more games will now hook with DX9)
+Added an OpenGL hook for wglDeleteContext to reset AVI recording
+Shows proper current state on Stats page
+Recording automatically splits into a new file at ~3.9GB
+Codecs that use additional format data now work (such as Huffyuv)

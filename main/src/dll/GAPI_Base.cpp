@@ -161,7 +161,10 @@ void CTaksiGAPIBase::RecordAVI_Reset()
 	if ( g_AVIFile.IsOpen())
 	{
 		LOG_MSG(( "CTaksiGAPIBase::RecordAVI_Reset" LOG_CR));
+		// an app could be shutting down, so the audio recorder also needs closed
+		g_AVIThread.StopAudioRecorder();
 		g_AVIThread.WaitForAllFrames();
+		g_AVIThread.CloseAudioInputDevice();
 		g_AVIFile.CloseAVI();
 		if ( ! sg_Shared.m_bRecordPause )
 		{
@@ -182,7 +185,7 @@ HRESULT CTaksiGAPIBase::RecordAVI_Start()
 {
 	// Start a new AVI file record. With a new name that has a time stamp.
 
-	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Start" ));
+	DEBUG_MSG(( "CTaksiGAPIBase::RecordAVI_Start" LOG_CR ));
 	sg_Shared.m_bRecordPause = false;
 
 	if ( g_AVIFile.IsOpen())
@@ -290,7 +293,6 @@ void CTaksiGAPIBase::RecordAVI_Stop()
 	//DEBUG_MSG(( "CTaksiGAPIBase:RecordAVI_Stop" LOG_CR));
 	g_AVIThread.StopAudioRecorder();
 	g_AVIThread.WaitForAllFrames();
-	// TODO: at this point there may be audio that still needs written to the AVI file
 	g_AVIThread.CloseAudioInputDevice();
 	g_AVIFile.CloseAVI();
 
@@ -309,7 +311,7 @@ bool CTaksiGAPIBase::RecordAVI_Frame()
 		return true;
 
 	// determine whether this frame needs to be grabbed when recording. or just skipped.
-	// dwFrameDups = multiple time frame shave gone by. compensate for this.
+	// dwFrameDups = multiple time frames have gone by. compensate for this.
 	DWORD dwFrameDups = g_FrameRate.CheckFrameRate();
 	if ( dwFrameDups <= 0)	// i want this frame? or too soon to record a new frame?
 		return true;
@@ -322,7 +324,7 @@ bool CTaksiGAPIBase::RecordAVI_Frame()
 	}
 
 	// NOTE: I cant safely use sg_Config.m_bVideoHalfSize in real time.
-	bool bVideoHalfSize = ( pFrame->m_Video.m_Size.cx < ( g_Proc.m_Stats.m_SizeWnd.cx - 4 ));
+	bool bVideoHalfSize = ( pFrame->m_Video.m_Size.cx <= ( g_Proc.m_Stats.m_SizeWnd.cx >> 1 ));
 
 	CLOCK_START(b);
 	// get pixels from the backbuffer into the new buffer
@@ -350,7 +352,7 @@ void CTaksiGAPIBase::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 	case TAKSI_HOTKEY_ConfigOpen:	// Open the config dialog window.
 		sg_Shared.HotKey_ConfigOpen();
 		return;
-	case TAKSI_HOTKEY_HookModeToggle:	// don't switch during video capture?
+	case TAKSI_HOTKEY_HookModeToggle:
 		sg_Shared.HotKey_HookModeToggle();
 		return;
 	case TAKSI_HOTKEY_IndicatorToggle:
@@ -384,7 +386,7 @@ void CTaksiGAPIBase::ProcessHotKey( TAKSI_HOTKEY_TYPE eHotKey )
 			{
 				// recording paused, stop audio recorder and re-init frame rate
 				g_AVIThread.StopAudioRecorder();
-		g_FrameRate.InitStart();
+				g_FrameRate.InitStart();
 			}
 			else
 			{
@@ -533,6 +535,10 @@ void CTaksiGAPIBase::PresentFrameEnd()
 	{
 		DEBUG_TRACE(( "PresentFrameEnd:StopGAPIs." LOG_CR ));
 		UnhookFunctions();					// we're ordered to unhook methods.
+		// Important to stop the recording now (before DLL_PROCESS_DETACH) so
+		// the WaveIn and codec handles can be properly closed in the case
+		// where the app is exiting while still recording.
+		RecordAVI_Stop();
 		g_Proc.StopGAPIs();
 		// the dll should now unload?
 		return;
