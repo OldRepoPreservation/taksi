@@ -104,7 +104,7 @@ private:
 	static DWORD __stdcall ThreadEntryProc( void* pThis );
 
 #ifdef USE_AUDIO
-	static void CALLBACK AudioInProc( HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 );
+	static void CALLBACK AudioInProc( HWAVEIN hwi, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 	HRESULT WriteAVIAudioBlock( LPBYTE pBuffer, DWORD dwBufferSize, bool bClip = false );
 	HRESULT WriteAVIAudioBlock();
 public:
