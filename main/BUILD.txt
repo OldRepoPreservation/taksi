@@ -2,6 +2,8 @@ BUILD INSTRUCTIONS
 ==========================================================================
 
 There is a Taksi.SLN file for building in Micrsoft Visual Studio 7.1
+There is a Taksi8.SLN file for building in Micrsoft Visual Studio 2005
+There is a Taksi9.SLN file for building in Micrsoft Visual Studio 2008
 
 Alternately the (OUT OF DATE, MUST UPDATE) Makefile (in the src folder) is intended to be used by Microsoft NMAKE 
 tool, which comes with Visual C++ 6. You will need the following 3rd-party
@@ -14,6 +16,16 @@ of the SDK on your disk. Default is \DXSDK9)
 2. OpenGL main header file (gl.h)
 (Usually is installed in Visual Studio standard location for headers.
 If not, modify the Makefile accordingly.)
+
+3. Optional DirectX 8 support
+The DirectX 8 SDK has been deprecated and thus not included in the latest
+DirectX SDK. However, the entire DirectX 8 SDK is not needed for Taksi to
+support DX8.  The only header files that are needed are:
+d3d8.h
+d3d8caps.h
+d3d8types.h
+Have those files in your include path and then make sure USE_DIRECTX8 is
+defined in stdafx.h (it may be commented out).
 
 Three types of build are supported by the current Makefile: 
 "debug", "release", and "perf".
