@@ -40,7 +40,7 @@ Direct3D 8:
    Pro Evolution Soccer 3, Winning Eleven 7 International,
    F1 2001, FIFA 2003, WarCraft III.
    Unreal Tournament 2003, Unreal Tournament 2004,
-   3DMark2001 SE.
+   3DMark2001 SE, Battlefield 1942.
 Direct3D 9:
    Prince of Persia: Sands of Time,
    Leisure Suit Larry: Magna Cum Laude,
