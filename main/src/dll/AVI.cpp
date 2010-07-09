@@ -418,7 +418,7 @@ HRESULT CAVIThread::WriteAVIAudioBlock()
 	return S_OK;
 }
 
-void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 ) // static
+void CALLBACK CAVIThread::AudioInProc( HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 ) // static
 {
 	// waveInProc() = data is ready
 	// uMsg = MM_WIM_DATA etc.
