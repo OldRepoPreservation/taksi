@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_394624437912484B9570ABD6223AF532"
+        "OwnerKey" = "8:_C845236A2E554111A58C6A7BCCE1CD54"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4BF8BEC9A8444A2AAFE9700D956125BA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -51,14 +57,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7EFFDC3F794377786A436A55151B26D8"
+        "MsmKey" = "8:_6DEE3AE85746792C07BCC3AC1CF9849A"
         "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_7EFFDC3F794377786A436A55151B26D8"
+        "MsmKey" = "8:_80C35A886E45124807AC7C1764FCB37E"
         "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_80C35A886E45124807AC7C1764FCB37E"
+        "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -87,32 +99,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BB6072BA3370475CBD12F7F770037E4E"
-        "OwnerKey" = "8:_D57C4C33B23D49FEBF140B5E440654D1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C44687CE49D80F9A0D807918DF3C68AD"
-        "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D57C4C33B23D49FEBF140B5E440654D1"
-        "OwnerKey" = "8:_890D5F6452A24ADD9D136684C28B9368"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D57C4C33B23D49FEBF140B5E440654D1"
-        "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D57C4C33B23D49FEBF140B5E440654D1"
+        "MsmKey" = "8:_C845236A2E554111A58C6A7BCCE1CD54"
         "OwnerKey" = "8:_60320F92D0F14B6797D1CD81DC4EED2A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C845236A2E554111A58C6A7BCCE1CD54"
+        "OwnerKey" = "8:_DB8E8A6D92F2418F81FBC11732FF0FC2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C845236A2E554111A58C6A7BCCE1CD54"
+        "OwnerKey" = "8:_890D5F6452A24ADD9D136684C28B9368"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -310,7 +310,27 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7EFFDC3F794377786A436A55151B26D8"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6DEE3AE85746792C07BCC3AC1CF9849A"
+            {
+            "SourcePath" = "8:TaksiDll.dll"
+            "TargetName" = "8:TaksiDll.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_80C35A886E45124807AC7C1764FCB37E"
             {
             "SourcePath" = "8:TaksiCommon.dll"
             "TargetName" = "8:TaksiCommon.dll"
@@ -374,26 +394,6 @@
             {
             "SourcePath" = "8:MSVFW32.dll"
             "TargetName" = "8:MSVFW32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C44687CE49D80F9A0D807918DF3C68AD"
-            {
-            "SourcePath" = "8:TaksiDll.dll"
-            "TargetName" = "8:TaksiDll.dll"
             "Tag" = "8:"
             "Folder" = "8:_B9C165177949444D9AC1312B7C4CC67D"
             "Condition" = "8:"
@@ -504,23 +504,23 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Taksi Desktop Video Recorder v0.778"
-        "ProductCode" = "8:{B8DAFC64-EC25-47FA-8413-FC7FA41A6AB0}"
-        "PackageCode" = "8:{7CF55560-4D8D-4191-9B68-48181E0BABC1}"
+        "ProductName" = "8:Taksi Desktop Video Recorder v0.779"
+        "ProductCode" = "8:{519ACA84-2F7E-4482-8201-B0DCB6C8B3A5}"
+        "PackageCode" = "8:{8C5579D2-BB0F-4256-819E-DBA10E6DC197}"
         "UpgradeCode" = "8:{24F27168-C6D5-4236-B614-30CC5E2D0044}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.7.78"
+        "ProductVersion" = "8:0.7.79"
         "Manufacturer" = "8:Menasoft"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.menasoft.com/taksi"
-        "Title" = "8:Taksi Desktop Video Recorder v0.778"
+        "Title" = "8:Taksi Desktop Video Recorder v0.779"
         "Subject" = "8:Desktop Video Recorder"
         "ARPCONTACT" = "8:Menasoft"
         "Keywords" = "8:Taksi Desktop Video Recorder"
-        "ARPCOMMENTS" = "8:Taksi Desktop Video Recorder v0.778"
+        "ARPCOMMENTS" = "8:Taksi Desktop Video Recorder v0.779"
         "ARPURLINFOABOUT" = "8:http://www.menasoft.com"
         "ARPPRODUCTICON" = "8:_4F1297FD3B08473FB6C6EFA2EF179DA4"
         "ARPIconIndex" = "3:0"
@@ -1059,30 +1059,30 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_BB6072BA3370475CBD12F7F770037E4E"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_394624437912484B9570ABD6223AF532"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86.msm"
+            "SourcePath" = "8:policy_8_0_microsoft_vc80_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
             "LanguageId" = "3:0"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "Folder" = "8:"
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D57C4C33B23D49FEBF140B5E440654D1"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C845236A2E554111A58C6A7BCCE1CD54"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC80_CRT_x86.msm"
+            "SourcePath" = "8:Microsoft_VC80_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
             "LanguageId" = "3:0"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "Folder" = "8:"
             "Feature" = "8:"
             "IsolateTo" = "8:"
