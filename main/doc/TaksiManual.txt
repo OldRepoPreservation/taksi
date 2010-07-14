@@ -212,25 +212,32 @@ captured in Adaptive mode.
 
 5) Recommended video codecs:
 ============================
-1. ffshow-tryouts
-There are a few encoders in ffshow-tryouts that can work well for real-time
-recordings. For the lossy encoders the "one pass quality" or "one pass
-quantizer" modes are known to work well.
+1. x264vfw
+To optimize x264vfw for fast encoding, use the Ultrafast Preset. You should
+enable the "Zero Latency" option, otherwise the audio may be out of sync.
+For the Rate control, select one of the "Single pass" options.
 
-MJPEG: Very fast but uses more disk space compared to MPEG and x264. All
-       frames are key frames so this is nice for editing. Quality values
-	   of 90 or more have minimal to no noticeable artifacts.
+You may want to use the "--fps" option in "extra command line (for advanced
+users)" to make sure the h264/AVC stream is tagged with the frame rate that
+matches what you record at. For example, "--fps 30" will specify 30 frames
+per second.
 
-MS MPEG4 v2: Smaller files than MJPEG but slower.
+2. ffdshow tryouts
+There are various encoders in ffdshow that can work well for real-time
+recordings. For the lossy encoders, select one of the "one pass" options
+for the Mode.
 
-MPEG-2: Smaller files than MS MPEG4 v2 but probably slower.
-        Make sure "b frames" is unchecked in the Generic options.
+MJPEG: Fast but uses more disk space compared to other lossy formats.
+       All frames are key frames so this is nice for editing.
 
-MPEG-4: Smaller files than MPEG-2 but probably slower.
-        Make sure "b frames" is unchecked in the Generic options. Make sure 
-        "Qpel" in the "motion estimation" is unchecked.
+MPEG-1: Make sure "b frames" in the Generic options is unchecked.
 
-FLV1: File size somewhere between MJPEG and MPEG-2.
+MPEG-2: Make sure "b frames" in the Generic options is unchecked.
+
+MPEG-4: Make sure "b frames" in the Generic options is unchecked.
+        Make sure "Qpel" in "Motion estimation" is unchecked.
+
+other lossy formats: FLV1, MS MPEG4 v2, WMV 7
 
 Huffyuv: Very fast lossless codec. At high resolutions and/or frame rates
          a lot of disk space will be needed (and a fast drive).
@@ -238,13 +245,6 @@ Huffyuv: Very fast lossless codec. At high resolutions and/or frame rates
 FFV1: Lossless codec, slower than Huffyuv but better compression.
 
 Lossless JPEG: another lossless option, slower than Huffyuv.
-
-2. x264vfw
-To optimize x264vfw for fast encoding, use the Ultrafast Preset. You should
-enable the "Zero Latency" otherwise your recorded video may have glitches.
-The "Single pass - ratefactor-based (CRF)" is probably the best rate control
-option with a ratefactor value of 23 or less.  Higher ratefactor values may
-have noticeable artifacts.
 
 
 9. Credits:
