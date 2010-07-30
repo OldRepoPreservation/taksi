@@ -87,6 +87,7 @@ HRESULT CTaksiGAPIBase::MakeScreenShotGDIP( TCHAR* pszFileName, CVideoFrame& fra
 		hRes = S_OK;
 	}
 	delete pBitmap;	//done with it.
+	g_gdiplus.DetachGDIPInt();
 	return hRes;
 }
 

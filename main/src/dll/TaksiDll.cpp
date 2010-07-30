@@ -658,6 +658,9 @@ void CTaksiProcess::StopGAPIs()
 	g_AVIFile.CloseAVI();	// close AVI file, if we were in recording mode 
 	g_HotKeys.DetachHotKeys();
 	m_hWndHookTry = NULL;	// Not trying to do anything anymore.
+#ifdef USE_GDIP
+	g_gdiplus.DetachGDIPInt();
+#endif
 }
 
 void CTaksiProcess::DetachGAPIs()
@@ -823,10 +826,6 @@ bool CTaksiProcess::OnDllProcessDetach()
 
 	// close specific log file 
 	g_Log.CloseLogFile();
-
-#ifdef USE_GDIP
-	g_gdiplus.DetachGDIPInt();
-#endif
 
 	// log information on which process unmapped the DLL 
 	sg_Shared.LogMessage( _T("unmapped: "));
