@@ -64,7 +64,7 @@ void CImageGDIPInt::DetachGDIPInt()
 		return;
 	if ( m_Token )
 	{
-		Gdiplus::GdiplusShutdown(m_Token);
+		Gdiplus::GdiplusShutdown(m_Token);	// as per MSDN, do not call in DllMain (might hang)
 		m_Token = 0;
 	}
 	FreeDll();
