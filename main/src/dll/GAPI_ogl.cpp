@@ -396,8 +396,9 @@ void CTaksiGAPI_OGL::FreeDll()
 	if ( ! IsValidDll())
 		return;
 
-	// restore hooked functions
-	UnhookFunctions();
+	// restore hooked functions if DLL is still loaded
+	if ( ::GetModuleHandle(get_DLLName()))
+		UnhookFunctions();
 
 	// release pixel buffers
 	m_SurfTemp.FreeFrame();

@@ -891,7 +891,10 @@ void CTaksiGAPI_DX8::FreeDll()
 		return;
 
 	InvalidateDeviceObjects(true);
-	UnhookFunctions();
+	
+	// restore hooked functions if DLL is still loaded
+	if ( ::GetModuleHandle(get_DLLName()))
+		UnhookFunctions();
 
 	DEBUG_MSG(( "CTaksiGAPI_DX8::FreeDll:done." LOG_CR));
 	__super::FreeDll();

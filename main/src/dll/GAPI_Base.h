@@ -25,6 +25,10 @@ public:
 	virtual TAKSI_GAPI_TYPE get_GAPIType() const = 0;
 
 	HRESULT AttachGAPI();
+	virtual void FreeDll()
+	{
+		__super::FreeDll();
+	}
 
 	void PresentFrameBegin( bool bDrawIndicator );
 	void PresentFrameEnd();
