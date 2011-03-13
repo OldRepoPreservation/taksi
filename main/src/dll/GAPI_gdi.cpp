@@ -182,7 +182,10 @@ HRESULT CTaksiGAPI_GDI::GetFrame( CVideoFrame& frame, bool bHalfSize )
 	{
 		return HRes_GetLastErrorDef(CONVERT10_E_STG_DIB_TO_BITMAP);
 	}
-	DrawMouse(MemDC,bHalfSize);	// Draw Mouse cursor if they want that.
+	if ( sg_Config.m_bGDICursor )
+	{
+		DrawMouse(MemDC,bHalfSize);	// Draw Mouse cursor if they want that.
+	}
 	}
 #ifdef _DEBUG
 	BITMAP BitmapInfo;

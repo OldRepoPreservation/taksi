@@ -326,6 +326,7 @@ void CGuiConfig::UpdateSettings( const CTaksiConfig& config )
 
 	// Display options
 	UPDATE_CHECK(GDIFrame,config.m_bGDIFrame);
+	UPDATE_CHECK(GDICursor,config.m_bGDICursor);
 	UPDATE_CHECK(MasterTopMost,config.m_bMasterTopMost);
 	UPDATE_CHECK(UseOverheadCompensation,config.m_bUseOverheadCompensation);
 
@@ -678,6 +679,9 @@ bool CGuiConfig::OnCommand( int id, int iNotify, HWND hControl )
 		return true;
 	case IDC_C_UseOverheadCompensation:
 		sg_Config.m_bUseOverheadCompensation = g_Config.m_bUseOverheadCompensation = OnCommandCheck( m_hControlUseOverheadCompensation );
+		return true;
+	case IDC_C_GDICursor:
+		sg_Config.m_bGDICursor = g_Config.m_bGDICursor = OnCommandCheck( m_hControlGDICursor );
 		return true;
 
 	case IDC_C_GDIDesktop:

@@ -161,6 +161,7 @@ BEGIN
     CONTROL         "Allow capture of full desktop",IDC_C_GDIDesktop,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,136,10
     CONTROL         "Record GDI Frame",IDC_C_GDIFrame,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,137,10
     CONTROL         "Hook OpenGL",IDC_C_UseOGL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,173,63,89,10
+	CONTROL         "Record GDI Cursor",IDC_C_GDICursor,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,76,137,10
     CONTROL         "Hook DirectX8",IDC_C_UseDX8,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,173,76,89,10
     CONTROL         "Hook DirectX9",IDC_C_UseDX9,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,173,89,89,10
     CONTROL         "Control Window Always on Top.",IDC_C_MasterTopMost,
@@ -431,7 +432,9 @@ BEGIN
     IDC_C_StatsClear        "Clear the stats values"
     IDC_C_UseOverheadCompensation 
                             "Check = compensate for the overhead of recording to keep videos at their original speed. (Good for cinematics) Unchecked = play videos as observed during record."
+	IDC_C_GDIDesktop		"Record the entire desktop"
 	IDC_C_GDIFrame          "Include window frame for GDI Window recordings"
+	IDC_C_GDICursor         "Include the cursor for GDI Window recordings"
 END
 
 STRINGTABLE 

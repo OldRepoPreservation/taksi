@@ -23,6 +23,7 @@ ConfigProp(FileNamePostfix,			m_szFileNamePostfix, "Postfix the saved file name 
 
 ConfigProp(GDIDesktop,				m_abUseGAPI[TAKSI_GAPI_DESKTOP], "Allow hooking of the GDI Desktop")
 ConfigProp(GDIFrame,				m_bGDIFrame,		"Record the GDI frame or just the client area")
+ConfigProp(GDICursor,				m_bGDICursor,		"Record the cursor for GDI Window captures")
 
 ConfigProp(ImageFormatExt,			m_szImageFormatExt,	"The image format for screen shots (png,bmp,jpeg)")
 
