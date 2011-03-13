@@ -123,6 +123,7 @@ public:
 
 	bool   m_bUseOverheadCompensation;	// for computing the frame rate
 	bool   m_bGDIFrame;		// record the frame of GDI windows or not ?
+	bool   m_bGDICursor;	// record the cursor in GDI windows
 	bool   m_abUseGAPI[TAKSI_GAPI_QTY];	// Use this API? true by default
 
 	// CAN NOT be set from CGuiConfig directly

@@ -38,7 +38,8 @@ GuiConfigControl(CustomUseCurrent,	   4, "Use the current hooked apps info to fi
 
 //GuiConfigControl(OverlayVerbose,        5, "Indicator has verbose text")
 GuiConfigControl(GDIDesktop,            5, "")
-GuiConfigControl(GDIFrame,              5, "")
+GuiConfigControl(GDIFrame,              5, "Record the GDI frame or just the client area")
+GuiConfigControl(GDICursor,             5, "Record the cursor for GDI Window captures")
 GuiConfigControl(MasterTopMost,			5,	"Make sure the control window is always on top")
 GuiConfigControl(UseOverheadCompensation, 5, "Attempt to compensate for the overhead of recording")
 

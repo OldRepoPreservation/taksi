@@ -87,6 +87,7 @@
 #define IDC_C_UseOGL                    1076
 #define IDC_C_UseDX8                    1077
 #define IDC_C_UseDX9                    1078
+#define IDC_C_GDICursor					1079
 #define IDS_APP_DESC                    2000
 #define IDS_GuiConfigHelp1              2010
 #define IDS_GuiConfigHelp2              2011
